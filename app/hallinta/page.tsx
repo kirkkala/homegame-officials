@@ -154,6 +154,9 @@ export default function HallintaPage() {
                 <GroupIcon color="primary" />
                 <Typography variant="h6">Pelaajat</Typography>
               </Stack>
+              <Typography variant="body2" color="text.secondary" mb={2}>
+                Joukkueen pelaajat, kenelle osoitetaan toimisijavuorovastuu.
+              </Typography>
 
               <form onSubmit={handleAddPlayers}>
                 <TextField

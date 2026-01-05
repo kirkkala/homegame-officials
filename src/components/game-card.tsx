@@ -12,12 +12,27 @@ import MenuItem from "@mui/material/MenuItem"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import ListItemText from "@mui/material/ListItemText"
 import Divider from "@mui/material/Divider"
+import Dialog from "@mui/material/Dialog"
+import DialogTitle from "@mui/material/DialogTitle"
+import DialogContent from "@mui/material/DialogContent"
+import DialogActions from "@mui/material/DialogActions"
+import TextField from "@mui/material/TextField"
+import Box from "@mui/material/Box"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
 import AssignmentIcon from "@mui/icons-material/Assignment"
 import TimerIcon from "@mui/icons-material/Timer"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty"
+import PersonIcon from "@mui/icons-material/Person"
+import GroupIcon from "@mui/icons-material/Group"
 import ClearIcon from "@mui/icons-material/Clear"
-import { assignOfficial, getPlayers, type Player, type Game } from "@/lib/storage"
+import {
+  updateOfficial,
+  getPlayers,
+  type Player,
+  type Game,
+  type OfficialAssignment,
+} from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
 const ROLES = {
@@ -25,19 +40,26 @@ const ROLES = {
   kello: { label: "Kello", Icon: TimerIcon },
 } as const
 
+type Role = "poytakirja" | "kello"
+
 function OfficialButton({
   role,
-  name,
-  onAssign,
+  assignment,
+  onUpdate,
 }: {
-  role: "poytakirja" | "kello"
-  name: string | null
-  onAssign: (playerName: string | null) => void
+  role: Role
+  assignment: OfficialAssignment | null
+  onUpdate: (assignment: OfficialAssignment | null) => void
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [players, setPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogType, setDialogType] = useState<"guardian" | "pool">("guardian")
+  const [name, setName] = useState("")
   const { label, Icon } = ROLES[role]
+
+  const isConfirmed = assignment?.handledBy != null
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const target = event.currentTarget
@@ -48,9 +70,56 @@ function OfficialButton({
     setLoading(false)
   }
 
-  const handleSelect = (playerName: string | null) => {
-    onAssign(playerName)
+  const handleSelectPlayer = (playerName: string) => {
+    // Confirm if changing from existing assignment
+    if (assignment && assignment.playerName !== playerName) {
+      if (!confirm(`Vaihdetaanko ${assignment.playerName} → ${playerName}?`)) {
+        setAnchorEl(null)
+        return
+      }
+    }
+    onUpdate({ playerName, handledBy: null, confirmedBy: null })
     setAnchorEl(null)
+  }
+
+  const handleOpenDialog = (type: "guardian" | "pool") => {
+    setAnchorEl(null)
+    setDialogType(type)
+    setDialogOpen(true)
+    setName("")
+  }
+
+  const handleConfirm = () => {
+    if (assignment) {
+      // Huoltaja requires name, pool doesn't
+      if (dialogType === "guardian" && !name.trim()) return
+      onUpdate({
+        ...assignment,
+        handledBy: dialogType,
+        confirmedBy: name.trim() || null,
+      })
+      setDialogOpen(false)
+    }
+  }
+
+  const handleClear = () => {
+    if (confirm(`Poistetaanko ${assignment?.playerName} valinta?`)) {
+      onUpdate(null)
+    }
+    setAnchorEl(null)
+  }
+
+  const getButtonColor = () => {
+    if (!assignment) return "warning"
+    return isConfirmed ? "success" : "info"
+  }
+
+  const getStatusLabel = () => {
+    if (!assignment?.handledBy) return "Odottaa vahvistusta"
+    if (assignment.handledBy === "guardian") {
+      return assignment.confirmedBy
+    }
+    return assignment.confirmedBy ? `${assignment.confirmedBy} (poolista)` : "Juniori poolista"
   }
 
   return (
@@ -60,57 +129,123 @@ function OfficialButton({
         onClick={handleClick}
         disabled={loading}
         startIcon={<Icon />}
-        color={name ? "success" : "warning"}
-        sx={{ flex: 1, justifyContent: "flex-start" }}
+        color={getButtonColor()}
+        sx={{ flex: 1, justifyContent: "flex-start", textAlign: "left" }}
       >
-        <Stack alignItems="flex-start">
+        <Stack alignItems="flex-start" sx={{ overflow: "hidden" }}>
           <Typography variant="caption">{label}</Typography>
-          <Typography variant="body2" fontWeight={name ? "bold" : "normal"}>
-            {loading ? "Ladataan..." : name || "Valitse..."}
+          <Typography variant="body2" fontWeight={assignment ? "bold" : "normal"} noWrap>
+            {loading ? "Ladataan..." : assignment?.playerName || "Valitse pelaaja..."}
           </Typography>
+          {assignment && (
+            <Box sx={{ mt: 0.5 }}>
+              <Chip
+                label={getStatusLabel()}
+                size="small"
+                color={isConfirmed ? "success" : "warning"}
+                icon={isConfirmed ? <CheckCircleIcon /> : <HourglassEmptyIcon />}
+              />
+            </Box>
+          )}
         </Stack>
       </Button>
+
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
-        {players.length === 0 && (
-          <MenuItem disabled>
-            <ListItemText>Ei pelaajia. Lisää ensin.</ListItemText>
-          </MenuItem>
-        )}
-        {name && (
-          <MenuItem onClick={() => handleSelect(null)}>
-            <ListItemIcon>
-              <ClearIcon color="error" />
-            </ListItemIcon>
-            <ListItemText>Poista valinta</ListItemText>
-          </MenuItem>
-        )}
-        {name && <Divider />}
-        {players.map((player) => (
-          <MenuItem
-            key={player.id}
-            onClick={() => handleSelect(player.name)}
-            selected={player.name === name}
-          >
-            {player.name === name && (
+        {[
+          assignment && !isConfirmed && (
+            <MenuItem key="guardian" onClick={() => handleOpenDialog("guardian")}>
               <ListItemIcon>
-                <CheckCircleIcon color="success" />
+                <GroupIcon color="primary" />
               </ListItemIcon>
-            )}
-            <ListItemText inset={player.name !== name}>{player.name}</ListItemText>
-          </MenuItem>
-        ))}
+              <ListItemText>Huoltaja tekee vuoron</ListItemText>
+            </MenuItem>
+          ),
+          assignment && !isConfirmed && (
+            <MenuItem key="pool" onClick={() => handleOpenDialog("pool")}>
+              <ListItemIcon>
+                <PersonIcon color="secondary" />
+              </ListItemIcon>
+              <ListItemText>Juniori poolista</ListItemText>
+            </MenuItem>
+          ),
+          assignment && !isConfirmed && <Divider key="d1" />,
+          assignment && (
+            <MenuItem key="clear" onClick={handleClear}>
+              <ListItemIcon>
+                <ClearIcon color="error" />
+              </ListItemIcon>
+              <ListItemText>Poista valinta</ListItemText>
+            </MenuItem>
+          ),
+          assignment && <Divider key="d2" />,
+          players.length === 0 && (
+            <MenuItem key="empty" disabled>
+              <ListItemText>Ei pelaajia</ListItemText>
+            </MenuItem>
+          ),
+          ...players.map((player) => (
+            <MenuItem
+              key={player.id}
+              onClick={() => handleSelectPlayer(player.name)}
+              selected={assignment?.playerName === player.name}
+            >
+              <ListItemText inset>{player.name}</ListItemText>
+            </MenuItem>
+          )),
+        ].filter(Boolean)}
       </Menu>
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>
+          {dialogType === "guardian" ? "Huoltaja tekee vuoron" : "Juniori poolista"}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            {dialogType === "guardian" ? (
+              <>
+                Kuka hoitaa pelaajan <strong>{assignment?.playerName}</strong> toimitsijavuoron?
+              </>
+            ) : (
+              <>
+                Juniori poolista hoitaa pelaajan <strong>{assignment?.playerName}</strong>{" "}
+                toimitsija-vuoron. Nimi on valinnainen.
+              </>
+            )}
+          </Typography>
+          <TextField
+            autoFocus
+            fullWidth
+            label={dialogType === "guardian" ? "Huoltajan nimi" : "Juniorin nimi (valinnainen)"}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            size="small"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Peruuta</Button>
+          <Button
+            onClick={handleConfirm}
+            variant="contained"
+            disabled={dialogType === "guardian" && !name.trim()}
+          >
+            Vahvista
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }
 
 export function GameCard({ game: initialGame }: { game: Game }) {
   const [game, setGame] = useState(initialGame)
-  const allAssigned = game.officials.poytakirja && game.officials.kello
 
-  const handleAssign = async (role: "poytakirja" | "kello", playerName: string | null) => {
-    setGame({ ...game, officials: { ...game.officials, [role]: playerName } })
-    await assignOfficial(game.id, role, playerName)
+  const isComplete = (a: OfficialAssignment | null) => a?.handledBy != null
+  const allConfirmed = isComplete(game.officials.poytakirja) && isComplete(game.officials.kello)
+  const hasAssignments = game.officials.poytakirja || game.officials.kello
+
+  const handleUpdate = async (role: Role, assignment: OfficialAssignment | null) => {
+    const updated = await updateOfficial(game.id, role, assignment)
+    setGame(updated)
   }
 
   return (
@@ -121,10 +256,16 @@ export function GameCard({ game: initialGame }: { game: Game }) {
             <Stack direction="row" gap={1} mb={1}>
               <Chip label={game.divisionId} size="small" color="primary" variant="outlined" />
               <Chip
-                label={allAssigned ? "Toimitsijat nimetty" : "Toimitsijat nimemättä"}
+                label={allConfirmed ? "Kunnossa" : hasAssignments ? "Odottaa" : "Ei toimitsijaa"}
                 size="small"
-                color={allAssigned ? "success" : "error"}
-                icon={allAssigned ? <CheckCircleIcon /> : undefined}
+                color={allConfirmed ? "success" : hasAssignments ? "warning" : "error"}
+                icon={
+                  allConfirmed ? (
+                    <CheckCircleIcon />
+                  ) : hasAssignments ? (
+                    <HourglassEmptyIcon />
+                  ) : undefined
+                }
               />
             </Stack>
             <Typography variant="h6" fontWeight="bold">
@@ -146,16 +287,16 @@ export function GameCard({ game: initialGame }: { game: Game }) {
           <Typography variant="body2">{game.location}</Typography>
         </Stack>
 
-        <Stack direction="row" gap={1}>
+        <Stack direction={{ xs: "column", sm: "row" }} gap={1}>
           <OfficialButton
             role="poytakirja"
-            name={game.officials.poytakirja}
-            onAssign={(name) => handleAssign("poytakirja", name)}
+            assignment={game.officials.poytakirja}
+            onUpdate={(a) => handleUpdate("poytakirja", a)}
           />
           <OfficialButton
             role="kello"
-            name={game.officials.kello}
-            onAssign={(name) => handleAssign("kello", name)}
+            assignment={game.officials.kello}
+            onUpdate={(a) => handleUpdate("kello", a)}
           />
         </Stack>
       </CardContent>

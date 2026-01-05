@@ -3,6 +3,12 @@ import path from "path"
 
 const DB_PATH = path.join(process.cwd(), "data", "db.json")
 
+export type OfficialAssignment = {
+  playerName: string
+  handledBy: "guardian" | "pool" | null
+  confirmedBy: string | null
+}
+
 export type Game = {
   id: string
   divisionId: string
@@ -10,7 +16,10 @@ export type Game = {
   date: string
   time: string
   location: string
-  officials: { poytakirja: string | null; kello: string | null }
+  officials: {
+    poytakirja: OfficialAssignment | null
+    kello: OfficialAssignment | null
+  }
   createdAt: string
 }
 

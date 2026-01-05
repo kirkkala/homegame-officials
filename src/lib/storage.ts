@@ -1,5 +1,11 @@
 // API-based storage - data is stored in data/db.json via API routes
 
+export type OfficialAssignment = {
+  playerName: string // Player whose turn it is
+  handledBy: "guardian" | "pool" | null // Who handles the shift
+  confirmedBy: string | null // Name (required for guardian, optional for pool)
+}
+
 export type Game = {
   id: string
   divisionId: string
@@ -8,8 +14,8 @@ export type Game = {
   time: string
   location: string
   officials: {
-    poytakirja: string | null
-    kello: string | null
+    poytakirja: OfficialAssignment | null
+    kello: OfficialAssignment | null
   }
   createdAt: string
 }
@@ -41,19 +47,15 @@ export async function clearAllGames(): Promise<void> {
   await fetch("/api/games", { method: "DELETE" })
 }
 
-export async function assignOfficial(
+export async function updateOfficial(
   gameId: string,
   role: "poytakirja" | "kello",
-  playerName: string | null
+  assignment: OfficialAssignment | null
 ): Promise<Game> {
   const res = await fetch(`/api/games/${gameId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      officials: {
-        [role]: playerName,
-      },
-    }),
+    body: JSON.stringify({ officials: { [role]: assignment } }),
   })
   return res.json()
 }
