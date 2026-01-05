@@ -1,7 +1,7 @@
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import { GamesList } from "@/components/games-list";
-import { MainHeader } from "@/components/header";
+import Container from "@mui/material/Container"
+import Box from "@mui/material/Box"
+import { GamesList } from "@/components/games-list"
+import { MainHeader } from "@/components/header"
 
 export default function Home() {
   return (
@@ -11,5 +11,5 @@ export default function Home() {
         <GamesList />
       </Container>
     </Box>
-  );
+  )
 }

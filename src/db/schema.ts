@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, integer, date, time } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer, date, time } from "drizzle-orm/pg-core"
 
 // Pelaajat / Players (parents are identified by player name)
 export const players = pgTable("players", {
@@ -8,14 +8,14 @@ export const players = pgTable("players", {
   phone: text("phone"), // Puhelinnumero
   email: text("email"), // Sähköposti
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+})
 
 // Sarjat / Divisions
 export const divisions = pgTable("divisions", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(), // esim. "U12", "U14", "U16"
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+})
 
 // Kotipelit / Home games
 export const games = pgTable("games", {
@@ -28,7 +28,7 @@ export const games = pgTable("games", {
   gameTime: time("game_time").notNull(), // Pelin alkamisaika
   location: text("location"), // Pelipaikka
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+})
 
 // Toimitsijat / Game officials assignments
 export const assignments = pgTable("assignments", {
@@ -41,15 +41,14 @@ export const assignments = pgTable("assignments", {
     .notNull(),
   role: text("role").notNull(), // "pöytäkirja" tai "kello"
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+})
 
 // Types for TypeScript
-export type Player = typeof players.$inferSelect;
-export type NewPlayer = typeof players.$inferInsert;
-export type Division = typeof divisions.$inferSelect;
-export type NewDivision = typeof divisions.$inferInsert;
-export type Game = typeof games.$inferSelect;
-export type NewGame = typeof games.$inferInsert;
-export type Assignment = typeof assignments.$inferSelect;
-export type NewAssignment = typeof assignments.$inferInsert;
-
+export type Player = typeof players.$inferSelect
+export type NewPlayer = typeof players.$inferInsert
+export type Division = typeof divisions.$inferSelect
+export type NewDivision = typeof divisions.$inferInsert
+export type Game = typeof games.$inferSelect
+export type NewGame = typeof games.$inferInsert
+export type Assignment = typeof assignments.$inferSelect
+export type NewAssignment = typeof assignments.$inferInsert
