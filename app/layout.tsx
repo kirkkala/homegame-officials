@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
-import "./globals.css";
-
-const outfit = Outfit({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import { ThemeRegistry } from "@/theme/ThemeRegistry";
 
 export const metadata: Metadata = {
   title: "Kotipelien toimitsijat",
@@ -20,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fi">
-      <body className={`${outfit.variable} antialiased`}>{children}</body>
+      <body>
+        <AppRouterCacheProvider>
+          <ThemeRegistry>{children}</ThemeRegistry>
+        </AppRouterCacheProvider>
+      </body>
     </html>
   );
 }

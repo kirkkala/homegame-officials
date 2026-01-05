@@ -1,13 +1,15 @@
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 import { GamesList } from "@/components/games-list";
-import { Header } from "@/components/header";
+import { MainHeader } from "@/components/header";
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="mx-auto max-w-4xl px-4 py-8">
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <MainHeader />
+      <Container maxWidth="md" sx={{ py: 4 }}>
         <GamesList />
-      </main>
-    </div>
+      </Container>
+    </Box>
   );
 }

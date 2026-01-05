@@ -1,210 +1,135 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { assignOfficial, getPlayers, type Player } from "@/lib/storage";
+import { useState } from "react";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import TimerIcon from "@mui/icons-material/Timer";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ClearIcon from "@mui/icons-material/Clear";
+import { assignOfficial, getPlayers, type Player, type Game } from "@/lib/storage";
+import { formatDate } from "@/lib/utils";
 
-type Game = {
-  id: string;
-  division: string;
-  opponent: string;
-  date: string;
-  time: string;
-  location: string;
-  officials: {
-    poytakirja: string | null;
-    kello: string | null;
-  };
-};
+const ROLES = {
+  poytakirja: { label: "Pöytäkirja", Icon: AssignmentIcon },
+  kello: { label: "Kello", Icon: TimerIcon },
+} as const;
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  const weekdays = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];
-  const months = [
-    "tammi", "helmi", "maalis", "huhti", "touko", "kesä",
-    "heinä", "elo", "syys", "loka", "marras", "joulu",
-  ];
-
-  const weekday = weekdays[date.getDay()];
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-
-  return `${weekday} ${day}. ${month}`;
-}
-
-function OfficialBadge({
-  gameId,
+function OfficialButton({
   role,
   name,
   onAssign,
 }: {
-  gameId: string;
   role: "poytakirja" | "kello";
   name: string | null;
-  onAssign: (role: "poytakirja" | "kello", playerName: string | null) => void;
+  onAssign: (playerName: string | null) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const isAssigned = name !== null;
-  const icon = role === "poytakirja" ? "📋" : "⏱️";
-  const roleLabel = role === "poytakirja" ? "Pöytäkirja" : "Kello";
+  const [loading, setLoading] = useState(false);
+  const { label, Icon } = ROLES[role];
 
-  const handleClick = async () => {
-    setIsLoading(true);
+  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const target = event.currentTarget;
+    setLoading(true);
     const loadedPlayers = await getPlayers();
     setPlayers(loadedPlayers);
-    setIsLoading(false);
-    setIsOpen(true);
+    setAnchorEl(target);
+    setLoading(false);
   };
 
   const handleSelect = (playerName: string | null) => {
-    onAssign(role, playerName);
-    setIsOpen(false);
+    onAssign(playerName);
+    setAnchorEl(null);
   };
 
   return (
-    <div className="relative">
-      <button
+    <>
+      <Button
+        variant="outlined"
         onClick={handleClick}
-        disabled={isLoading}
-        className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left transition-all ${
-          isAssigned
-            ? "bg-success/10 text-success hover:bg-success/20"
-            : "bg-warning/10 text-warning hover:bg-warning/20"
-        }`}
+        disabled={loading}
+        startIcon={<Icon />}
+        color={name ? "success" : "warning"}
+        sx={{ flex: 1, justifyContent: "flex-start" }}
       >
-        <span>{isLoading ? "⏳" : icon}</span>
-        <div className="flex flex-col">
-          <span className="font-medium">{roleLabel}</span>
-          <span className={isAssigned ? "" : "italic"}>
-            {name || "Valitse →"}
-          </span>
-        </div>
-      </button>
-
-      {/* Dropdown */}
-      {isOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-xl border border-border bg-surface shadow-lg overflow-hidden">
-            <div className="max-h-48 overflow-y-auto">
-              {players.length === 0 ? (
-                <div className="px-4 py-3 text-sm text-muted">
-                  Ei pelaajia. Lisää pelaajia ensin.
-                </div>
-              ) : (
-                <>
-                  {isAssigned && (
-                    <button
-                      onClick={() => handleSelect(null)}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600"
-                    >
-                      ✕ Poista valinta
-                    </button>
-                  )}
-                  {players.map((player) => (
-                    <button
-                      key={player.id}
-                      onClick={() => handleSelect(player.name)}
-                      className={`w-full px-4 py-2 text-left text-sm hover:bg-muted/10 ${
-                        player.name === name ? "bg-primary/10 text-primary font-medium" : ""
-                      }`}
-                    >
-                      {player.name}
-                    </button>
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+        <Stack alignItems="flex-start">
+          <Typography variant="caption">{label}</Typography>
+          <Typography variant="body2" fontWeight={name ? "bold" : "normal"}>
+            {loading ? "Ladataan..." : name || "Valitse..."}
+          </Typography>
+        </Stack>
+      </Button>
+      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
+        {players.length === 0 && (
+          <MenuItem disabled>
+            <ListItemText>Ei pelaajia. Lisää ensin.</ListItemText>
+          </MenuItem>
+        )}
+        {name && <MenuItem onClick={() => handleSelect(null)}><ListItemIcon><ClearIcon color="error" /></ListItemIcon><ListItemText>Poista valinta</ListItemText></MenuItem>}
+        {name && <Divider />}
+        {players.map((player) => (
+          <MenuItem key={player.id} onClick={() => handleSelect(player.name)} selected={player.name === name}>
+            {player.name === name && <ListItemIcon><CheckCircleIcon color="success" /></ListItemIcon>}
+            <ListItemText inset={player.name !== name}>{player.name}</ListItemText>
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   );
 }
 
 export function GameCard({ game: initialGame }: { game: Game }) {
   const [game, setGame] = useState(initialGame);
-  
-  // Update when initialGame changes (e.g., after page refresh)
-  useEffect(() => {
-    setGame(initialGame);
-  }, [initialGame]);
-  
-  const allAssigned =
-    game.officials.poytakirja !== null && game.officials.kello !== null;
-  const noneAssigned =
-    game.officials.poytakirja === null && game.officials.kello === null;
+  const allAssigned = game.officials.poytakirja && game.officials.kello;
 
   const handleAssign = async (role: "poytakirja" | "kello", playerName: string | null) => {
-    // Optimistic update
-    setGame({
-      ...game,
-      officials: { ...game.officials, [role]: playerName },
-    });
-    
-    // Save to server
+    setGame({ ...game, officials: { ...game.officials, [role]: playerName } });
     await assignOfficial(game.id, role, playerName);
   };
 
   return (
-    <div className="group rounded-2xl border border-border bg-surface p-5 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-      {/* Header */}
-      <div className="mb-4 flex items-start justify-between">
-        <div>
-          <div className="mb-1 flex items-center gap-2">
-            <span className="rounded-md bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
-              {game.division}
-            </span>
-            <span
-              className={`rounded-md px-2 py-0.5 text-xs font-medium ${
-                allAssigned
-                  ? "bg-success/10 text-success"
-                  : noneAssigned
-                    ? "bg-warning/10 text-warning"
-                    : "bg-primary/10 text-primary"
-              }`}
-            >
-              {allAssigned
-                ? "✓ Valmis"
-                : noneAssigned
-                  ? "Toimitsijat puuttuu"
-                  : "Osittain täytetty"}
-            </span>
-          </div>
-          <h3 className="text-lg font-semibold">vs. {game.opponent}</h3>
-        </div>
+    <Card variant="outlined">
+      <CardContent>
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
+          <Stack>
+            <Stack direction="row" gap={1} mb={1}>
+              <Chip label={game.divisionId} size="small" color="primary" variant="outlined" />
+              <Chip
+                label={allAssigned ? "Toimitsijat nimetty" : "Toimitsijat nimemättä"}
+                size="small"
+                color={allAssigned ? "success" : "error"}
+                icon={allAssigned ? <CheckCircleIcon /> : undefined}
+              />
+            </Stack>
+            <Typography variant="h6" fontWeight="bold">vs. {game.opponent}</Typography>
+          </Stack>
+          <Stack alignItems="flex-end">
+            <Typography variant="h6" color="primary" fontWeight="bold">{game.time}</Typography>
+            <Typography variant="body2" color="text.secondary">{formatDate(game.date)}</Typography>
+          </Stack>
+        </Stack>
 
-        <div className="text-right">
-          <div className="text-lg font-semibold text-primary">{game.time}</div>
-          <div className="text-sm text-muted">{formatDate(game.date)}</div>
-        </div>
-      </div>
+        <Stack direction="row" alignItems="center" gap={0.5} mb={2} color="text.secondary">
+          <LocationOnIcon fontSize="small" />
+          <Typography variant="body2">{game.location}</Typography>
+        </Stack>
 
-      {/* Location */}
-      <div className="mb-4 flex items-center gap-2 text-sm text-muted">
-        <span>📍</span>
-        <span>{game.location}</span>
-      </div>
-
-      {/* Officials */}
-      <div className="grid grid-cols-2 gap-3">
-        <OfficialBadge
-          gameId={game.id}
-          role="poytakirja"
-          name={game.officials.poytakirja}
-          onAssign={handleAssign}
-        />
-        <OfficialBadge
-          gameId={game.id}
-          role="kello"
-          name={game.officials.kello}
-          onAssign={handleAssign}
-        />
-      </div>
-    </div>
+        <Stack direction="row" gap={1}>
+          <OfficialButton role="poytakirja" name={game.officials.poytakirja} onAssign={(name) => handleAssign("poytakirja", name)} />
+          <OfficialButton role="kello" name={game.officials.kello} onAssign={(name) => handleAssign("kello", name)} />
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,32 +1,54 @@
-import Link from "next/link";
+"use client";
 
-export function Header() {
+import Link from "next/link";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SettingsIcon from "@mui/icons-material/Settings";
+import SportsBasketballIcon from "@mui/icons-material/SportsBasketball";
+
+type HeaderProps = {
+  title: string;
+  subtitle: string;
+  backHref?: string;
+  action?: React.ReactNode;
+};
+
+export function Header({ title, subtitle, backHref, action }: HeaderProps) {
   return (
-    <header className="border-b border-border bg-surface">
-      <div className="mx-auto max-w-4xl px-4 py-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-2xl">
-              🏀
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Kotipelien toimitsijat
-              </h1>
-              <p className="text-sm text-muted">
-                Hallitse kotipelien pöytäkirja- ja kellovuorot
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/hallinta"
-            className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-white hover:bg-primary-dark transition-colors"
-          >
-            <span>⚙️</span>
-            <span>Hallinta</span>
-          </Link>
-        </div>
-      </div>
-    </header>
+    <AppBar position="static" color="default" elevation={1}>
+      <Toolbar>
+        {backHref ? (
+          <IconButton component={Link} href={backHref} edge="start" sx={{ mr: 2 }}>
+            <ArrowBackIcon />
+          </IconButton>
+        ) : (
+          <SportsBasketballIcon color="primary" sx={{ mr: 1.5 }} />
+        )}
+        <Stack sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" component="h1" fontWeight="bold">{title}</Typography>
+          <Typography variant="body2" color="text.secondary">{subtitle}</Typography>
+        </Stack>
+        {action}
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+export function MainHeader() {
+  return (
+    <Header
+      title="Kotipelien toimitsijat"
+      subtitle="Hallitse pöytäkirja- ja kellovuorot"
+      action={
+        <Button component={Link} href="/hallinta" variant="contained" startIcon={<SettingsIcon />}>
+          Hallinta
+        </Button>
+      }
+    />
   );
 }
