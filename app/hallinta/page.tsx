@@ -112,7 +112,12 @@ export default function HallintaPage() {
 
       const existingNames = new Set(players.map((p) => p.name.toLowerCase()))
       const newNames = names.filter((n) => !existingNames.has(n.toLowerCase()))
-      const newPlayers = await Promise.all(newNames.map(savePlayer))
+
+      // Save players sequentially to avoid race condition in file-based DB
+      const newPlayers = []
+      for (const name of newNames) {
+        newPlayers.push(await savePlayer(name))
+      }
 
       setPlayers([...players, ...newPlayers])
       setPlayerNames("")
@@ -129,6 +134,8 @@ export default function HallintaPage() {
 
   const handleDeletePlayer = useCallback(
     async (id: string) => {
+      const player = players.find((p) => p.id === id)
+      if (!player || !confirm(`Haluatko varmasti poistaa pelaajan ${player.name}?`)) return
       await deletePlayer(id)
       setPlayers(players.filter((p) => p.id !== id))
     },
@@ -160,13 +167,12 @@ export default function HallintaPage() {
 
               <form onSubmit={handleAddPlayers}>
                 <TextField
-                  fullWidth
                   multiline
-                  rows={3}
+                  minRows={4}
+                  fullWidth
                   value={playerNames}
                   onChange={(e) => setPlayerNames(e.target.value)}
                   placeholder="Lisää pelaajia (yksi per rivi)"
-                  size="small"
                   sx={{ mb: 2 }}
                 />
                 <Button type="submit" variant="contained" size="small">
@@ -176,14 +182,16 @@ export default function HallintaPage() {
 
               {players.length > 0 && (
                 <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
-                  {players.map((player) => (
-                    <Chip
-                      key={player.id}
-                      label={player.name}
-                      onDelete={() => handleDeletePlayer(player.id)}
-                      deleteIcon={<CloseIcon />}
-                    />
-                  ))}
+                  {[...players]
+                    .sort((a, b) => a.name.localeCompare(b.name, "fi"))
+                    .map((player) => (
+                      <Chip
+                        key={player.id}
+                        label={player.name}
+                        onDelete={() => handleDeletePlayer(player.id)}
+                        deleteIcon={<CloseIcon />}
+                      />
+                    ))}
                 </Stack>
               )}
             </CardContent>

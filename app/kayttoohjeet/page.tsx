@@ -83,7 +83,9 @@ export default function KaijttoohjeetPage() {
             Vinkkejä
           </Typography>
           <Typography variant="body2" color="text.secondary" component="ul" sx={{ pl: 2 }}>
-            <li>Vuoron voi merkitä joko huoltajan tai junioripoolista tulevan henkilön hoidettavaksi</li>
+            <li>
+              Vuoron voi merkitä joko huoltajan tai junioripoolista tulevan henkilön hoidettavaksi
+            </li>
             <li>Huoltajan nimi on pakollinen, juniorin nimi on valinnainen</li>
             <li>Vahvistetut vuorot näkyvät vihreällä taustavärillä</li>
             <li>Voit poistaa vahvistuksen ja vaihtaa vuoron toiselle henkilölle tarvittaessa</li>
@@ -94,4 +96,3 @@ export default function KaijttoohjeetPage() {
     </Box>
   )
 }
-

@@ -11,7 +11,6 @@ import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import ListItemText from "@mui/material/ListItemText"
-import Divider from "@mui/material/Divider"
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle"
 import DialogContent from "@mui/material/DialogContent"
@@ -103,7 +102,7 @@ function OfficialButton({
   }
 
   const handleClear = () => {
-    if (confirm(`Poistetaanko ${assignment?.playerName} valinta?`)) {
+    if (confirm(`Poistetaanko pelaajan ${assignment?.playerName} vastuu tästä pelistä?`)) {
       onUpdate(null)
     }
     setAnchorEl(null)
@@ -168,30 +167,33 @@ function OfficialButton({
               <ListItemText>Juniori poolista</ListItemText>
             </MenuItem>
           ),
-          assignment && !isConfirmed && <Divider key="d1" />,
           assignment && (
             <MenuItem key="clear" onClick={handleClear}>
               <ListItemIcon>
                 <ClearIcon color="error" />
               </ListItemIcon>
-              <ListItemText>Poista valinta</ListItemText>
+              <ListItemText>Poista valittu pelaaja</ListItemText>
             </MenuItem>
           ),
-          assignment && <Divider key="d2" />,
-          players.length === 0 && (
+          // Only show player list when no assignment yet or when already confirmed
+          !assignment && players.length === 0 && (
             <MenuItem key="empty" disabled>
               <ListItemText>Ei pelaajia</ListItemText>
             </MenuItem>
           ),
-          ...players.map((player) => (
-            <MenuItem
-              key={player.id}
-              onClick={() => handleSelectPlayer(player.name)}
-              selected={assignment?.playerName === player.name}
-            >
-              <ListItemText inset>{player.name}</ListItemText>
-            </MenuItem>
-          )),
+          ...(!assignment || isConfirmed
+            ? [...players]
+                .sort((a, b) => a.name.localeCompare(b.name, "fi"))
+                .map((player) => (
+                  <MenuItem
+                    key={player.id}
+                    onClick={() => handleSelectPlayer(player.name)}
+                    selected={assignment?.playerName === player.name}
+                  >
+                    <ListItemText inset>{player.name}</ListItemText>
+                  </MenuItem>
+                ))
+            : []),
         ].filter(Boolean)}
       </Menu>
 
