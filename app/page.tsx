@@ -1,6 +1,7 @@
 import Container from "@mui/material/Container"
 import Box from "@mui/material/Box"
 import { GamesList } from "@/components/games-list"
+import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 
 export default function Home() {
@@ -9,6 +10,7 @@ export default function Home() {
       <MainHeader />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <GamesList />
+        <Footer />
       </Container>
     </Box>
   )

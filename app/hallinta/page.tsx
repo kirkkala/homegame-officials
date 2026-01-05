@@ -24,6 +24,7 @@ import GroupIcon from "@mui/icons-material/Group"
 import SportsBasketballIcon from "@mui/icons-material/SportsBasketball"
 import CloseIcon from "@mui/icons-material/Close"
 import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
 import { parseExcelFile, type ParsedGame } from "@/lib/excel-parser"
 import {
   saveGames,
@@ -286,6 +287,7 @@ export default function HallintaPage() {
             </Card>
           )}
         </Stack>
+        <Footer />
       </Container>
     </Box>
   )
