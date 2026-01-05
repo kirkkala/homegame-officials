@@ -12,7 +12,9 @@ export type OfficialAssignment = {
 export type Game = {
   id: string
   divisionId: string
-  opponent: string
+  homeTeam: string
+  awayTeam: string
+  isHomeGame: boolean
   date: string
   time: string
   location: string

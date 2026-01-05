@@ -9,7 +9,9 @@ export type OfficialAssignment = {
 export type Game = {
   id: string
   divisionId: string
-  opponent: string
+  homeTeam: string
+  awayTeam: string
+  isHomeGame: boolean
   date: string
   time: string
   location: string
@@ -56,6 +58,15 @@ export async function updateOfficial(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ officials: { [role]: assignment } }),
+  })
+  return res.json()
+}
+
+export async function updateGameHomeStatus(gameId: string, isHomeGame: boolean): Promise<Game> {
+  const res = await fetch(`/api/games/${gameId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ isHomeGame }),
   })
   return res.json()
 }

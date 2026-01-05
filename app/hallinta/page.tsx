@@ -18,6 +18,7 @@ import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
+import Checkbox from "@mui/material/Checkbox"
 import DeleteIcon from "@mui/icons-material/Delete"
 import UploadFileIcon from "@mui/icons-material/UploadFile"
 import GroupIcon from "@mui/icons-material/Group"
@@ -33,24 +34,112 @@ import {
   getPlayers,
   savePlayer,
   deletePlayer,
+  updateGameHomeStatus,
   type Player,
+  type Game,
 } from "@/lib/storage"
-import { formatDate } from "@/lib/utils"
+
+type GameRow = {
+  key: string
+  division: string
+  homeTeam: string
+  awayTeam: string
+  date: string
+  time: string
+  location: string
+  isHomeGame: boolean
+}
+
+function GamesTable({
+  games,
+  onToggleHomeGame,
+}: {
+  games: GameRow[]
+  onToggleHomeGame: (key: string, isHomeGame: boolean) => void
+}) {
+  const showDivision = games.some((g) => g.division)
+
+  return (
+    <TableContainer component={Paper} variant="outlined">
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell padding="checkbox">Kotipeli</TableCell>
+            {showDivision && <TableCell>Divisioona</TableCell>}
+            <TableCell>Ottelu</TableCell>
+            <TableCell>Aika</TableCell>
+            <TableCell>Paikka</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {games.map((game) => (
+            <TableRow
+              key={game.key}
+              hover
+              onClick={() => onToggleHomeGame(game.key, !game.isHomeGame)}
+              selected={game.isHomeGame}
+              sx={{
+                cursor: "pointer",
+                "&.Mui-selected": {
+                  bgcolor: "success.50",
+                },
+                "&.Mui-selected:hover": {
+                  bgcolor: "success.100",
+                },
+                transition: "background-color 0.15s ease-in-out",
+              }}
+            >
+              <TableCell padding="checkbox">
+                <Checkbox
+                  checked={game.isHomeGame}
+                  color="success"
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={() => onToggleHomeGame(game.key, !game.isHomeGame)}
+                />
+              </TableCell>
+              {showDivision && (
+                <TableCell>
+                  {game.division && (
+                    <Chip label={game.division} size="small" color="primary" variant="outlined" />
+                  )}
+                </TableCell>
+              )}
+              <TableCell>
+                <Typography variant="body2">
+                  {game.homeTeam} — {game.awayTeam}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                {game.date} {game.time}
+              </TableCell>
+              <TableCell>{game.location}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
+}
 
 export default function HallintaPage() {
   const [parsedGames, setParsedGames] = useState<ParsedGame[]>([])
+  const [existingGames, setExistingGames] = useState<Game[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [importStatus, setImportStatus] = useState<{
     type: "success" | "error" | "info"
     message: string
   } | null>(null)
-  const [existingGamesCount, setExistingGamesCount] = useState(0)
   const [players, setPlayers] = useState<Player[]>([])
   const [playerNames, setPlayerNames] = useState("")
 
+  const loadGames = useCallback(async () => {
+    const games = await getGames()
+    setExistingGames(games)
+  }, [])
+
   useEffect(() => {
     Promise.all([getGames(), getPlayers()]).then(([games, loadedPlayers]) => {
-      setExistingGamesCount(games.length)
+      setExistingGames(games)
       setPlayers(loadedPlayers)
     })
   }, [])
@@ -74,31 +163,45 @@ export default function HallintaPage() {
     [handleFile]
   )
 
+  const handleToggleHomeGame = useCallback((index: number) => {
+    setParsedGames((prev) =>
+      prev.map((g, i) => (i === index ? { ...g, isHomeGame: !g.isHomeGame } : g))
+    )
+  }, [])
+
   const handleImport = useCallback(async () => {
     const saved = await saveGames(
       parsedGames.map((g) => ({
         divisionId: g.division,
-        opponent: g.opponent,
+        homeTeam: g.homeTeam,
+        awayTeam: g.awayTeam,
+        isHomeGame: g.isHomeGame,
         date: g.date,
         time: g.time,
         location: g.location,
       }))
     )
     const skipped = parsedGames.length - saved.length
+    const homeGamesCount = saved.filter((g) => g.isHomeGame).length
     setImportStatus({
       type: "success",
-      message: `Tuotu ${saved.length} kotipeliä!${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
+      message: `Tuotu ${saved.length} peliä (${homeGamesCount} kotipeliä)!${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
     })
     setParsedGames([])
-    setExistingGamesCount((await getGames()).length)
-  }, [parsedGames])
+    await loadGames()
+  }, [parsedGames, loadGames])
 
   const handleClearAll = useCallback(async () => {
     if (confirm("Haluatko varmasti poistaa kaikki pelit?")) {
       await clearAllGames()
-      setExistingGamesCount(0)
+      setExistingGames([])
       setImportStatus({ type: "info", message: "Kaikki pelit poistettu" })
     }
+  }, [])
+
+  const handleToggleExistingHomeGame = useCallback(async (gameId: string, isHomeGame: boolean) => {
+    const updated = await updateGameHomeStatus(gameId, isHomeGame)
+    setExistingGames((prev) => prev.map((g) => (g.id === gameId ? updated : g)))
   }, [])
 
   const handleAddPlayers = useCallback(
@@ -197,24 +300,14 @@ export default function HallintaPage() {
             </CardContent>
           </Card>
 
-          {/* Games */}
+          {/* Games Upload */}
           <Card>
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
                 <Stack direction="row" alignItems="center" gap={1}>
                   <SportsBasketballIcon color="primary" />
-                  <Typography variant="h6">Pelit</Typography>
+                  <Typography variant="h6">Tuo pelejä</Typography>
                 </Stack>
-                {existingGamesCount > 0 && (
-                  <Button
-                    color="error"
-                    size="small"
-                    startIcon={<DeleteIcon />}
-                    onClick={handleClearAll}
-                  >
-                    Tyhjennä ({existingGamesCount})
-                  </Button>
-                )}
               </Stack>
 
               <Box
@@ -229,7 +322,7 @@ export default function HallintaPage() {
                   borderStyle: "dashed",
                   borderColor: isDragging ? "primary.main" : "grey.300",
                   borderRadius: 2,
-                  p: 4,
+                  p: 3,
                   textAlign: "center",
                   bgcolor: isDragging ? "primary.50" : "transparent",
                 }}
@@ -250,50 +343,77 @@ export default function HallintaPage() {
             </CardContent>
           </Card>
 
-          {/* Preview */}
+          {/* Preview - New games to import */}
           {parsedGames.length > 0 && (
             <Card>
               <CardContent>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-                  <Typography variant="h6">Esikatselu: {parsedGames.length} kotipeliä</Typography>
+                  <Stack>
+                    <Typography variant="h6">Esikatselu: {parsedGames.length} peliä</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Merkitse kotipelit, jotka vaativat toimitsijat
+                    </Typography>
+                  </Stack>
                   <Button variant="contained" color="success" onClick={handleImport}>
                     Tuo pelit
                   </Button>
                 </Stack>
 
-                <TableContainer component={Paper} variant="outlined">
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Divisioona</TableCell>
-                        <TableCell>Vastustaja</TableCell>
-                        <TableCell>Päivämäärä</TableCell>
-                        <TableCell>Aika</TableCell>
-                        <TableCell>Paikka</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {parsedGames.map((game, index) => (
-                        <TableRow key={index}>
-                          <TableCell>
-                            <Chip
-                              label={game.division}
-                              size="small"
-                              color="primary"
-                              variant="outlined"
-                            />
-                          </TableCell>
-                          <TableCell>{game.opponent}</TableCell>
-                          <TableCell>{formatDate(game.date)}</TableCell>
-                          <TableCell sx={{ fontWeight: "bold", color: "primary.main" }}>
-                            {game.time}
-                          </TableCell>
-                          <TableCell>{game.location}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                <GamesTable
+                  games={parsedGames.map((g, i) => ({
+                    key: String(i),
+                    division: g.division,
+                    homeTeam: g.homeTeam,
+                    awayTeam: g.awayTeam,
+                    date: g.date,
+                    time: g.time,
+                    location: g.location,
+                    isHomeGame: g.isHomeGame,
+                  }))}
+                  onToggleHomeGame={(key) => handleToggleHomeGame(Number(key))}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Existing Games */}
+          {existingGames.length > 0 && (
+            <Card>
+              <CardContent>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+                  <Stack direction="row" alignItems="center" gap={1}>
+                    <SportsBasketballIcon color="primary" />
+                    <Typography variant="h6">Kaikki pelit ({existingGames.length})</Typography>
+                  </Stack>
+                  <Button
+                    color="error"
+                    size="small"
+                    startIcon={<DeleteIcon />}
+                    onClick={handleClearAll}
+                  >
+                    Tyhjennä kaikki
+                  </Button>
+                </Stack>
+
+                <Typography variant="body2" color="text.secondary" mb={2}>
+                  Merkitse kotipelit rastilla. Kotipeleissä tarvitaan toimitsijat.
+                </Typography>
+
+                <GamesTable
+                  games={existingGames.map((g) => ({
+                    key: g.id,
+                    division: g.divisionId,
+                    homeTeam: g.homeTeam,
+                    awayTeam: g.awayTeam,
+                    date: g.date,
+                    time: g.time,
+                    location: g.location,
+                    isHomeGame: g.isHomeGame,
+                  }))}
+                  onToggleHomeGame={(key, isHomeGame) =>
+                    handleToggleExistingHomeGame(key, isHomeGame)
+                  }
+                />
               </CardContent>
             </Card>
           )}

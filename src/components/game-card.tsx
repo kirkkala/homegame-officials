@@ -17,7 +17,6 @@ import DialogContent from "@mui/material/DialogContent"
 import DialogActions from "@mui/material/DialogActions"
 import TextField from "@mui/material/TextField"
 import Box from "@mui/material/Box"
-import LocationOnIcon from "@mui/icons-material/LocationOn"
 import AssignmentIcon from "@mui/icons-material/Assignment"
 import TimerIcon from "@mui/icons-material/Timer"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
@@ -250,57 +249,69 @@ export function GameCard({ game: initialGame }: { game: Game }) {
     setGame(updated)
   }
 
+  const statusChip = game.isHomeGame ? (
+    <Chip
+      label={
+        allConfirmed ? "Toimitsijat vahvistettu" : hasAssignments ? "Odottaa" : "Ei toimitsijaa"
+      }
+      size="small"
+      color={allConfirmed ? "success" : hasAssignments ? "warning" : "error"}
+      icon={
+        allConfirmed ? <CheckCircleIcon /> : hasAssignments ? <HourglassEmptyIcon /> : undefined
+      }
+    />
+  ) : (
+    <Chip label="Vierasottelu" size="small" color="default" />
+  )
+
   return (
     <Card variant="outlined">
-      <CardContent>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
-          <Stack>
-            <Stack direction="row" gap={1} mb={1}>
-              <Chip label={game.divisionId} size="small" color="primary" variant="outlined" />
+      <CardContent sx={{ py: 1.5, "&:last-child": { pb: 1.5 } }}>
+        {/* Header row - same for both home and away */}
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" alignItems="center" gap={1.5} sx={{ minWidth: 0, flex: 1 }}>
+            {game.divisionId && (
               <Chip
-                label={allConfirmed ? "Kunnossa" : hasAssignments ? "Odottaa" : "Ei toimitsijaa"}
+                label={game.divisionId}
                 size="small"
-                color={allConfirmed ? "success" : hasAssignments ? "warning" : "error"}
-                icon={
-                  allConfirmed ? (
-                    <CheckCircleIcon />
-                  ) : hasAssignments ? (
-                    <HourglassEmptyIcon />
-                  ) : undefined
-                }
+                color={game.isHomeGame ? "primary" : "default"}
+                variant="outlined"
               />
-            </Stack>
-            <Typography variant="h6" fontWeight="bold">
-              vs. {game.opponent}
+            )}
+            {statusChip}
+            <Typography variant="body2" fontWeight={game.isHomeGame ? "bold" : "normal"} noWrap>
+              {game.homeTeam} vs {game.awayTeam}
             </Typography>
           </Stack>
-          <Stack alignItems="flex-end">
-            <Typography variant="h6" color="primary" fontWeight="bold">
-              {game.time}
-            </Typography>
+          <Stack direction="row" alignItems="center" gap={2} sx={{ flexShrink: 0 }}>
             <Typography variant="body2" color="text.secondary">
               {formatDate(game.date)}
             </Typography>
+            <Typography
+              variant="body2"
+              fontWeight="bold"
+              color={game.isHomeGame ? "primary" : "text.primary"}
+            >
+              {game.time}
+            </Typography>
           </Stack>
         </Stack>
 
-        <Stack direction="row" alignItems="center" gap={0.5} mb={2} color="text.secondary">
-          <LocationOnIcon fontSize="small" />
-          <Typography variant="body2">{game.location}</Typography>
-        </Stack>
-
-        <Stack direction={{ xs: "column", sm: "row" }} gap={1}>
-          <OfficialButton
-            role="poytakirja"
-            assignment={game.officials.poytakirja}
-            onUpdate={(a) => handleUpdate("poytakirja", a)}
-          />
-          <OfficialButton
-            role="kello"
-            assignment={game.officials.kello}
-            onUpdate={(a) => handleUpdate("kello", a)}
-          />
-        </Stack>
+        {/* Officials section - only for home games */}
+        {game.isHomeGame && (
+          <Stack direction={{ xs: "column", sm: "row" }} gap={1} mt={1.5}>
+            <OfficialButton
+              role="poytakirja"
+              assignment={game.officials.poytakirja}
+              onUpdate={(a) => handleUpdate("poytakirja", a)}
+            />
+            <OfficialButton
+              role="kello"
+              assignment={game.officials.kello}
+              onUpdate={(a) => handleUpdate("kello", a)}
+            />
+          </Stack>
+        )}
       </CardContent>
     </Card>
   )

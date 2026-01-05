@@ -14,7 +14,11 @@ export async function POST(request: Request) {
     .filter(
       (game) =>
         !db.games.some(
-          (g) => g.date === game.date && g.time === game.time && g.opponent === game.opponent
+          (g) =>
+            g.date === game.date &&
+            g.time === game.time &&
+            g.homeTeam === game.homeTeam &&
+            g.awayTeam === game.awayTeam
         )
     )
     .map((game) => ({

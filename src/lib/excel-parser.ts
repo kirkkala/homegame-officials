@@ -1,18 +1,19 @@
 import * as XLSX from "xlsx"
-import type { Game } from "./storage"
 
 export type ParsedGame = {
   division: string
-  opponent: string
+  homeTeam: string
+  awayTeam: string
   date: string // YYYY-MM-DD
   time: string // HH:mm
   location: string
   rawName: string
+  isHomeGame: boolean // User will mark this in the UI
 }
 
 /**
- * Parse Excel file and extract home games only
- * Home games are identified by "HNMKY/Stadi -" appearing in the game name
+ * Parse Excel file and extract all games
+ * Games are expected to have format like "I div. Team A - Team B"
  */
 export function parseExcelFile(file: ArrayBuffer): ParsedGame[] {
   const workbook = XLSX.read(file, { type: "array" })
@@ -20,23 +21,32 @@ export function parseExcelFile(file: ArrayBuffer): ParsedGame[] {
   const sheet = workbook.Sheets[sheetName]
   const data = XLSX.utils.sheet_to_json<Record<string, string>>(sheet)
 
-  const homeGames: ParsedGame[] = []
+  const games: ParsedGame[] = []
 
   for (const row of data) {
     const name = row["Nimi"] || ""
 
-    // Skip if not a home game (HNMKY/Stadi should be mentioned first)
-    if (!name.includes("HNMKY/Stadi -")) {
+    // Skip rows without a game name or without the " - " separator (not a game)
+    if (!name || !name.includes(" - ")) {
       continue
     }
 
     // Parse division from name (e.g., "I div.", "II div.", "III div.")
-    const divMatch = name.match(/^(I{1,3})\s*div\./)
-    const division = divMatch ? `${divMatch[1]} divisioona` : "Tuntematon"
+    const divMatch = name.match(/^(I{1,3}\s*div\.)/)
+    const division = divMatch ? divMatch[1] : ""
 
-    // Parse opponent (everything after "HNMKY/Stadi - ")
-    const opponentMatch = name.match(/HNMKY\/Stadi\s*-\s*(.+)$/)
-    const opponent = opponentMatch ? opponentMatch[1].trim() : "Tuntematon"
+    // Parse teams from name
+    // Format: "I div. Team A - Team B" or just "Team A - Team B"
+    let teamsString = name
+    if (divMatch) {
+      teamsString = name.replace(/^I{1,3}\s*div\.\s*/, "")
+    }
+
+    const teamsParts = teamsString.split(" - ")
+    if (teamsParts.length < 2) continue
+
+    const homeTeam = teamsParts[0].trim()
+    const awayTeam = teamsParts.slice(1).join(" - ").trim() // Handle team names with " - " in them
 
     // Parse date and time from "Alkaa" field (format: "10.01.2026 08:30:00")
     const startTime = row["Alkaa"] || ""
@@ -61,33 +71,20 @@ export function parseExcelFile(file: ArrayBuffer): ParsedGame[] {
 
     const location = row["Tapahtumapaikka"] || ""
 
-    homeGames.push({
+    games.push({
       division,
-      opponent,
+      homeTeam,
+      awayTeam,
       date,
       time,
       location,
       rawName: name,
+      isHomeGame: false, // User will mark this in preview
     })
   }
 
   // Sort by date
-  homeGames.sort((a, b) => a.date.localeCompare(b.date))
+  games.sort((a, b) => a.date.localeCompare(b.date))
 
-  return homeGames
-}
-
-/**
- * Convert parsed games to storage format
- */
-export function convertToStorageFormat(
-  parsedGames: ParsedGame[]
-): Omit<Game, "id" | "createdAt" | "officials">[] {
-  return parsedGames.map((game) => ({
-    divisionId: game.division,
-    opponent: game.opponent,
-    date: game.date,
-    time: game.time,
-    location: game.location,
-  }))
+  return games
 }
