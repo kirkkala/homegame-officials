@@ -10,8 +10,17 @@
 !.yarn/releases
 !.yarn/versions
 
+# pnpm
+.pnpm-store/
+
 # testing
 /coverage
+
+# local database
+/data/db.json
+
+# excel imports
+*.xlsx
 
 # next.js
 /.next/
