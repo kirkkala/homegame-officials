@@ -19,7 +19,9 @@ import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Checkbox from "@mui/material/Checkbox"
-import DeleteIcon from "@mui/icons-material/Delete"
+import IconButton from "@mui/material/IconButton"
+import DeleteIcon from "@mui/icons-material/DeleteForever"
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import UploadFileIcon from "@mui/icons-material/UploadFile"
 import GroupIcon from "@mui/icons-material/Group"
 import SportsBasketballIcon from "@mui/icons-material/SportsBasketball"
@@ -35,6 +37,7 @@ import {
   savePlayer,
   deletePlayer,
   updateGameHomeStatus,
+  deleteGame,
   type Player,
   type Game,
 } from "@/lib/storage"
@@ -54,9 +57,11 @@ type GameRow = {
 function GamesTable({
   games,
   onToggleHomeGame,
+  onDelete,
 }: {
   games: GameRow[]
   onToggleHomeGame: (key: string, isHomeGame: boolean) => void
+  onDelete?: (key: string) => void
 }) {
   return (
     <TableContainer component={Paper} variant="outlined">
@@ -68,6 +73,7 @@ function GamesTable({
             <TableCell>Ottelu</TableCell>
             <TableCell>Aika</TableCell>
             <TableCell>Paikka</TableCell>
+            {onDelete && <TableCell padding="checkbox" />}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -106,6 +112,20 @@ function GamesTable({
                 {game.date} {game.time}
               </TableCell>
               <TableCell>{game.location}</TableCell>
+              {onDelete && (
+                <TableCell padding="checkbox">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(game.key)
+                    }}
+                    sx={{ opacity: 0.5, "&:hover": { opacity: 1, color: "error.main" } }}
+                  >
+                    <DeleteOutlineIcon fontSize="small" />
+                  </IconButton>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
@@ -196,6 +216,16 @@ export default function HallintaPage() {
     const updated = await updateGameHomeStatus(gameId, isHomeGame)
     setExistingGames((prev) => prev.map((g) => (g.id === gameId ? updated : g)))
   }, [])
+
+  const handleDeleteGame = useCallback(
+    async (gameId: string) => {
+      const game = existingGames.find((g) => g.id === gameId)
+      if (!game || !confirm(`Poistetaanko ${game.homeTeam} vs ${game.awayTeam}?`)) return
+      await deleteGame(gameId)
+      setExistingGames((prev) => prev.filter((g) => g.id !== gameId))
+    },
+    [existingGames]
+  )
 
   const handleAddPlayers = useCallback(
     async (e: React.FormEvent) => {
@@ -412,6 +442,7 @@ export default function HallintaPage() {
                   onToggleHomeGame={(key, isHomeGame) =>
                     handleToggleExistingHomeGame(key, isHomeGame)
                   }
+                  onDelete={handleDeleteGame}
                 />
               </CardContent>
             </Card>

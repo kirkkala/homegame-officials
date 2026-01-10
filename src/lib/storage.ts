@@ -71,6 +71,10 @@ export async function updateGameHomeStatus(gameId: string, isHomeGame: boolean):
   return res.json()
 }
 
+export async function deleteGame(gameId: string): Promise<void> {
+  await fetch(`/api/games/${gameId}`, { method: "DELETE" })
+}
+
 // Players
 export async function getPlayers(): Promise<Player[]> {
   const res = await fetch("/api/players")
