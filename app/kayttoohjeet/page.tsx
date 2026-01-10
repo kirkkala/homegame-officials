@@ -19,13 +19,19 @@ export default function KaijttoohjeetPage() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <MainHeader />
-      <Container maxWidth="md" sx={{ py: 4, flex: 1 }}>
-        <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+      <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          fontWeight="bold"
+          sx={{ fontSize: { xs: "1.5rem", sm: "2.125rem" } }}
+        >
           Käyttöohjeet
         </Typography>
 
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
+          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
             Mikä tämä on?
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph>
@@ -34,13 +40,13 @@ export default function KaijttoohjeetPage() {
           </Typography>
         </Paper>
 
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
+          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
             Näin pääset alkuun
           </Typography>
-          <List>
-            <ListItem>
-              <ListItemIcon>
+          <List sx={{ py: 0 }}>
+            <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
+              <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
                 <UploadFileIcon color="primary" />
               </ListItemIcon>
               <ListItemText
@@ -48,8 +54,8 @@ export default function KaijttoohjeetPage() {
                 secondary="Mene Hallinta-sivulle ja lataa eLSA-excel tiedosto, joka sisältää joukkueen kotipelit."
               />
             </ListItem>
-            <ListItem>
-              <ListItemIcon>
+            <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
+              <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
                 <GroupsIcon color="primary" />
               </ListItemIcon>
               <ListItemText
@@ -57,8 +63,8 @@ export default function KaijttoohjeetPage() {
                 secondary="Lisää joukkueen pelaajat Hallinta-sivulla. Voit lisätä pelaajia manuaalisesti tai tuoda ne tiedostosta."
               />
             </ListItem>
-            <ListItem>
-              <ListItemIcon>
+            <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
+              <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
                 <SettingsIcon color="primary" />
               </ListItemIcon>
               <ListItemText
@@ -66,8 +72,8 @@ export default function KaijttoohjeetPage() {
                 secondary="Etusivulla näet tulevat kotipelit. Klikkaa peliä ja jaa pöytäkirja- ja kellovuorot pelaajille."
               />
             </ListItem>
-            <ListItem>
-              <ListItemIcon>
+            <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
+              <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
                 <CheckCircleIcon color="primary" />
               </ListItemIcon>
               <ListItemText
@@ -78,11 +84,16 @@ export default function KaijttoohjeetPage() {
           </List>
         </Paper>
 
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
             Vinkkejä
           </Typography>
-          <Typography variant="body2" color="text.secondary" component="ul" sx={{ pl: 2 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            component="ul"
+            sx={{ pl: { xs: 2, sm: 3 }, m: 0 }}
+          >
             <li>
               Vuoron voi merkitä joko huoltajan tai junioripoolista tulevan henkilön hoidettavaksi
             </li>

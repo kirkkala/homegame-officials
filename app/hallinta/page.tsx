@@ -65,7 +65,7 @@ function GamesTable({
         <TableHead>
           <TableRow>
             <TableCell padding="checkbox">Kotipeli</TableCell>
-            {showDivision && <TableCell>Divisioona</TableCell>}
+            {showDivision && <TableCell>Sarja</TableCell>}
             <TableCell>Ottelu</TableCell>
             <TableCell>Aika</TableCell>
             <TableCell>Paikka</TableCell>
@@ -97,13 +97,7 @@ function GamesTable({
                   onChange={() => onToggleHomeGame(game.key, !game.isHomeGame)}
                 />
               </TableCell>
-              {showDivision && (
-                <TableCell>
-                  {game.division && (
-                    <Chip label={game.division} size="small" color="primary" variant="outlined" />
-                  )}
-                </TableCell>
-              )}
+              {showDivision && <TableCell>{game.division}</TableCell>}
               <TableCell>
                 <Typography variant="body2">
                   {game.homeTeam} — {game.awayTeam}

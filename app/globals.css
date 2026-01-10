@@ -1,1 +1,26 @@
-/* MUI handles most styling, minimal custom CSS */
+/* MUI handles most styling, minimal custom CSS here */
+html {
+  /* Prevent scrollbar from disappearing when opening dialogs */
+  overflow-y: scroll !important;
+}
+
+body {
+  /* Prevent scrollbar from appearing when opening dialogs */
+  padding-right: 0 !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),
+    url("/basketball-sport-environment-filed.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: blur(4px);
+}
