@@ -1,10 +1,17 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
 
 export const metadata: Metadata = {
   title: "Kotipelien toimitsijat",
   description: "Hallitse kotipelien toimitsijat helposti",
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({

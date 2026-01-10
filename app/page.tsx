@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <MainHeader />
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
         <GamesList />
         <Footer />
       </Container>

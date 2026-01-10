@@ -5,7 +5,6 @@ import Link from "next/link"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
-import Chip from "@mui/material/Chip"
 import CircularProgress from "@mui/material/CircularProgress"
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"
 import UploadFileIcon from "@mui/icons-material/UploadFile"
@@ -60,14 +59,17 @@ export function GamesList() {
   }
 
   return (
-    <Stack gap={3}>
+    <Stack gap={{ xs: 2, sm: 3 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="h5" fontWeight="bold">
+        <Typography
+          variant="h2"
+          fontWeight="bold"
+          sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+        >
           Tulevat kotipelit
         </Typography>
-        <Chip label={`${games.length} peliä`} color="primary" />
       </Stack>
-      <Stack gap={2}>
+      <Stack gap={{ xs: 1.5, sm: 2 }}>
         {games.map((game) => (
           <GameCard key={game.id} game={game} />
         ))}
