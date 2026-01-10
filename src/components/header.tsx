@@ -81,7 +81,7 @@ export function MainHeader() {
 
   return (
     <>
-      <AppBar position="static" color="default" elevation={1}>
+      <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0 }}>
         <Toolbar>
           {/* Mobile: hamburger menu */}
           <IconButton

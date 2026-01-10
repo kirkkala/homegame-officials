@@ -6,7 +6,7 @@ import { MainHeader } from "@/components/header"
 
 export default function Home() {
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+    <Box>
       <MainHeader />
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
         <GamesList />

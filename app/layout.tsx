@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Kotipelien toimitsijat",
