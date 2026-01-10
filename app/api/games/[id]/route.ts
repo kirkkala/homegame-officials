@@ -22,3 +22,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   await writeDB(db)
   return NextResponse.json(game)
 }
+
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const db = await readDB()
+
+  const index = db.games.findIndex((g) => g.id === id)
+  if (index === -1) return NextResponse.json({ error: "Game not found" }, { status: 404 })
+
+  db.games.splice(index, 1)
+  await writeDB(db)
+  return NextResponse.json({ success: true })
+}

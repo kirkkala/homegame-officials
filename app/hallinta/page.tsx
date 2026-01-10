@@ -19,7 +19,9 @@ import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Checkbox from "@mui/material/Checkbox"
-import DeleteIcon from "@mui/icons-material/Delete"
+import IconButton from "@mui/material/IconButton"
+import DeleteIcon from "@mui/icons-material/DeleteForever"
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import UploadFileIcon from "@mui/icons-material/UploadFile"
 import GroupIcon from "@mui/icons-material/Group"
 import SportsBasketballIcon from "@mui/icons-material/SportsBasketball"
@@ -35,9 +37,11 @@ import {
   savePlayer,
   deletePlayer,
   updateGameHomeStatus,
+  deleteGame,
   type Player,
   type Game,
 } from "@/lib/storage"
+import { formatDate } from "@/lib/utils"
 
 type GameRow = {
   key: string
@@ -53,22 +57,23 @@ type GameRow = {
 function GamesTable({
   games,
   onToggleHomeGame,
+  onDelete,
 }: {
   games: GameRow[]
   onToggleHomeGame: (key: string, isHomeGame: boolean) => void
+  onDelete?: (key: string) => void
 }) {
-  const showDivision = games.some((g) => g.division)
-
   return (
     <TableContainer component={Paper} variant="outlined">
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell padding="checkbox">Kotipeli</TableCell>
-            {showDivision && <TableCell>Sarja</TableCell>}
+            <TableCell padding="checkbox">Koti</TableCell>
+            <TableCell>Sarja</TableCell>
             <TableCell>Ottelu</TableCell>
             <TableCell>Aika</TableCell>
             <TableCell>Paikka</TableCell>
+            {onDelete && <TableCell padding="checkbox" />}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -97,7 +102,7 @@ function GamesTable({
                   onChange={() => onToggleHomeGame(game.key, !game.isHomeGame)}
                 />
               </TableCell>
-              {showDivision && <TableCell>{game.division}</TableCell>}
+              <TableCell sx={{ textWrap: "nowrap", textAlign: "right" }}>{game.division}</TableCell>
               <TableCell>
                 <Typography variant="body2">
                   {game.homeTeam} — {game.awayTeam}
@@ -107,6 +112,20 @@ function GamesTable({
                 {game.date} {game.time}
               </TableCell>
               <TableCell>{game.location}</TableCell>
+              {onDelete && (
+                <TableCell padding="checkbox">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(game.key)
+                    }}
+                    sx={{ opacity: 0.5, "&:hover": { opacity: 1, color: "error.main" } }}
+                  >
+                    <DeleteOutlineIcon fontSize="small" />
+                  </IconButton>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
@@ -197,6 +216,16 @@ export default function HallintaPage() {
     const updated = await updateGameHomeStatus(gameId, isHomeGame)
     setExistingGames((prev) => prev.map((g) => (g.id === gameId ? updated : g)))
   }, [])
+
+  const handleDeleteGame = useCallback(
+    async (gameId: string) => {
+      const game = existingGames.find((g) => g.id === gameId)
+      if (!game || !confirm(`Poistetaanko ${game.homeTeam} vs ${game.awayTeam}?`)) return
+      await deleteGame(gameId)
+      setExistingGames((prev) => prev.filter((g) => g.id !== gameId))
+    },
+    [existingGames]
+  )
 
   const handleAddPlayers = useCallback(
     async (e: React.FormEvent) => {
@@ -359,7 +388,7 @@ export default function HallintaPage() {
                     division: g.division,
                     homeTeam: g.homeTeam,
                     awayTeam: g.awayTeam,
-                    date: g.date,
+                    date: formatDate(g.date),
                     time: g.time,
                     location: g.location,
                     isHomeGame: g.isHomeGame,
@@ -390,23 +419,30 @@ export default function HallintaPage() {
                 </Stack>
 
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  Merkitse kotipelit rastilla. Kotipeleissä tarvitaan toimitsijat.
+                  Merkitse kotipelit rastilla, näihin peleihin voi merkitä toimitsijat.
                 </Typography>
 
                 <GamesTable
-                  games={existingGames.map((g) => ({
-                    key: g.id,
-                    division: g.divisionId,
-                    homeTeam: g.homeTeam,
-                    awayTeam: g.awayTeam,
-                    date: g.date,
-                    time: g.time,
-                    location: g.location,
-                    isHomeGame: g.isHomeGame,
-                  }))}
+                  games={[...existingGames]
+                    .sort((a, b) => {
+                      const dateCompare = a.date.localeCompare(b.date)
+                      if (dateCompare !== 0) return dateCompare
+                      return a.time.localeCompare(b.time)
+                    })
+                    .map((g) => ({
+                      key: g.id,
+                      division: g.divisionId,
+                      homeTeam: g.homeTeam,
+                      awayTeam: g.awayTeam,
+                      date: formatDate(g.date),
+                      time: g.time,
+                      location: g.location,
+                      isHomeGame: g.isHomeGame,
+                    }))}
                   onToggleHomeGame={(key, isHomeGame) =>
                     handleToggleExistingHomeGame(key, isHomeGame)
                   }
+                  onDelete={handleDeleteGame}
                 />
               </CardContent>
             </Card>
