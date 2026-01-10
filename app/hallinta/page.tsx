@@ -38,6 +38,7 @@ import {
   type Player,
   type Game,
 } from "@/lib/storage"
+import { formatDate } from "@/lib/utils"
 
 type GameRow = {
   key: string
@@ -57,15 +58,13 @@ function GamesTable({
   games: GameRow[]
   onToggleHomeGame: (key: string, isHomeGame: boolean) => void
 }) {
-  const showDivision = games.some((g) => g.division)
-
   return (
     <TableContainer component={Paper} variant="outlined">
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell padding="checkbox">Kotipeli</TableCell>
-            {showDivision && <TableCell>Sarja</TableCell>}
+            <TableCell padding="checkbox">Koti</TableCell>
+            <TableCell>Sarja</TableCell>
             <TableCell>Ottelu</TableCell>
             <TableCell>Aika</TableCell>
             <TableCell>Paikka</TableCell>
@@ -97,7 +96,7 @@ function GamesTable({
                   onChange={() => onToggleHomeGame(game.key, !game.isHomeGame)}
                 />
               </TableCell>
-              {showDivision && <TableCell>{game.division}</TableCell>}
+              <TableCell sx={{ textWrap: "nowrap", textAlign: "right" }}>{game.division}</TableCell>
               <TableCell>
                 <Typography variant="body2">
                   {game.homeTeam} — {game.awayTeam}
@@ -359,7 +358,7 @@ export default function HallintaPage() {
                     division: g.division,
                     homeTeam: g.homeTeam,
                     awayTeam: g.awayTeam,
-                    date: g.date,
+                    date: formatDate(g.date),
                     time: g.time,
                     location: g.location,
                     isHomeGame: g.isHomeGame,
@@ -390,20 +389,26 @@ export default function HallintaPage() {
                 </Stack>
 
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  Merkitse kotipelit rastilla. Kotipeleissä tarvitaan toimitsijat.
+                  Merkitse kotipelit rastilla, näihin peleihin voi merkitä toimitsijat.
                 </Typography>
 
                 <GamesTable
-                  games={existingGames.map((g) => ({
-                    key: g.id,
-                    division: g.divisionId,
-                    homeTeam: g.homeTeam,
-                    awayTeam: g.awayTeam,
-                    date: g.date,
-                    time: g.time,
-                    location: g.location,
-                    isHomeGame: g.isHomeGame,
-                  }))}
+                  games={[...existingGames]
+                    .sort((a, b) => {
+                      const dateCompare = a.date.localeCompare(b.date)
+                      if (dateCompare !== 0) return dateCompare
+                      return a.time.localeCompare(b.time)
+                    })
+                    .map((g) => ({
+                      key: g.id,
+                      division: g.divisionId,
+                      homeTeam: g.homeTeam,
+                      awayTeam: g.awayTeam,
+                      date: formatDate(g.date),
+                      time: g.time,
+                      location: g.location,
+                      isHomeGame: g.isHomeGame,
+                    }))}
                   onToggleHomeGame={(key, isHomeGame) =>
                     handleToggleExistingHomeGame(key, isHomeGame)
                   }
