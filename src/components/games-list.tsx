@@ -2,21 +2,34 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import Button from "@mui/material/Button"
-import CircularProgress from "@mui/material/CircularProgress"
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"
-import UploadFileIcon from "@mui/icons-material/UploadFile"
+import { Button, CircularProgress, Stack, Typography } from "@mui/material"
+import {
+  CalendarMonth as CalendarMonthIcon,
+  Groups as GroupsIcon,
+  UploadFile as UploadFileIcon,
+} from "@mui/icons-material"
+import { TeamSelector } from "./team-selector"
 import { GameCard } from "./game-card"
+import { useTeam } from "./team-context"
 import { getGames, type Game } from "@/lib/storage"
 
 export function GamesList() {
+  const { selectedTeam, isLoading: teamLoading } = useTeam()
   const [games, setGames] = useState<Game[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    getGames().then((storedGames) => {
+    if (teamLoading) return
+
+    const loadGames = async () => {
+      if (!selectedTeam) {
+        setGames([])
+        setIsLoading(false)
+        return
+      }
+
+      setIsLoading(true)
+      const storedGames = await getGames(selectedTeam.id)
       const now = new Date()
       now.setHours(0, 0, 0, 0)
       setGames(
@@ -25,13 +38,27 @@ export function GamesList() {
           .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
       )
       setIsLoading(false)
-    })
-  }, [])
+    }
 
-  if (isLoading) {
+    loadGames()
+  }, [selectedTeam, teamLoading])
+
+  if (isLoading || teamLoading) {
     return (
       <Stack alignItems="center" py={8}>
         <CircularProgress />
+      </Stack>
+    )
+  }
+
+  if (!selectedTeam) {
+    return (
+      <Stack alignItems="center" py={8}>
+        <GroupsIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+        <Typography variant="h5" gutterBottom>
+          Valitse joukkue
+        </Typography>
+        <TeamSelector />
       </Stack>
     )
   }
@@ -41,10 +68,7 @@ export function GamesList() {
       <Stack alignItems="center" py={8}>
         <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
         <Typography variant="h5" gutterBottom>
-          Ei tulevia kotipelejä
-        </Typography>
-        <Typography color="text.secondary" mb={3}>
-          Tuo kotipelit Excel-tiedostosta aloittaaksesi.
+          Ei pelejä
         </Typography>
         <Button
           component={Link}
@@ -52,7 +76,7 @@ export function GamesList() {
           variant="contained"
           startIcon={<UploadFileIcon />}
         >
-          Tuo pelit Excelistä
+          Siirry hallintaan
         </Button>
       </Stack>
     )
@@ -66,7 +90,7 @@ export function GamesList() {
           fontWeight="bold"
           sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
         >
-          Tulevat kotipelit
+          {selectedTeam.name} seuraavat pelit
         </Typography>
       </Stack>
       <Stack gap={{ xs: 1.5, sm: 2 }}>

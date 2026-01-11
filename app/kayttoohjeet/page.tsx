@@ -1,17 +1,21 @@
 "use client"
 
-import Container from "@mui/material/Container"
-import Typography from "@mui/material/Typography"
-import Box from "@mui/material/Box"
-import Paper from "@mui/material/Paper"
-import List from "@mui/material/List"
-import ListItem from "@mui/material/ListItem"
-import ListItemIcon from "@mui/material/ListItemIcon"
-import ListItemText from "@mui/material/ListItemText"
-import UploadFileIcon from "@mui/icons-material/UploadFile"
-import GroupsIcon from "@mui/icons-material/Groups"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import SettingsIcon from "@mui/icons-material/Settings"
+import {
+  Box,
+  Container,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Typography,
+} from "@mui/material"
+import {
+  CheckCircle as CheckCircleIcon,
+  Groups as GroupsIcon,
+  Settings as SettingsIcon,
+  UploadFile as UploadFileIcon,
+} from "@mui/icons-material"
 import { MainHeader } from "@/components/header"
 import { Footer } from "@/components/footer"
 

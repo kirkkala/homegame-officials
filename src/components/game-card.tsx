@@ -1,29 +1,33 @@
 "use client"
 
 import { useState } from "react"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import Chip from "@mui/material/Chip"
-import Button from "@mui/material/Button"
-import Menu from "@mui/material/Menu"
-import MenuItem from "@mui/material/MenuItem"
-import ListItemIcon from "@mui/material/ListItemIcon"
-import ListItemText from "@mui/material/ListItemText"
-import Dialog from "@mui/material/Dialog"
-import DialogTitle from "@mui/material/DialogTitle"
-import DialogContent from "@mui/material/DialogContent"
-import DialogActions from "@mui/material/DialogActions"
-import TextField from "@mui/material/TextField"
-import Box from "@mui/material/Box"
-import AssignmentIcon from "@mui/icons-material/Assignment"
-import TimerIcon from "@mui/icons-material/Timer"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty"
-import PersonIcon from "@mui/icons-material/Person"
-import GroupIcon from "@mui/icons-material/Group"
-import ClearIcon from "@mui/icons-material/Clear"
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material"
+import {
+  Assignment as AssignmentIcon,
+  CheckCircle as CheckCircleIcon,
+  Clear as ClearIcon,
+  Group as GroupIcon,
+  HourglassEmpty as HourglassEmptyIcon,
+  Person as PersonIcon,
+  Timer as TimerIcon,
+} from "@mui/icons-material"
 import {
   updateOfficial,
   getPlayers,
@@ -44,10 +48,12 @@ function OfficialButton({
   role,
   assignment,
   onUpdate,
+  teamId,
 }: {
   role: Role
   assignment: OfficialAssignment | null
   onUpdate: (assignment: OfficialAssignment | null) => void
+  teamId: string
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [players, setPlayers] = useState<Player[]>([])
@@ -62,7 +68,7 @@ function OfficialButton({
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const target = event.currentTarget
     setLoading(true)
-    const loadedPlayers = await getPlayers()
+    const loadedPlayers = await getPlayers(teamId)
     setPlayers(loadedPlayers)
     setAnchorEl(target)
     setLoading(false)
@@ -179,7 +185,12 @@ function OfficialButton({
         {!assignment &&
           (players.length === 0 ? (
             <MenuItem key="empty" disabled>
-              <ListItemText>Ei pelaajia</ListItemText>
+              <ListItemText>
+                Ei pelaajia{" "}
+                <Typography sx={{ fontSize: "0.8rem" }}>
+                  (lisää pelaajia hallinnan kautta)
+                </Typography>
+              </ListItemText>
             </MenuItem>
           ) : (
             [...players]
@@ -312,11 +323,13 @@ export function GameCard({ game: initialGame }: { game: Game }) {
               role="poytakirja"
               assignment={game.officials.poytakirja}
               onUpdate={(a) => handleUpdate("poytakirja", a)}
+              teamId={game.teamId}
             />
             <OfficialButton
               role="kello"
               assignment={game.officials.kello}
               onUpdate={(a) => handleUpdate("kello", a)}
+              teamId={game.teamId}
             />
           </Stack>
         )}

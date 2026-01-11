@@ -1,20 +1,36 @@
-import { NextResponse } from "next/server"
-import { readDB, writeDB, type Game } from "@/lib/db"
+import { NextRequest, NextResponse } from "next/server"
+import { readDB, writeDB } from "@/lib/db"
+import { createGamesSchema, validate } from "@/lib/validation"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const db = await readDB()
-  return NextResponse.json(db.games)
+  const teamId = request.nextUrl.searchParams.get("teamId")
+
+  let games = db.games
+  if (teamId) {
+    games = games.filter((g) => g.teamId === teamId)
+  }
+
+  return NextResponse.json(games)
 }
 
 export async function POST(request: Request) {
+  const body = await request.json()
+  const result = validate(createGamesSchema, body)
+
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 400 })
+  }
+
+  const { games: newGames, teamId } = result.data
   const db = await readDB()
-  const newGames: Omit<Game, "id" | "createdAt" | "officials">[] = await request.json()
 
   const savedGames = newGames
     .filter(
       (game) =>
         !db.games.some(
           (g) =>
+            g.teamId === teamId &&
             g.date === game.date &&
             g.time === game.time &&
             g.homeTeam === game.homeTeam &&
@@ -23,6 +39,7 @@ export async function POST(request: Request) {
     )
     .map((game) => ({
       ...game,
+      teamId,
       id: crypto.randomUUID(),
       officials: { poytakirja: null, kello: null },
       createdAt: new Date().toISOString(),
@@ -33,9 +50,16 @@ export async function POST(request: Request) {
   return NextResponse.json(savedGames)
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   const db = await readDB()
-  db.games = []
+  const teamId = request.nextUrl.searchParams.get("teamId")
+
+  if (teamId) {
+    db.games = db.games.filter((g) => g.teamId !== teamId)
+  } else {
+    db.games = []
+  }
+
   await writeDB(db)
   return NextResponse.json({ success: true })
 }

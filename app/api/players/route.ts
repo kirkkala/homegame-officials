@@ -1,16 +1,36 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { readDB, writeDB } from "@/lib/db"
+import { createPlayerSchema, validate } from "@/lib/validation"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const db = await readDB()
-  return NextResponse.json(db.players)
+  const teamId = request.nextUrl.searchParams.get("teamId")
+
+  let players = db.players
+  if (teamId) {
+    players = players.filter((p) => p.teamId === teamId)
+  }
+
+  return NextResponse.json(players)
 }
 
 export async function POST(request: Request) {
-  const db = await readDB()
-  const { name } = await request.json()
+  const body = await request.json()
+  const result = validate(createPlayerSchema, body)
 
-  const newPlayer = { id: crypto.randomUUID(), name, createdAt: new Date().toISOString() }
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 400 })
+  }
+
+  const { name, teamId } = result.data
+  const db = await readDB()
+
+  const newPlayer = {
+    id: crypto.randomUUID(),
+    teamId,
+    name,
+    createdAt: new Date().toISOString(),
+  }
   db.players.push(newPlayer)
   await writeDB(db)
   return NextResponse.json(newPlayer)

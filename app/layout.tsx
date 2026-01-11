@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next"
+import { Suspense } from "react"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
+import { TeamProvider } from "@/components/team-context"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -24,7 +26,11 @@ export default function RootLayout({
     <html lang="fi">
       <body>
         <AppRouterCacheProvider>
-          <ThemeRegistry>{children}</ThemeRegistry>
+          <ThemeRegistry>
+            <Suspense>
+              <TeamProvider>{children}</TeamProvider>
+            </Suspense>
+          </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>
     </html>
