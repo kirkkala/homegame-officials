@@ -1,17 +1,16 @@
 "use client"
 
-import Container from "@mui/material/Container"
-import Typography from "@mui/material/Typography"
-import Box from "@mui/material/Box"
-import Paper from "@mui/material/Paper"
-import List from "@mui/material/List"
-import ListItem from "@mui/material/ListItem"
-import ListItemIcon from "@mui/material/ListItemIcon"
-import ListItemText from "@mui/material/ListItemText"
-import UploadFileIcon from "@mui/icons-material/UploadFile"
-import GroupsIcon from "@mui/icons-material/Groups"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import SettingsIcon from "@mui/icons-material/Settings"
+import {
+  Box,
+  Container,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Typography,
+} from "@mui/material"
+import { CheckCircle, Groups, Settings, UploadFile } from "@mui/icons-material"
 import { MainHeader } from "@/components/header"
 import { Footer } from "@/components/footer"
 
@@ -47,7 +46,7 @@ export default function KaijttoohjeetPage() {
           <List sx={{ py: 0 }}>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <UploadFileIcon color="primary" />
+                <UploadFile color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="1. Lataa ottelutiedot"
@@ -56,7 +55,7 @@ export default function KaijttoohjeetPage() {
             </ListItem>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <GroupsIcon color="primary" />
+                <Groups color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="2. Lisää pelaajat"
@@ -65,7 +64,7 @@ export default function KaijttoohjeetPage() {
             </ListItem>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <SettingsIcon color="primary" />
+                <Settings color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="3. Jaa vuorot"
@@ -74,7 +73,7 @@ export default function KaijttoohjeetPage() {
             </ListItem>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <CheckCircleIcon color="primary" />
+                <CheckCircle color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="4. Vahvista vuorot"

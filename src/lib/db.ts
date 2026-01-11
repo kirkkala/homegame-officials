@@ -9,8 +9,15 @@ export type OfficialAssignment = {
   confirmedBy: string | null
 }
 
+export type Team = {
+  id: string
+  name: string
+  createdAt: string
+}
+
 export type Game = {
   id: string
+  teamId: string
   divisionId: string
   homeTeam: string
   awayTeam: string
@@ -27,20 +34,27 @@ export type Game = {
 
 export type Player = {
   id: string
+  teamId: string
   name: string
   createdAt: string
 }
 
 export type DB = {
+  teams: Team[]
   games: Game[]
   players: Player[]
 }
 
 export async function readDB(): Promise<DB> {
   try {
-    return JSON.parse(await fs.readFile(DB_PATH, "utf-8"))
+    const data = JSON.parse(await fs.readFile(DB_PATH, "utf-8"))
+    // Ensure teams array exists for backward compatibility
+    if (!data.teams) {
+      data.teams = []
+    }
+    return data
   } catch {
-    return { games: [], players: [] }
+    return { teams: [], games: [], players: [] }
   }
 }
 

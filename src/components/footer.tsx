@@ -1,7 +1,5 @@
-import FavoriteIcon from "@mui/icons-material/Favorite"
-import Box from "@mui/material/Box"
-import MuiLink from "@mui/material/Link"
-import Typography from "@mui/material/Typography"
+import { Box, Link as MuiLink, Typography } from "@mui/material"
+import { Favorite } from "@mui/icons-material"
 
 export function Footer() {
   return (
@@ -18,7 +16,7 @@ export function Footer() {
     >
       <Typography sx={{ mb: 0.5 }}>
         Made with{" "}
-        <FavoriteIcon
+        <Favorite
           sx={{
             fontSize: "1rem",
             transform: "translateY(2px)",
