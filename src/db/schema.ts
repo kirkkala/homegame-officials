@@ -1,54 +1,58 @@
-import { pgTable, serial, text, timestamp, integer, date, time } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, boolean, jsonb } from "drizzle-orm/pg-core"
 
-// Pelaajat / Players (parents are identified by player name)
-export const players = pgTable("players", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(), // Pelaajan nimi
-  parentName: text("parent_name"), // Vanhemman nimi (valinnainen)
-  phone: text("phone"), // Puhelinnumero
-  email: text("email"), // Sähköposti
+// Officials assignment stored as JSON
+export type OfficialAssignment = {
+  playerName: string
+  handledBy: "guardian" | "pool" | null
+  confirmedBy: string | null
+}
+
+export type Officials = {
+  poytakirja: OfficialAssignment | null
+  kello: OfficialAssignment | null
+}
+
+// Teams
+export const teams = pgTable("teams", {
+  id: text("id").primaryKey(), // slug-based ID
+  name: text("name").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
-// Sarjat / Divisions
-export const divisions = pgTable("divisions", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(), // esim. "U12", "U14", "U16"
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-})
-
-// Kotipelit / Home games
+// Games
 export const games = pgTable("games", {
-  id: serial("id").primaryKey(),
-  divisionId: integer("division_id")
-    .references(() => divisions.id)
+  id: text("id").primaryKey(), // UUID
+  teamId: text("team_id")
+    .references(() => teams.id, { onDelete: "cascade" })
     .notNull(),
-  opponent: text("opponent").notNull(), // Vastustaja
-  gameDate: date("game_date").notNull(), // Pelin päivämäärä
-  gameTime: time("game_time").notNull(), // Pelin alkamisaika
-  location: text("location"), // Pelipaikka
+  divisionId: text("division_id").notNull(),
+  homeTeam: text("home_team").notNull(),
+  awayTeam: text("away_team").notNull(),
+  isHomeGame: boolean("is_home_game").notNull().default(false),
+  date: text("date").notNull(), // ISO date string
+  time: text("time").notNull(), // HH:mm format
+  location: text("location").notNull(),
+  officials: jsonb("officials")
+    .$type<Officials>()
+    .notNull()
+    .default({ poytakirja: null, kello: null }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
-// Toimitsijat / Game officials assignments
-export const assignments = pgTable("assignments", {
-  id: serial("id").primaryKey(),
-  gameId: integer("game_id")
-    .references(() => games.id)
+// Players
+export const players = pgTable("players", {
+  id: text("id").primaryKey(), // UUID
+  teamId: text("team_id")
+    .references(() => teams.id, { onDelete: "cascade" })
     .notNull(),
-  playerId: integer("player_id")
-    .references(() => players.id)
-    .notNull(),
-  role: text("role").notNull(), // "pöytäkirja" tai "kello"
+  name: text("name").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
 // Types for TypeScript
-export type Player = typeof players.$inferSelect
-export type NewPlayer = typeof players.$inferInsert
-export type Division = typeof divisions.$inferSelect
-export type NewDivision = typeof divisions.$inferInsert
+export type Team = typeof teams.$inferSelect
+export type NewTeam = typeof teams.$inferInsert
 export type Game = typeof games.$inferSelect
 export type NewGame = typeof games.$inferInsert
-export type Assignment = typeof assignments.$inferSelect
-export type NewAssignment = typeof assignments.$inferInsert
+export type Player = typeof players.$inferSelect
+export type NewPlayer = typeof players.$inferInsert
