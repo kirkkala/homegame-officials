@@ -25,13 +25,13 @@ import {
 } from "@mui/material"
 import {
   ArrowBack as ArrowBackIcon,
+  Close as CloseIcon,
+  HelpOutline as HelpOutlineIcon,
+  Home as HomeIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  Menu as MenuIcon,
   Settings as SettingsIcon,
   SportsBasketball as SportsBasketballIcon,
-  Menu as MenuIcon,
-  Home as HomeIcon,
-  HelpOutline as HelpOutlineIcon,
-  Close as CloseIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material"
 import { TeamSelector } from "./team-selector"
 import { useTeam } from "./team-context"

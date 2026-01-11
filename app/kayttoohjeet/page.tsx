@@ -10,7 +10,12 @@ import {
   Paper,
   Typography,
 } from "@mui/material"
-import { CheckCircle, Groups, Settings, UploadFile } from "@mui/icons-material"
+import {
+  CheckCircle as CheckCircleIcon,
+  Groups as GroupsIcon,
+  Settings as SettingsIcon,
+  UploadFile as UploadFileIcon,
+} from "@mui/icons-material"
 import { MainHeader } from "@/components/header"
 import { Footer } from "@/components/footer"
 
@@ -46,7 +51,7 @@ export default function KaijttoohjeetPage() {
           <List sx={{ py: 0 }}>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <UploadFile color="primary" />
+                <UploadFileIcon color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="1. Lataa ottelutiedot"
@@ -55,7 +60,7 @@ export default function KaijttoohjeetPage() {
             </ListItem>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <Groups color="primary" />
+                <GroupsIcon color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="2. Lisää pelaajat"
@@ -64,7 +69,7 @@ export default function KaijttoohjeetPage() {
             </ListItem>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <Settings color="primary" />
+                <SettingsIcon color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="3. Jaa vuorot"
@@ -73,7 +78,7 @@ export default function KaijttoohjeetPage() {
             </ListItem>
             <ListItem sx={{ px: { xs: 0, sm: 2 }, alignItems: "flex-start" }}>
               <ListItemIcon sx={{ minWidth: { xs: 40, sm: 56 }, mt: 0.5 }}>
-                <CheckCircle color="primary" />
+                <CheckCircleIcon color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary="4. Vahvista vuorot"

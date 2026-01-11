@@ -17,7 +17,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material"
-import { Add } from "@mui/icons-material"
+import { Add as AddIcon } from "@mui/icons-material"
 import { useTeam } from "./team-context"
 
 type TeamSelectorProps = {
@@ -62,7 +62,7 @@ export function TeamSelector({
     return (
       <Button
         variant="contained"
-        startIcon={<Add />}
+        startIcon={<AddIcon />}
         onClick={() => setDialogOpen(true)}
         size={size}
       >

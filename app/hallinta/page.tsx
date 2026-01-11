@@ -27,14 +27,14 @@ import {
   CircularProgress,
 } from "@mui/material"
 import {
-  Remove as MinusIcon,
-  DeleteForever as DeleteIcon,
-  DeleteOutline as DeleteOutlineIcon,
-  UploadFile as UploadFileIcon,
-  ExpandMore as ExpandMoreIcon,
   Add as AddIcon,
   Close as CloseIcon,
+  DeleteForever as DeleteForeverIcon,
+  DeleteOutline as DeleteOutlineIcon,
+  ExpandMore as ExpandMoreIcon,
   Groups as GroupsIcon,
+  Remove as RemoveIcon,
+  UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -411,7 +411,7 @@ export default function HallintaPage() {
             <Button
               color="error"
               size="small"
-              startIcon={<DeleteIcon />}
+              startIcon={<DeleteForeverIcon />}
               onClick={handleDeleteTeam}
             >
               Poista joukkue
@@ -508,7 +508,7 @@ export default function HallintaPage() {
               <Box sx={{ mt: 2 }}>
                 <Button
                   size="small"
-                  startIcon={showManualForm ? <MinusIcon /> : <AddIcon />}
+                  startIcon={showManualForm ? <RemoveIcon /> : <AddIcon />}
                   onClick={() => setShowManualForm(!showManualForm)}
                   variant="outlined"
                 >
@@ -669,7 +669,7 @@ export default function HallintaPage() {
                 <Button
                   color="error"
                   size="small"
-                  startIcon={<DeleteIcon />}
+                  startIcon={<DeleteForeverIcon />}
                   onClick={handleClearAll}
                 >
                   Poista kaikki pelit

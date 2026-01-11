@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button, CircularProgress, Stack, Typography } from "@mui/material"
-import { CalendarMonth, Groups, UploadFile } from "@mui/icons-material"
+import {
+  CalendarMonth as CalendarMonthIcon,
+  Groups as GroupsIcon,
+  UploadFile as UploadFileIcon,
+} from "@mui/icons-material"
 import { TeamSelector } from "./team-selector"
 import { GameCard } from "./game-card"
 import { useTeam } from "./team-context"
@@ -50,7 +54,7 @@ export function GamesList() {
   if (!selectedTeam) {
     return (
       <Stack alignItems="center" py={8}>
-        <Groups sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+        <GroupsIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
         <Typography variant="h5" gutterBottom>
           Valitse joukkue
         </Typography>
@@ -62,11 +66,16 @@ export function GamesList() {
   if (games.length === 0) {
     return (
       <Stack alignItems="center" py={8}>
-        <CalendarMonth sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+        <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
         <Typography variant="h5" gutterBottom>
           Ei pelejä
         </Typography>
-        <Button component={Link} href="/hallinta" variant="contained" startIcon={<UploadFile />}>
+        <Button
+          component={Link}
+          href="/hallinta"
+          variant="contained"
+          startIcon={<UploadFileIcon />}
+        >
           Siirry hallintaan
         </Button>
       </Stack>

@@ -20,13 +20,13 @@ import {
   Typography,
 } from "@mui/material"
 import {
-  Assignment,
-  CheckCircle,
-  Clear,
-  Group,
-  HourglassEmpty,
-  Person,
-  Timer,
+  Assignment as AssignmentIcon,
+  CheckCircle as CheckCircleIcon,
+  Clear as ClearIcon,
+  Group as GroupIcon,
+  HourglassEmpty as HourglassEmptyIcon,
+  Person as PersonIcon,
+  Timer as TimerIcon,
 } from "@mui/icons-material"
 import {
   updateOfficial,
@@ -38,8 +38,8 @@ import {
 import { formatDate } from "@/lib/utils"
 
 const ROLES = {
-  poytakirja: { label: "Pöytäkirja (eSCO)", Icon: Assignment },
-  kello: { label: "Kello (tulostaulu)", Icon: Timer },
+  poytakirja: { label: "Pöytäkirja (eSCO)", Icon: AssignmentIcon },
+  kello: { label: "Kello (tulostaulu)", Icon: TimerIcon },
 } as const
 
 type Role = "poytakirja" | "kello"
@@ -147,7 +147,7 @@ function OfficialButton({
                 label={getStatusLabel()}
                 size="small"
                 color={isConfirmed ? "success" : "warning"}
-                icon={isConfirmed ? <CheckCircle /> : <HourglassEmpty />}
+                icon={isConfirmed ? <CheckCircleIcon /> : <HourglassEmptyIcon />}
               />
             </Box>
           )}
@@ -159,7 +159,7 @@ function OfficialButton({
         {assignment && !isConfirmed && (
           <MenuItem key="guardian" onClick={() => handleOpenDialog("guardian")}>
             <ListItemIcon>
-              <Group color="primary" />
+              <GroupIcon color="primary" />
             </ListItemIcon>
             <ListItemText>Huoltaja tekee vuoron</ListItemText>
           </MenuItem>
@@ -167,7 +167,7 @@ function OfficialButton({
         {assignment && !isConfirmed && (
           <MenuItem key="pool" onClick={() => handleOpenDialog("pool")}>
             <ListItemIcon>
-              <Person color="secondary" />
+              <PersonIcon color="secondary" />
             </ListItemIcon>
             <ListItemText>Juniori poolista</ListItemText>
           </MenuItem>
@@ -176,7 +176,7 @@ function OfficialButton({
         {assignment && (
           <MenuItem key="clear" onClick={handleClear}>
             <ListItemIcon>
-              <Clear color="error" />
+              <ClearIcon color="error" />
             </ListItemIcon>
             <ListItemText>Poista toimitsijavastuu</ListItemText>
           </MenuItem>

@@ -18,7 +18,7 @@ type TeamContextType = {
   selectTeam: (teamId: string | null) => void
   createTeam: (name: string) => Promise<Team>
   deleteTeam: (id: string) => Promise<void>
-  refreshTeams: () => Promise<void>
+  refreshTeams: () => Promise<Team[]>
 }
 
 const TeamContext = createContext<TeamContextType | null>(null)
