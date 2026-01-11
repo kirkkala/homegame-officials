@@ -33,9 +33,11 @@ import {
   DeleteOutline as DeleteOutlineIcon,
   ExpandMore as ExpandMoreIcon,
   Groups as GroupsIcon,
+  HelpOutline as HelpOutlineIcon,
   Remove as RemoveIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
+import NextLink from "next/link"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { TeamSelector } from "@/components/team-selector"
@@ -389,6 +391,15 @@ export default function HallintaPage() {
             Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä kotipelit.
           </Typography>
           <TeamSelector showCreateButton />
+          <Button
+            component={NextLink}
+            href="/kayttoohjeet"
+            size="small"
+            startIcon={<HelpOutlineIcon />}
+            sx={{ mt: 4, color: "text.secondary" }}
+          >
+            Käyttöohjeet
+          </Button>
         </Stack>
         <Footer />
       </PageLayout>
@@ -406,8 +417,16 @@ export default function HallintaPage() {
 
         {/* Team Management */}
         <Box>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1}>
-            <Typography variant="subtitle2">Joukkue</Typography>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+            <Button
+              component={NextLink}
+              href="/kayttoohjeet"
+              size="small"
+              startIcon={<HelpOutlineIcon />}
+              sx={{ color: "text.secondary" }}
+            >
+              Käyttöohjeet
+            </Button>
             <Button
               color="error"
               size="small"
@@ -417,10 +436,9 @@ export default function HallintaPage() {
               Poista joukkue
             </Button>
           </Stack>
-          <Stack direction="row" alignItems="center" gap={2}>
-            <TeamSelector showCreateButton />
-          </Stack>
         </Box>
+
+        <TeamSelector showCreateButton />
 
         <Box>
           <Accordion
