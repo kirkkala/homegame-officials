@@ -7,6 +7,9 @@ import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
+import Accordion from "@mui/material/Accordion"
+import AccordionSummary from "@mui/material/AccordionSummary"
+import AccordionDetails from "@mui/material/AccordionDetails"
 import TextField from "@mui/material/TextField"
 import Chip from "@mui/material/Chip"
 import Alert from "@mui/material/Alert"
@@ -20,11 +23,11 @@ import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Checkbox from "@mui/material/Checkbox"
 import IconButton from "@mui/material/IconButton"
+import MinusIcon from "@mui/icons-material/Remove"
 import DeleteIcon from "@mui/icons-material/DeleteForever"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import UploadFileIcon from "@mui/icons-material/UploadFile"
-import GroupIcon from "@mui/icons-material/Group"
-import SportsBasketballIcon from "@mui/icons-material/SportsBasketball"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import AddIcon from "@mui/icons-material/Add"
 import CloseIcon from "@mui/icons-material/Close"
 import { Header } from "@/components/header"
@@ -326,187 +329,191 @@ export default function HallintaPage() {
             </Alert>
           )}
 
-          {/* Players */}
-          <Card>
-            <CardContent>
-              <Stack direction="row" alignItems="center" gap={1} mb={2}>
-                <GroupIcon color="primary" />
-                <Typography variant="h6">Pelaajat</Typography>
-              </Stack>
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Joukkueen pelaajat, kenelle osoitetaan toimisijavuorovastuu.
-              </Typography>
-
-              <form onSubmit={handleAddPlayers}>
-                <TextField
-                  multiline
-                  minRows={4}
-                  fullWidth
-                  value={playerNames}
-                  onChange={(e) => setPlayerNames(e.target.value)}
-                  placeholder="Lisää pelaajia (yksi per rivi)"
-                  sx={{ mb: 2 }}
-                />
-                <Button type="submit" variant="contained" size="small">
-                  Lisää pelaajat
-                </Button>
-              </form>
-
-              {players.length > 0 && (
-                <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
-                  {[...players]
-                    .sort((a, b) => a.name.localeCompare(b.name, "fi"))
-                    .map((player) => (
-                      <Chip
-                        key={player.id}
-                        label={player.name}
-                        onDelete={() => handleDeletePlayer(player.id)}
-                        deleteIcon={<CloseIcon />}
-                      />
-                    ))}
-                </Stack>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Games Upload */}
-          <Card>
-            <CardContent>
-              <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-                <Stack direction="row" alignItems="center" gap={1}>
-                  <SportsBasketballIcon color="primary" />
-                  <Typography variant="h6">Lisää pelejä</Typography>
-                </Stack>
-                <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={() => setShowManualForm(!showManualForm)}
-                  variant={showManualForm ? "outlined" : "text"}
-                >
-                  {showManualForm ? "Piilota lomake" : "Lisää manuaalisesti"}
-                </Button>
-              </Stack>
-
-              {/* Manual game form */}
-              {showManualForm && (
-                <Box
-                  component="form"
-                  onSubmit={handleAddManualGame}
-                  sx={{ mb: 3, p: 2, bgcolor: "grey.50", borderRadius: 1 }}
-                >
-                  <Typography variant="subtitle2" gutterBottom>
-                    Lisää peli manuaalisesti
-                  </Typography>
-                  <Stack gap={2}>
-                    <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
-                      <TextField
-                        label="Kotijoukkue"
-                        size="small"
-                        required
-                        value={manualGame.homeTeam}
-                        onChange={(e) => setManualGame({ ...manualGame, homeTeam: e.target.value })}
-                        sx={{ flex: 1 }}
-                      />
-                      <TextField
-                        label="Vierasjoukkue"
-                        size="small"
-                        required
-                        value={manualGame.awayTeam}
-                        onChange={(e) => setManualGame({ ...manualGame, awayTeam: e.target.value })}
-                        sx={{ flex: 1 }}
-                      />
-                    </Stack>
-                    <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
-                      <TextField
-                        label="Päivämäärä"
-                        type="date"
-                        size="small"
-                        required
-                        value={manualGame.date}
-                        onChange={(e) => setManualGame({ ...manualGame, date: e.target.value })}
-                        slotProps={{ inputLabel: { shrink: true } }}
-                        sx={{ flex: 1 }}
-                      />
-                      <TextField
-                        label="Aika"
-                        type="time"
-                        size="small"
-                        required
-                        value={manualGame.time}
-                        onChange={(e) => setManualGame({ ...manualGame, time: e.target.value })}
-                        slotProps={{ inputLabel: { shrink: true } }}
-                        sx={{ flex: 1 }}
-                      />
-                    </Stack>
-                    <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
-                      <TextField
-                        label="Sarja"
-                        size="small"
-                        placeholder="esim. I div."
-                        value={manualGame.division}
-                        onChange={(e) => setManualGame({ ...manualGame, division: e.target.value })}
-                        sx={{ flex: 1 }}
-                      />
-                      <TextField
-                        label="Paikka"
-                        size="small"
-                        value={manualGame.location}
-                        onChange={(e) => setManualGame({ ...manualGame, location: e.target.value })}
-                        sx={{ flex: 2 }}
-                      />
-                    </Stack>
-                    <Stack direction="row" alignItems="center" justifyContent="space-between">
-                      <Stack direction="row" alignItems="center" gap={1}>
-                        <Checkbox
-                          checked={manualGame.isHomeGame}
-                          onChange={(e) =>
-                            setManualGame({ ...manualGame, isHomeGame: e.target.checked })
-                          }
-                          color="success"
-                        />
-                        <Typography variant="body2">Kotipeli (tarvitsee toimitsijat)</Typography>
-                      </Stack>
-                      <Button type="submit" variant="contained" size="small">
-                        Lisää peli
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </Box>
-              )}
-
-              <Box
-                onDragOver={(e) => {
-                  e.preventDefault()
-                  setIsDragging(true)
-                }}
-                onDragLeave={() => setIsDragging(false)}
-                onDrop={handleDrop}
-                sx={{
-                  border: 2,
-                  borderStyle: "dashed",
-                  borderColor: isDragging ? "primary.main" : "grey.300",
-                  borderRadius: 2,
-                  p: 3,
-                  textAlign: "center",
-                  bgcolor: isDragging ? "primary.50" : "transparent",
-                }}
-              >
-                <Typography color="text.secondary" gutterBottom>
-                  Vedä Excel-tiedosto tähän tai
+          <Box>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography component="h2" sx={{ fontSize: "1.25rem" }}>
+                  Pelaajat
                 </Typography>
-                <Button variant="contained" component="label" startIcon={<UploadFileIcon />}>
-                  Valitse tiedosto
-                  <input
-                    type="file"
-                    hidden
-                    accept=".xlsx,.xls"
-                    onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography>Joukkueen pelaajat toimitsijavuorovastuun valintalistaan.</Typography>
+                {players.length > 0 && (
+                  <Stack direction="row" flexWrap="wrap" gap={1} my={2}>
+                    {[...players]
+                      .sort((a, b) => a.name.localeCompare(b.name, "fi"))
+                      .map((player) => (
+                        <Chip
+                          key={player.id}
+                          label={player.name}
+                          onDelete={() => handleDeletePlayer(player.id)}
+                          deleteIcon={<CloseIcon />}
+                        />
+                      ))}
+                  </Stack>
+                )}
+                <form onSubmit={handleAddPlayers}>
+                  <TextField
+                    multiline
+                    minRows={4}
+                    fullWidth
+                    value={playerNames}
+                    onChange={(e) => setPlayerNames(e.target.value)}
+                    placeholder="Lisää pelaajia (yksi per rivi)"
+                    sx={{ mb: 2 }}
                   />
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
+                  <Button type="submit" variant="contained" size="small">
+                    Lisää pelaajat
+                  </Button>
+                </form>
+              </AccordionDetails>
+            </Accordion>
 
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography component="h2" sx={{ fontSize: "1.25rem" }}>
+                  Lisää pelejä
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography></Typography>
+                <Box
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    setIsDragging(true)
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  sx={{
+                    border: 2,
+                    borderStyle: "dashed",
+                    borderColor: isDragging ? "primary.main" : "grey.300",
+                    borderRadius: 2,
+                    p: 3,
+                    textAlign: "center",
+                    bgcolor: isDragging ? "primary.50" : "transparent",
+                  }}
+                >
+                  <Typography color="text.secondary" gutterBottom>
+                    Vedä Excel-tiedosto tähän tai
+                  </Typography>
+                  <Button variant="contained" component="label" startIcon={<UploadFileIcon />}>
+                    Valitse tiedosto
+                    <input
+                      type="file"
+                      hidden
+                      accept=".xlsx,.xls"
+                      onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                    />
+                  </Button>
+                </Box>
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    size="small"
+                    startIcon={showManualForm ? <MinusIcon /> : <AddIcon />}
+                    onClick={() => setShowManualForm(!showManualForm)}
+                    variant="outlined"
+                  >
+                    {showManualForm ? "Piilota lomake" : "Lisää manuaalisesti"}
+                  </Button>
+                </Box>
+                {/* Manual game form */}
+                {showManualForm && (
+                  <Box
+                    component="form"
+                    onSubmit={handleAddManualGame}
+                    sx={{ mb: 3, p: 2, bgcolor: "grey.50", borderRadius: 1 }}
+                  >
+                    <Typography variant="subtitle2" gutterBottom>
+                      Lisää peli manuaalisesti
+                    </Typography>
+                    <Stack gap={2}>
+                      <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+                        <TextField
+                          label="Kotijoukkue"
+                          size="small"
+                          required
+                          value={manualGame.homeTeam}
+                          onChange={(e) =>
+                            setManualGame({ ...manualGame, homeTeam: e.target.value })
+                          }
+                          sx={{ flex: 1 }}
+                        />
+                        <TextField
+                          label="Vierasjoukkue"
+                          size="small"
+                          required
+                          value={manualGame.awayTeam}
+                          onChange={(e) =>
+                            setManualGame({ ...manualGame, awayTeam: e.target.value })
+                          }
+                          sx={{ flex: 1 }}
+                        />
+                      </Stack>
+                      <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+                        <TextField
+                          label="Päivämäärä"
+                          type="date"
+                          size="small"
+                          required
+                          value={manualGame.date}
+                          onChange={(e) => setManualGame({ ...manualGame, date: e.target.value })}
+                          slotProps={{ inputLabel: { shrink: true } }}
+                          sx={{ flex: 1 }}
+                        />
+                        <TextField
+                          label="Aika"
+                          type="time"
+                          size="small"
+                          required
+                          value={manualGame.time}
+                          onChange={(e) => setManualGame({ ...manualGame, time: e.target.value })}
+                          slotProps={{ inputLabel: { shrink: true } }}
+                          sx={{ flex: 1 }}
+                        />
+                      </Stack>
+                      <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+                        <TextField
+                          label="Sarja"
+                          size="small"
+                          placeholder="esim. I div."
+                          value={manualGame.division}
+                          onChange={(e) =>
+                            setManualGame({ ...manualGame, division: e.target.value })
+                          }
+                          sx={{ flex: 1 }}
+                        />
+                        <TextField
+                          label="Paikka"
+                          size="small"
+                          value={manualGame.location}
+                          onChange={(e) =>
+                            setManualGame({ ...manualGame, location: e.target.value })
+                          }
+                          sx={{ flex: 2 }}
+                        />
+                      </Stack>
+                      <Stack direction="row" alignItems="center" justifyContent="space-between">
+                        <Stack direction="row" alignItems="center" gap={1}>
+                          <Checkbox
+                            checked={manualGame.isHomeGame}
+                            onChange={(e) =>
+                              setManualGame({ ...manualGame, isHomeGame: e.target.checked })
+                            }
+                            color="success"
+                          />
+                          <Typography variant="body2">Kotipeli (tarvitsee toimitsijat)</Typography>
+                        </Stack>
+                        <Button type="submit" variant="contained" size="small">
+                          Lisää peli
+                        </Button>
+                      </Stack>
+                    </Stack>
+                  </Box>
+                )}
+              </AccordionDetails>
+            </Accordion>
+          </Box>
           {/* Preview - New games to import */}
           {parsedGames.length > 0 && (
             <Card>
@@ -544,23 +551,20 @@ export default function HallintaPage() {
           {existingGames.length > 0 && (
             <Card>
               <CardContent>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-                  <Stack direction="row" alignItems="center" gap={1}>
-                    <SportsBasketballIcon color="primary" />
-                    <Typography variant="h6">Kaikki pelit ({existingGames.length})</Typography>
-                  </Stack>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   <Button
                     color="error"
                     size="small"
                     startIcon={<DeleteIcon />}
                     onClick={handleClearAll}
                   >
-                    Tyhjennä kaikki
+                    Poista kaikki
                   </Button>
-                </Stack>
+                </Box>
 
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  Merkitse kotipelit rastilla, näihin peleihin voi merkitä toimitsijat.
+                  Merkitse kotipelit rastilla jotta niihin voi lisätä toimitsijoita. Järjestelmä
+                  tallentaa valinnan automaattisesti.
                 </Typography>
 
                 <GamesTable
