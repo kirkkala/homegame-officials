@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { readDB, writeDB } from "@/lib/db"
+import { slugify } from "@/lib/utils"
 
 export async function GET() {
   const db = await readDB()
@@ -10,14 +11,17 @@ export async function POST(request: Request) {
   const db = await readDB()
   const { name } = await request.json()
 
-  // Find the highest existing ID and add 1
-  const maxId = db.teams.reduce((max, team) => {
-    const numId = parseInt(team.id, 10)
-    return isNaN(numId) ? max : Math.max(max, numId)
-  }, 0)
+  // Generate ID from team name
+  const id = slugify(name)
+
+  // Check if team with this ID (or same name) already exists
+  const existingTeam = db.teams.find((team) => team.id === id)
+  if (existingTeam) {
+    return NextResponse.json({ error: "Joukkue tällä nimellä on jo olemassa" }, { status: 409 })
+  }
 
   const newTeam = {
-    id: String(maxId + 1),
+    id,
     name,
     createdAt: new Date().toISOString(),
   }

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import {
+  Alert,
   Box,
   Button,
   Dialog,
@@ -36,6 +37,7 @@ export function TeamSelector({
   const { teams, selectedTeam, selectTeam, createTeam, isLoading } = useTeam()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newTeamName, setNewTeamName] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   const handleChange = (event: SelectChangeEvent) => {
     const value = event.target.value
@@ -46,11 +48,22 @@ export function TeamSelector({
     }
   }
 
+  const handleCloseDialog = () => {
+    setDialogOpen(false)
+    setNewTeamName("")
+    setError(null)
+  }
+
   const handleCreateTeam = async () => {
     if (newTeamName.trim()) {
-      await createTeam(newTeamName.trim())
-      setNewTeamName("")
-      setDialogOpen(false)
+      try {
+        setError(null)
+        await createTeam(newTeamName.trim())
+        setNewTeamName("")
+        setDialogOpen(false)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Joukkueen luonti epäonnistui")
+      }
     }
   }
 
@@ -92,23 +105,32 @@ export function TeamSelector({
         </FormControl>
       </Stack>
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="xs" fullWidth>
         <DialogTitle>Luo uusi joukkue</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
+            {error && (
+              <Alert severity="warning" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
             <TextField
               autoFocus
               fullWidth
               label="Joukkueen nimi"
               placeholder="esim. HNMKY T14 Stadi"
               value={newTeamName}
-              onChange={(e) => setNewTeamName(e.target.value)}
+              onChange={(e) => {
+                setNewTeamName(e.target.value)
+                setError(null)
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault()
                   handleCreateTeam()
                 }
               }}
+              error={!!error}
             />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
               Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä pelit hallintasivulta.
@@ -116,7 +138,7 @@ export function TeamSelector({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Peruuta</Button>
+          <Button onClick={handleCloseDialog}>Peruuta</Button>
           <Button variant="contained" onClick={handleCreateTeam} disabled={!newTeamName.trim()}>
             Luo joukkue
           </Button>

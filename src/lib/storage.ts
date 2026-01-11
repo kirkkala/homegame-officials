@@ -48,6 +48,10 @@ export async function createTeam(name: string): Promise<Team> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name }),
   })
+  if (!res.ok) {
+    const data = await res.json()
+    throw new Error(data.error || "Joukkueen luonti epäonnistui")
+  }
   return res.json()
 }
 
