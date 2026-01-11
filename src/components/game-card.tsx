@@ -197,7 +197,7 @@ function OfficialButton({
               .sort((a, b) => a.name.localeCompare(b.name, "fi"))
               .map((player) => (
                 <MenuItem key={player.id} onClick={() => handleSelectPlayer(player.name)}>
-                  <ListItemText inset>{player.name}</ListItemText>
+                  <ListItemText>{player.name}</ListItemText>
                 </MenuItem>
               ))
           ))}
