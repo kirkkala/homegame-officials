@@ -71,39 +71,37 @@ export function TeamSelector({
     return null
   }
 
-  if (teams.length === 0) {
-    return (
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => setDialogOpen(true)}
-        size={size}
-      >
-        Luo joukkue
-      </Button>
-    )
-  }
-
   return (
     <>
-      <Stack direction="row" alignItems="center" gap={1}>
-        <FormControl size={size} fullWidth={fullWidth} variant={variant} sx={{ minWidth: 180 }}>
-          <InputLabel id="team-select-label">Joukkue</InputLabel>
-          <Select
-            labelId="team-select-label"
-            value={selectedTeam?.id ?? ""}
-            label="Joukkue"
-            onChange={handleChange}
-          >
-            {teams.map((team) => (
-              <MenuItem key={team.id} value={team.id}>
-                {team.name}
-              </MenuItem>
-            ))}
-            {showCreateButton && <MenuItem value="__create__">+ Luo uusi joukkue...</MenuItem>}
-          </Select>
-        </FormControl>
-      </Stack>
+      {teams.length === 0 ? (
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setDialogOpen(true)}
+          size={size}
+        >
+          Luo joukkue
+        </Button>
+      ) : (
+        <Stack direction="row" alignItems="center" gap={1}>
+          <FormControl size={size} fullWidth={fullWidth} variant={variant} sx={{ minWidth: 180 }}>
+            <InputLabel id="team-select-label">Joukkue</InputLabel>
+            <Select
+              labelId="team-select-label"
+              value={selectedTeam?.id ?? ""}
+              label="Joukkue"
+              onChange={handleChange}
+            >
+              {teams.map((team) => (
+                <MenuItem key={team.id} value={team.id}>
+                  {team.name}
+                </MenuItem>
+              ))}
+              {showCreateButton && <MenuItem value="__create__">+ Luo uusi joukkue...</MenuItem>}
+            </Select>
+          </FormControl>
+        </Stack>
+      )}
 
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="xs" fullWidth>
         <DialogTitle>Luo uusi joukkue</DialogTitle>
