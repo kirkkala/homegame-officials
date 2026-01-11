@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { readDB, writeDB, type Game } from "@/lib/db"
+import { readDB, writeDB } from "@/lib/db"
+import { createGamesSchema, validate } from "@/lib/validation"
 
 export async function GET(request: NextRequest) {
   const db = await readDB()
@@ -14,11 +15,15 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: Request) {
-  const db = await readDB()
-  const { games: newGames, teamId } = (await request.json()) as {
-    games: Omit<Game, "id" | "createdAt" | "officials" | "teamId">[]
-    teamId: string
+  const body = await request.json()
+  const result = validate(createGamesSchema, body)
+
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 400 })
   }
+
+  const { games: newGames, teamId } = result.data
+  const db = await readDB()
 
   const savedGames = newGames
     .filter(

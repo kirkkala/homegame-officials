@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { readDB, writeDB } from "@/lib/db"
 import { slugify } from "@/lib/utils"
+import { createTeamSchema, validate } from "@/lib/validation"
 
 export async function GET() {
   const db = await readDB()
@@ -8,8 +9,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const body = await request.json()
+  const result = validate(createTeamSchema, body)
+
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 400 })
+  }
+
+  const { name } = result.data
   const db = await readDB()
-  const { name } = await request.json()
 
   // Generate ID from team name
   const id = slugify(name)

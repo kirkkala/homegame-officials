@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { readDB, writeDB } from "@/lib/db"
+import { createPlayerSchema, validate } from "@/lib/validation"
 
 export async function GET(request: NextRequest) {
   const db = await readDB()
@@ -14,8 +15,15 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: Request) {
+  const body = await request.json()
+  const result = validate(createPlayerSchema, body)
+
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 400 })
+  }
+
+  const { name, teamId } = result.data
   const db = await readDB()
-  const { name, teamId } = await request.json()
 
   const newPlayer = {
     id: crypto.randomUUID(),
