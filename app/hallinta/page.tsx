@@ -25,6 +25,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import UploadFileIcon from "@mui/icons-material/UploadFile"
 import GroupIcon from "@mui/icons-material/Group"
 import SportsBasketballIcon from "@mui/icons-material/SportsBasketball"
+import AddIcon from "@mui/icons-material/Add"
 import CloseIcon from "@mui/icons-material/Close"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -144,6 +145,16 @@ export default function HallintaPage() {
   } | null>(null)
   const [players, setPlayers] = useState<Player[]>([])
   const [playerNames, setPlayerNames] = useState("")
+  const [showManualForm, setShowManualForm] = useState(false)
+  const [manualGame, setManualGame] = useState({
+    division: "",
+    homeTeam: "",
+    awayTeam: "",
+    date: "",
+    time: "",
+    location: "",
+    isHomeGame: true,
+  })
 
   const loadGames = useCallback(async () => {
     const games = await getGames()
@@ -268,6 +279,41 @@ export default function HallintaPage() {
     [players]
   )
 
+  const handleAddManualGame = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      if (!manualGame.homeTeam || !manualGame.awayTeam || !manualGame.date || !manualGame.time) {
+        return
+      }
+      const saved = await saveGames([
+        {
+          divisionId: manualGame.division,
+          homeTeam: manualGame.homeTeam,
+          awayTeam: manualGame.awayTeam,
+          date: manualGame.date,
+          time: manualGame.time,
+          location: manualGame.location,
+          isHomeGame: manualGame.isHomeGame,
+        },
+      ])
+      if (saved.length > 0) {
+        setImportStatus({ type: "success", message: "Peli lisätty!" })
+        setManualGame({
+          division: "",
+          homeTeam: "",
+          awayTeam: "",
+          date: "",
+          time: "",
+          location: "",
+          isHomeGame: true,
+        })
+        setShowManualForm(false)
+        await loadGames()
+      }
+    },
+    [manualGame, loadGames]
+  )
+
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <Header title="Hallinta" subtitle="Pelaajat ja pelien tuonti" backHref="/" />
@@ -329,9 +375,104 @@ export default function HallintaPage() {
               <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
                 <Stack direction="row" alignItems="center" gap={1}>
                   <SportsBasketballIcon color="primary" />
-                  <Typography variant="h6">Tuo pelejä</Typography>
+                  <Typography variant="h6">Lisää pelejä</Typography>
                 </Stack>
+                <Button
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={() => setShowManualForm(!showManualForm)}
+                  variant={showManualForm ? "outlined" : "text"}
+                >
+                  {showManualForm ? "Piilota lomake" : "Lisää manuaalisesti"}
+                </Button>
               </Stack>
+
+              {/* Manual game form */}
+              {showManualForm && (
+                <Box
+                  component="form"
+                  onSubmit={handleAddManualGame}
+                  sx={{ mb: 3, p: 2, bgcolor: "grey.50", borderRadius: 1 }}
+                >
+                  <Typography variant="subtitle2" gutterBottom>
+                    Lisää peli manuaalisesti
+                  </Typography>
+                  <Stack gap={2}>
+                    <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+                      <TextField
+                        label="Kotijoukkue"
+                        size="small"
+                        required
+                        value={manualGame.homeTeam}
+                        onChange={(e) => setManualGame({ ...manualGame, homeTeam: e.target.value })}
+                        sx={{ flex: 1 }}
+                      />
+                      <TextField
+                        label="Vierasjoukkue"
+                        size="small"
+                        required
+                        value={manualGame.awayTeam}
+                        onChange={(e) => setManualGame({ ...manualGame, awayTeam: e.target.value })}
+                        sx={{ flex: 1 }}
+                      />
+                    </Stack>
+                    <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+                      <TextField
+                        label="Päivämäärä"
+                        type="date"
+                        size="small"
+                        required
+                        value={manualGame.date}
+                        onChange={(e) => setManualGame({ ...manualGame, date: e.target.value })}
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        sx={{ flex: 1 }}
+                      />
+                      <TextField
+                        label="Aika"
+                        type="time"
+                        size="small"
+                        required
+                        value={manualGame.time}
+                        onChange={(e) => setManualGame({ ...manualGame, time: e.target.value })}
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        sx={{ flex: 1 }}
+                      />
+                    </Stack>
+                    <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+                      <TextField
+                        label="Sarja"
+                        size="small"
+                        placeholder="esim. I div."
+                        value={manualGame.division}
+                        onChange={(e) => setManualGame({ ...manualGame, division: e.target.value })}
+                        sx={{ flex: 1 }}
+                      />
+                      <TextField
+                        label="Paikka"
+                        size="small"
+                        value={manualGame.location}
+                        onChange={(e) => setManualGame({ ...manualGame, location: e.target.value })}
+                        sx={{ flex: 2 }}
+                      />
+                    </Stack>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between">
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <Checkbox
+                          checked={manualGame.isHomeGame}
+                          onChange={(e) =>
+                            setManualGame({ ...manualGame, isHomeGame: e.target.checked })
+                          }
+                          color="success"
+                        />
+                        <Typography variant="body2">Kotipeli (tarvitsee toimitsijat)</Typography>
+                      </Stack>
+                      <Button type="submit" variant="contained" size="small">
+                        Lisää peli
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Box>
+              )}
 
               <Box
                 onDragOver={(e) => {
