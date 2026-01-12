@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import { useMutation } from "@tanstack/react-query"
 import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -37,7 +39,14 @@ export function TeamSelector({
   const { teams, selectedTeam, selectTeam, createTeam, isLoading } = useTeam()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newTeamName, setNewTeamName] = useState("")
-  const [error, setError] = useState<string | null>(null)
+
+  const createMutation = useMutation({
+    mutationFn: (name: string) => createTeam(name),
+    onSuccess: () => {
+      setNewTeamName("")
+      setDialogOpen(false)
+    },
+  })
 
   const handleChange = (event: SelectChangeEvent) => {
     const value = event.target.value
@@ -49,21 +58,15 @@ export function TeamSelector({
   }
 
   const handleCloseDialog = () => {
+    if (createMutation.isPending) return
     setDialogOpen(false)
     setNewTeamName("")
-    setError(null)
+    createMutation.reset()
   }
 
-  const handleCreateTeam = async () => {
+  const handleCreateTeam = () => {
     if (newTeamName.trim()) {
-      try {
-        setError(null)
-        await createTeam(newTeamName.trim())
-        setNewTeamName("")
-        setDialogOpen(false)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Joukkueen luonti epäonnistui")
-      }
+      createMutation.mutate(newTeamName.trim())
     }
   }
 
@@ -107,9 +110,11 @@ export function TeamSelector({
         <DialogTitle>Luo uusi joukkue</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
-            {error && (
+            {createMutation.error && (
               <Alert severity="warning" sx={{ mb: 2 }}>
-                {error}
+                {createMutation.error instanceof Error
+                  ? createMutation.error.message
+                  : "Joukkueen luonti epäonnistui"}
               </Alert>
             )}
             <TextField
@@ -120,7 +125,7 @@ export function TeamSelector({
               value={newTeamName}
               onChange={(e) => {
                 setNewTeamName(e.target.value)
-                setError(null)
+                createMutation.reset()
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -128,17 +133,26 @@ export function TeamSelector({
                   handleCreateTeam()
                 }
               }}
-              error={!!error}
+              error={!!createMutation.error}
             />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä pelit hallintasivulta.
+              Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä ottelut hallintasivulta.
             </Typography>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Peruuta</Button>
-          <Button variant="contained" onClick={handleCreateTeam} disabled={!newTeamName.trim()}>
-            Luo joukkue
+          <Button onClick={handleCloseDialog} disabled={createMutation.isPending}>
+            Peruuta
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleCreateTeam}
+            disabled={!newTeamName.trim() || createMutation.isPending}
+            startIcon={
+              createMutation.isPending ? <CircularProgress size={20} color="inherit" /> : null
+            }
+          >
+            {createMutation.isPending ? "Luodaan..." : "Luo joukkue"}
           </Button>
         </DialogActions>
       </Dialog>

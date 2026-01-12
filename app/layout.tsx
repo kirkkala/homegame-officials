@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Suspense } from "react"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
+import { Providers } from "@/components/providers"
 import { TeamProvider } from "@/components/team-context"
 import "./globals.css"
 
@@ -27,9 +28,11 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider>
           <ThemeRegistry>
-            <Suspense>
-              <TeamProvider>{children}</TeamProvider>
-            </Suspense>
+            <Providers>
+              <Suspense>
+                <TeamProvider>{children}</TeamProvider>
+              </Suspense>
+            </Providers>
           </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>

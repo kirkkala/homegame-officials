@@ -36,10 +36,7 @@ export async function getTeamById(id: string) {
 }
 
 export async function createTeam(id: string, name: string) {
-  const result = await db
-    .insert(schema.teams)
-    .values({ id, name })
-    .returning()
+  const result = await db.insert(schema.teams).values({ id, name }).returning()
   return result[0]
 }
 
@@ -66,17 +63,11 @@ export async function getGameById(id: string) {
   return result[0] || null
 }
 
-export async function createGames(
-  games: Omit<schema.NewGame, "createdAt">[],
-  teamId: string
-) {
+export async function createGames(games: Omit<schema.NewGame, "createdAt">[], teamId: string) {
   if (games.length === 0) return []
 
   // Get existing games to check for duplicates
-  const existingGames = await db
-    .select()
-    .from(schema.games)
-    .where(eq(schema.games.teamId, teamId))
+  const existingGames = await db.select().from(schema.games).where(eq(schema.games.teamId, teamId))
 
   const newGames = games.filter(
     (game) =>
@@ -123,10 +114,7 @@ export async function updateGame(
         updates.officials.poytakirja !== undefined
           ? updates.officials.poytakirja
           : game.officials.poytakirja,
-      kello:
-        updates.officials.kello !== undefined
-          ? updates.officials.kello
-          : game.officials.kello,
+      kello: updates.officials.kello !== undefined ? updates.officials.kello : game.officials.kello,
     }
   }
 
@@ -174,10 +162,7 @@ export async function getPlayerById(id: string) {
 }
 
 export async function createPlayer(id: string, name: string, teamId: string) {
-  const result = await db
-    .insert(schema.players)
-    .values({ id, name, teamId })
-    .returning()
+  const result = await db.insert(schema.players).values({ id, name, teamId }).returning()
   return result[0]
 }
 

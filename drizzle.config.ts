@@ -7,7 +7,10 @@ if (existsSync(".env.local")) {
   envContent.split("\n").forEach((line) => {
     const [key, ...valueParts] = line.split("=")
     if (key && valueParts.length > 0) {
-      const value = valueParts.join("=").replace(/^["']|["']$/g, "").trim()
+      const value = valueParts
+        .join("=")
+        .replace(/^["']|["']$/g, "")
+        .trim()
       if (!process.env[key.trim()]) {
         process.env[key.trim()] = value
       }
