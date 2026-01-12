@@ -58,7 +58,7 @@ export function GamesList() {
         <Typography variant="h5" gutterBottom>
           Valitse joukkue
         </Typography>
-        <TeamSelector />
+        <TeamSelector showCreateButton />
       </Stack>
     )
   }
