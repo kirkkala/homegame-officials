@@ -12,6 +12,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   ListItemIcon,
   ListItemText,
@@ -56,6 +57,11 @@ function OfficialButton({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<"guardian" | "pool">("guardian")
   const [name, setName] = useState("")
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean
+    message: string
+    onConfirm: () => void
+  }>({ open: false, message: "", onConfirm: () => {} })
   const { label, Icon } = ROLES[role]
 
   // Mutation for updating official
@@ -86,10 +92,13 @@ function OfficialButton({
 
   const handleSelectPlayer = (playerName: string) => {
     if (assignment && assignment.playerName !== playerName) {
-      if (!confirm(`Vaihdetaanko ${assignment.playerName} → ${playerName}?`)) {
-        setAnchorEl(null)
-        return
-      }
+      setAnchorEl(null)
+      setConfirmDialog({
+        open: true,
+        message: `Vaihdetaanko ${assignment.playerName} → ${playerName}?`,
+        onConfirm: () => mutation.mutate({ playerName, handledBy: null, confirmedBy: null }),
+      })
+      return
     }
     setAnchorEl(null)
     mutation.mutate({ playerName, handledBy: null, confirmedBy: null })
@@ -115,12 +124,12 @@ function OfficialButton({
   }
 
   const handleClear = () => {
-    if (confirm(`Poistetaanko pelaajan ${assignment?.playerName} vastuu tästä pelistä?`)) {
-      setAnchorEl(null)
-      mutation.mutate(null)
-    } else {
-      setAnchorEl(null)
-    }
+    setAnchorEl(null)
+    setConfirmDialog({
+      open: true,
+      message: `Poistetaanko pelaajan ${assignment?.playerName} vastuu tästä pelistä?`,
+      onConfirm: () => mutation.mutate(null),
+    })
   }
 
   const getButtonColor = () => {
@@ -256,6 +265,35 @@ function OfficialButton({
             disabled={dialogType === "guardian" && !name.trim()}
           >
             Vahvista
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+      >
+        <DialogContent>
+          <DialogContentText id="confirm-dialog-description">
+            {confirmDialog.message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}>
+            Peruuta
+          </Button>
+          <Button
+            onClick={() => {
+              confirmDialog.onConfirm()
+              setConfirmDialog((prev) => ({ ...prev, open: false }))
+            }}
+            color="error"
+            autoFocus
+          >
+            Kyllä
           </Button>
         </DialogActions>
       </Dialog>

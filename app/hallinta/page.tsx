@@ -26,6 +26,11 @@ import {
   Checkbox,
   IconButton,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material"
 import {
   Add as AddIcon,
@@ -180,6 +185,12 @@ export default function HallintaPage() {
   const [manualGame, setManualGame] = useState(INITIAL_MANUAL_GAME)
   const [importExpanded, setImportExpanded] = useState(false)
   const [playersExpanded, setPlayersExpanded] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean
+    title?: string
+    message: string
+    onConfirm: () => void
+  }>({ open: false, message: "", onConfirm: () => {} })
 
   // Queries
   const { data: existingGames = [], isLoading: gamesLoading } = useQuery({
@@ -345,13 +356,26 @@ export default function HallintaPage() {
     )
   }, [])
 
+  const openConfirmDialog = useCallback(
+    (message: string, onConfirm: () => void, title?: string) => {
+      setConfirmDialog({ open: true, message, onConfirm, title })
+    },
+    []
+  )
+
+  const closeConfirmDialog = useCallback(() => {
+    setConfirmDialog((prev) => ({ ...prev, open: false }))
+  }, [])
+
   const handleDeleteGame = useCallback(
     (gameId: string) => {
       const game = existingGames.find((g) => g.id === gameId)
-      if (!game || !confirm(`Poistetaanko ${game.homeTeam} vs ${game.awayTeam}?`)) return
-      deleteGameMutation.mutate(gameId)
+      if (!game) return
+      openConfirmDialog(`Poistetaanko ${game.homeTeam} vs ${game.awayTeam}?`, () =>
+        deleteGameMutation.mutate(gameId)
+      )
     },
-    [existingGames, deleteGameMutation]
+    [existingGames, deleteGameMutation, openConfirmDialog]
   )
 
   const handleAddPlayers = useCallback(
@@ -370,10 +394,12 @@ export default function HallintaPage() {
   const handleDeletePlayer = useCallback(
     (id: string) => {
       const player = players.find((p) => p.id === id)
-      if (!player || !confirm(`Haluatko varmasti poistaa pelaajan ${player.name}?`)) return
-      deletePlayerMutation.mutate(id)
+      if (!player) return
+      openConfirmDialog(`Haluatko varmasti poistaa pelaajan ${player.name}?`, () =>
+        deletePlayerMutation.mutate(id)
+      )
     },
-    [players, deletePlayerMutation]
+    [players, deletePlayerMutation, openConfirmDialog]
   )
 
   const updateManualGame = (field: keyof typeof INITIAL_MANUAL_GAME, value: string | boolean) =>
@@ -391,20 +417,16 @@ export default function HallintaPage() {
 
   const handleDeleteTeam = useCallback(() => {
     if (!selectedTeam) return
-    if (
-      confirm(
-        `Haluatko varmasti poistaa joukkueen "${selectedTeam.name}"? Tämä poistaa myös kaikki joukkueen pelit ja pelaajat.`
-      )
-    ) {
-      deleteTeamMutation.mutate()
-    }
-  }, [selectedTeam, deleteTeamMutation])
+    openConfirmDialog(
+      `Haluatko varmasti poistaa joukkueen "${selectedTeam.name}"? Tämä poistaa myös kaikki joukkueen pelit ja pelaajat.`,
+      () => deleteTeamMutation.mutate(),
+      "Poista joukkue"
+    )
+  }, [selectedTeam, deleteTeamMutation, openConfirmDialog])
 
   const handleClearAll = useCallback(() => {
-    if (confirm("Haluatko varmasti poistaa kaikki pelit?")) {
-      clearGamesMutation.mutate()
-    }
-  }, [clearGamesMutation])
+    openConfirmDialog("Haluatko varmasti poistaa kaikki pelit?", () => clearGamesMutation.mutate())
+  }, [clearGamesMutation, openConfirmDialog])
 
   if (teamLoading) {
     return (
@@ -770,6 +792,36 @@ export default function HallintaPage() {
         )}
       </Stack>
       <Footer />
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={confirmDialog.open}
+        onClose={closeConfirmDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        {confirmDialog.title && (
+          <DialogTitle id="alert-dialog-title">{confirmDialog.title}</DialogTitle>
+        )}
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {confirmDialog.message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeConfirmDialog}>Peruuta</Button>
+          <Button
+            onClick={() => {
+              confirmDialog.onConfirm()
+              closeConfirmDialog()
+            }}
+            color="error"
+            autoFocus
+          >
+            Poista
+          </Button>
+        </DialogActions>
+      </Dialog>
     </PageLayout>
   )
 }
