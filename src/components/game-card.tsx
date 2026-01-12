@@ -301,7 +301,7 @@ function OfficialButton({
   )
 }
 
-export function GameCard({ game }: { game: Game }) {
+export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolean }) {
   return (
     <Card variant="outlined">
       <CardContent sx={{ p: { xs: 1.5, sm: 2 }, "&:last-child": { pb: { xs: 1.5, sm: 2 } } }}>
@@ -316,6 +316,9 @@ export function GameCard({ game }: { game: Game }) {
               <Typography variant="body2" fontWeight="bold">
                 {game.time}
               </Typography>
+              {isPast && (
+                <Chip label="Pelattu" size="small" sx={{ ml: 0.5, fontSize: "0.7rem" }} />
+              )}
             </Stack>
             {game.divisionId && (
               <Chip
@@ -354,6 +357,7 @@ export function GameCard({ game }: { game: Game }) {
               <Typography variant="body2" fontWeight={game.isHomeGame ? "bold" : "normal"} noWrap>
                 {game.homeTeam} vs. {game.awayTeam}
               </Typography>
+              {isPast && <Chip label="Pelattu" size="small" sx={{ fontSize: "0.75rem" }} />}
             </Stack>
             <Stack direction="row" alignItems="center" gap={2} sx={{ flexShrink: 0 }}>
               <Typography variant="body2" color="text.secondary">

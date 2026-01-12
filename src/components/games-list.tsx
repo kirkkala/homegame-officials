@@ -3,7 +3,16 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
-import { Alert, Button, CircularProgress, Snackbar, Stack, Typography } from "@mui/material"
+import {
+  Alert,
+  Button,
+  Checkbox,
+  CircularProgress,
+  FormControlLabel,
+  Snackbar,
+  Stack,
+  Typography,
+} from "@mui/material"
 import {
   CalendarMonth as CalendarMonthIcon,
   Groups as GroupsIcon,
@@ -17,10 +26,12 @@ import { getGames } from "@/lib/storage"
 export function GamesList() {
   const { selectedTeam, isLoading: teamLoading } = useTeam()
   const [snackbar, setSnackbar] = useState<string | null>(null)
+  const [showPastGames, setShowPastGames] = useState(false)
+  const [showOnlyHomeGames, setShowOnlyHomeGames] = useState(false)
   const prevDataRef = useRef<string | null>(null)
 
   const {
-    data: games = [],
+    data: allGames = [],
     isLoading: gamesLoading,
     dataUpdatedAt,
   } = useQuery({
@@ -29,20 +40,24 @@ export function GamesList() {
     enabled: !!selectedTeam,
     refetchInterval: 10000,
     refetchIntervalInBackground: false,
-    select: (data) => {
-      const now = new Date()
-      now.setHours(0, 0, 0, 0)
-      return data
-        .filter((game) => new Date(game.date) >= now)
-        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
-    },
+    select: (data) => data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
   })
+
+  // Filter games based on checkboxes
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+  const games = allGames.filter((game) => {
+    if (!showPastGames && new Date(game.date) < now) return false
+    if (showOnlyHomeGames && !game.isHomeGame) return false
+    return true
+  })
+  const pastGamesCount = allGames.filter((game) => new Date(game.date) < now).length
 
   // Detect when data changes and show snackbar (via async callback to satisfy lint rules)
   useEffect(() => {
-    if (gamesLoading || !games.length) return
+    if (gamesLoading || !allGames.length) return
 
-    const dataHash = JSON.stringify(games)
+    const dataHash = JSON.stringify(allGames)
     const timer = setTimeout(() => {
       // Access ref inside async callback, not during render
       const prevHash = prevDataRef.current
@@ -53,7 +68,10 @@ export function GamesList() {
     }, 0)
 
     return () => clearTimeout(timer)
-  }, [dataUpdatedAt, games, gamesLoading])
+  }, [dataUpdatedAt, allGames, gamesLoading])
+
+  // Helper to check if a game is in the past
+  const isGamePast = (gameDate: string) => new Date(gameDate) < now
 
   if (teamLoading || gamesLoading) {
     return (
@@ -97,18 +115,55 @@ export function GamesList() {
   return (
     <>
       <Stack gap={{ xs: 2, sm: 3 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          gap={1}
+          sx={{
+            bgcolor: "background.paper",
+            borderRadius: 1,
+            px: 2,
+            py: 1.5,
+          }}
+        >
           <Typography
             variant="h2"
             fontWeight="bold"
             sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
           >
-            {selectedTeam.name} seuraavat ottelut
+            {selectedTeam.name} {showPastGames ? "ottelut" : "seuraavat ottelut"}
           </Typography>
+          <Stack direction={{ xs: "column", sm: "row" }} gap={{ xs: 0, sm: 2 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showOnlyHomeGames}
+                  onChange={(e) => setShowOnlyHomeGames(e.target.checked)}
+                  size="small"
+                />
+              }
+              label="Näytä vain kotipelit"
+              slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
+            />
+            {pastGamesCount > 0 && (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showPastGames}
+                    onChange={(e) => setShowPastGames(e.target.checked)}
+                    size="small"
+                  />
+                }
+                label={`Näytä menneet (${pastGamesCount})`}
+                slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
+              />
+            )}
+          </Stack>
         </Stack>
         <Stack gap={{ xs: 1.5, sm: 2 }}>
           {games.map((game) => (
-            <GameCard key={game.id} game={game} />
+            <GameCard key={game.id} game={game} isPast={isGamePast(game.date)} />
           ))}
         </Stack>
       </Stack>
