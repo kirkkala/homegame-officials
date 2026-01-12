@@ -99,6 +99,28 @@ pnpm db:push         # Push schema to database
 pnpm db:studio       # Open Drizzle Studio
 ```
 
+### Copy Production Database to Local
+
+1. Get the database URL from Vercel Dashboard → Storage → your database → `.env.local` tab
+2. Remove `&supa=base-pooler.x` from the URL (pg_dump doesn't understand it)
+
+```bash
+# Set the production URL (remove &supa=...)
+export HOMEGAME_OFFICIALS_PROD_DB="postgres://user:pass@host:6543/postgres?sslmode=require"
+
+# Dump production to file (use postgres:17 to match Vercel's version)
+docker run --rm postgres:17 pg_dump "$HOMEGAME_OFFICIALS_PROD_DB" > prod-backup.sql
+
+# Import to local Docker
+docker exec -i homegame-postgres psql -U postgres < prod-backup.sql
+```
+
+To clear local database first (fresh copy):
+
+```bash
+docker exec -i homegame-postgres psql -U postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+```
+
 ## Deployment
 
 Deploy to Vercel with Vercel Postgres:
