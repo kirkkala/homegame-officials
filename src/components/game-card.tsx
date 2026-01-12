@@ -316,9 +316,7 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
               <Typography variant="body2" fontWeight="bold">
                 {game.time}
               </Typography>
-              {isPast && (
-                <Chip label="Pelattu" size="small" sx={{ ml: 0.5, fontSize: "0.7rem" }} />
-              )}
+              {isPast && <Chip label="Pelattu" size="small" sx={{ ml: 0.5, fontSize: "0.7rem" }} />}
             </Stack>
             {game.divisionId && (
               <Chip

@@ -40,7 +40,8 @@ export function GamesList() {
     enabled: !!selectedTeam,
     refetchInterval: 10000,
     refetchIntervalInBackground: false,
-    select: (data) => data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
+    select: (data) =>
+      data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
   })
 
   // Filter games based on checkboxes
