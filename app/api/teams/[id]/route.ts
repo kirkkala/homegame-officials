@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server"
-import { readDB, writeDB } from "@/lib/db"
+import { deleteTeam, getTeamById } from "@/lib/db"
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const db = await readDB()
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
 
-  const teamIndex = db.teams.findIndex((t) => t.id === id)
-  if (teamIndex === -1) {
-    return NextResponse.json({ error: "Team not found" }, { status: 404 })
+    const team = await getTeamById(id)
+    if (!team) {
+      return NextResponse.json({ error: "Team not found" }, { status: 404 })
+    }
+
+    // Games and players are deleted via cascade in the database
+    await deleteTeam(id)
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Failed to delete team:", error)
+    return NextResponse.json({ error: "Joukkueen poisto epäonnistui" }, { status: 500 })
   }
-
-  // Also delete all games and players belonging to this team
-  db.teams.splice(teamIndex, 1)
-  db.games = db.games.filter((g) => g.teamId !== id)
-  db.players = db.players.filter((p) => p.teamId !== id)
-
-  await writeDB(db)
-  return NextResponse.json({ success: true })
 }

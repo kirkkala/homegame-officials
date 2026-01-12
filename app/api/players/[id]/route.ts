@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server"
-import { readDB, writeDB } from "@/lib/db"
+import { deletePlayer, getPlayerById } from "@/lib/db"
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const db = await readDB()
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
 
-  const index = db.players.findIndex((p) => p.id === id)
-  if (index === -1) return NextResponse.json({ error: "Player not found" }, { status: 404 })
+    const player = await getPlayerById(id)
+    if (!player) {
+      return NextResponse.json({ error: "Player not found" }, { status: 404 })
+    }
 
-  db.players.splice(index, 1)
-  await writeDB(db)
-  return NextResponse.json({ success: true })
+    await deletePlayer(id)
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Failed to delete player:", error)
+    return NextResponse.json({ error: "Pelaajan poisto epäonnistui" }, { status: 500 })
+  }
 }

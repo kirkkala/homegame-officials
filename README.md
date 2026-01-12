@@ -28,7 +28,6 @@ homegame-officials/
 │   ├── db/                 # Drizzle schema & config
 │   ├── lib/                # Utilities (Excel parser, storage)
 │   └── theme/              # MUI theme configuration
-├── data/                   # Local JSON storage (dev)
 └── public/                 # Static assets
 ```
 
@@ -45,6 +44,35 @@ The application helps basketball team managers assign officials to home games:
 **Output**: Organized list of home games with assigned officials
 
 ## Development
+
+### Local Database Setup
+
+Start a local Postgres database with Docker:
+
+```bash
+docker run --name homegame-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:16
+```
+
+Create a `.env.local` file:
+
+```bash
+POSTGRES_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+```
+
+Push the database schema:
+
+```bash
+pnpm db:push
+```
+
+To stop/start the database later:
+
+```bash
+docker stop homegame-postgres   # Stop
+docker start homegame-postgres  # Start again
+```
+
+### Install & Run
 
 ```bash
 pnpm install         # Install dependencies
