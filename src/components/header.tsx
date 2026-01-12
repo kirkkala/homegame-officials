@@ -247,7 +247,7 @@ export function MainHeader() {
           </Box>
 
           <Box sx={{ p: 2 }}>
-            <TeamSelector showCreateButton fullWidth />
+            <TeamSelector fullWidth />
           </Box>
 
           <Divider />
