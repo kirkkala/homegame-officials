@@ -23,7 +23,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json(updatedGame)
   } catch (error) {
     console.error("Failed to update game:", error)
-    return NextResponse.json({ error: "Pelin päivitys epäonnistui" }, { status: 500 })
+    return NextResponse.json({ error: "Ottelun päivitys epäonnistui" }, { status: 500 })
   }
 }
 
@@ -33,13 +33,13 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 
     const game = await getGameById(id)
     if (!game) {
-      return NextResponse.json({ error: "Game not found" }, { status: 404 })
+      return NextResponse.json({ error: "404 Game not found" }, { status: 404 })
     }
 
     await deleteGame(id)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Failed to delete game:", error)
-    return NextResponse.json({ error: "Pelin poisto epäonnistui" }, { status: 500 })
+    return NextResponse.json({ error: "Ottelun poisto epäonnistui" }, { status: 500 })
   }
 }

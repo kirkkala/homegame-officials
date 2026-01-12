@@ -136,7 +136,7 @@ export function TeamSelector({
               error={!!createMutation.error}
             />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä pelit hallintasivulta.
+              Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä ottelut hallintasivulta.
             </Typography>
           </Box>
         </DialogContent>

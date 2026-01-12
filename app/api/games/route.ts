@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(games)
   } catch (error) {
     console.error("Failed to get games:", error)
-    return NextResponse.json({ error: "Pelien haku epäonnistui" }, { status: 500 })
+    return NextResponse.json({ error: "Otteluiden haku epäonnistui" }, { status: 500 })
   }
 }
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json(savedGames)
   } catch (error) {
     console.error("Failed to create games:", error)
-    return NextResponse.json({ error: "Pelien tallennus epäonnistui" }, { status: 500 })
+    return NextResponse.json({ error: "Otteluiden tallennus epäonnistui" }, { status: 500 })
   }
 }
 
@@ -58,6 +58,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Failed to delete games:", error)
-    return NextResponse.json({ error: "Pelien poisto epäonnistui" }, { status: 500 })
+    return NextResponse.json({ error: "Otteluiden poisto epäonnistui" }, { status: 500 })
   }
 }

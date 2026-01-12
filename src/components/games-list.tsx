@@ -54,7 +54,7 @@ export function GamesList() {
       <Stack alignItems="center" py={8}>
         <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
         <Typography variant="h5" gutterBottom>
-          Ei pelejä
+          Ei otteluita
         </Typography>
         <Button
           component={Link}
@@ -76,7 +76,7 @@ export function GamesList() {
           fontWeight="bold"
           sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
         >
-          {selectedTeam.name} seuraavat pelit
+          {selectedTeam.name} seuraavat ottelut
         </Typography>
       </Stack>
       <Stack gap={{ xs: 1.5, sm: 2 }}>

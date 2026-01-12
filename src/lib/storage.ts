@@ -114,7 +114,7 @@ export async function clearAllGames(teamId?: string): Promise<void> {
   const url = teamId ? `/api/games?teamId=${teamId}` : "/api/games"
   const res = await fetch(url, { method: "DELETE" })
   if (!res.ok) {
-    throw new Error("Pelien poisto epäonnistui")
+    throw new Error("Otteluiden poisto epäonnistui")
   }
 }
 
@@ -143,7 +143,7 @@ export async function updateGameHomeStatus(gameId: string, isHomeGame: boolean):
 export async function deleteGame(gameId: string): Promise<void> {
   const res = await fetch(`/api/games/${gameId}`, { method: "DELETE" })
   if (!res.ok) {
-    throw new Error("Pelin poisto epäonnistui")
+    throw new Error("Ottelun poisto epäonnistui")
   }
 }
 

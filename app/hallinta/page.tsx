@@ -31,6 +31,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Snackbar,
 } from "@mui/material"
 import {
   Add as AddIcon,
@@ -176,7 +177,7 @@ export default function HallintaPage() {
   const { selectedTeam, isLoading: teamLoading, deleteTeam } = useTeam()
   const [parsedGames, setParsedGames] = useState<ParsedGame[]>([])
   const [isDragging, setIsDragging] = useState(false)
-  const [importStatus, setImportStatus] = useState<{
+  const [snackbar, setSnackbar] = useState<{
     type: "success" | "error" | "info"
     message: string
   } | null>(null)
@@ -229,20 +230,26 @@ export default function HallintaPage() {
     onSuccess: ({ saved, total }) => {
       const skipped = total - saved.length
       const homeGamesCount = saved.filter((g) => g.isHomeGame).length
-      setImportStatus({
+      setSnackbar({
         type: "success",
-        message: `Tuotu ${saved.length} peliä (${homeGamesCount} kotipeliä)!${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
+        message: `Tuotu ${saved.length} ottelua, (${homeGamesCount} kotipeliä)!${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
       })
       setParsedGames([])
       queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Otteluiden tuonti epäonnistui" })
     },
   })
 
   const clearGamesMutation = useMutation({
     mutationFn: () => clearAllGames(selectedTeam!.id),
     onSuccess: () => {
-      setImportStatus({ type: "info", message: "Kaikki pelit poistettu" })
+      setSnackbar({ type: "info", message: "Kaikki ottelut poistettu" })
       queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Otteluiden poisto epäonnistui" })
     },
   })
 
@@ -260,12 +267,19 @@ export default function HallintaPage() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
     },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Tallentaminen epäonnistui" })
+    },
   })
 
   const deleteGameMutation = useMutation({
     mutationFn: (gameId: string) => deleteGame(gameId),
     onSuccess: () => {
+      setSnackbar({ type: "success", message: "Ottelu poistettu" })
       queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Ottelun poistaminen epäonnistui" })
     },
   })
 
@@ -282,19 +296,26 @@ export default function HallintaPage() {
     onSuccess: ({ added, skipped }) => {
       setPlayerNames("")
       if (added > 0) {
-        setImportStatus({
+        setSnackbar({
           type: "success",
           message: `Lisätty ${added} pelaajaa${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
         })
       }
       queryClient.invalidateQueries({ queryKey: ["players", selectedTeam?.id] })
     },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Pelaajien lisääminen epäonnistui" })
+    },
   })
 
   const deletePlayerMutation = useMutation({
     mutationFn: (id: string) => deletePlayer(id),
     onSuccess: () => {
+      setSnackbar({ type: "success", message: "Pelaaja poistettu" })
       queryClient.invalidateQueries({ queryKey: ["players", selectedTeam?.id] })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Pelaajan poistaminen epäonnistui" })
     },
   })
 
@@ -316,29 +337,35 @@ export default function HallintaPage() {
       ),
     onSuccess: (saved) => {
       if (saved.length > 0) {
-        setImportStatus({ type: "success", message: "Peli lisätty!" })
+        setSnackbar({ type: "success", message: "Ottelu lisätty!" })
         setManualGame(INITIAL_MANUAL_GAME)
         setShowManualForm(false)
         queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
       }
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Ottelun lisäys epäonnistui" })
     },
   })
 
   const deleteTeamMutation = useMutation({
     mutationFn: () => deleteTeam(selectedTeam!.id),
     onSuccess: () => {
-      setImportStatus({ type: "info", message: "Joukkue poistettu" })
+      setSnackbar({ type: "info", message: "Joukkue poistettu" })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Joukkueen poistaminen epäonnistui" })
     },
   })
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
-      setImportStatus({ type: "error", message: "Valitse Excel-tiedosto (.xlsx tai .xls)" })
+      setSnackbar({ type: "error", message: "Valitse Excel-tiedosto (.xlsx tai .xls)" })
       return
     }
     const arrayBuffer = await file.arrayBuffer()
     setParsedGames(parseExcelFile(arrayBuffer))
-    setImportStatus(null)
+    setSnackbar(null)
   }, [])
 
   const handleDrop = useCallback(
@@ -418,19 +445,21 @@ export default function HallintaPage() {
   const handleDeleteTeam = useCallback(() => {
     if (!selectedTeam) return
     openConfirmDialog(
-      `Haluatko varmasti poistaa joukkueen "${selectedTeam.name}"? Tämä poistaa myös kaikki joukkueen pelit ja pelaajat.`,
+      `Haluatko varmasti poistaa joukkueen "${selectedTeam.name}"? Tämä poistaa myös kaikki joukkueen ottelut sekä pelaajat.`,
       () => deleteTeamMutation.mutate(),
       "Poista joukkue"
     )
   }, [selectedTeam, deleteTeamMutation, openConfirmDialog])
 
   const handleClearAll = useCallback(() => {
-    openConfirmDialog("Haluatko varmasti poistaa kaikki pelit?", () => clearGamesMutation.mutate())
+    openConfirmDialog("Haluatko varmasti poistaa kaikki ottelut?", () =>
+      clearGamesMutation.mutate()
+    )
   }, [clearGamesMutation, openConfirmDialog])
 
   if (teamLoading) {
     return (
-      <PageLayout subtitle="Pelaajat ja pelien tuonti">
+      <PageLayout subtitle="Pelaajat ja otteluiden tuonti">
         <Stack alignItems="center" py={8}>
           <CircularProgress />
         </Stack>
@@ -440,7 +469,7 @@ export default function HallintaPage() {
 
   if (!selectedTeam) {
     return (
-      <PageLayout subtitle="Pelaajat ja pelien tuonti">
+      <PageLayout subtitle="Pelaajat ja otteluiden tuonti">
         <Stack alignItems="center" py={8}>
           <GroupsIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
           <Typography variant="h5" gutterBottom>
@@ -468,12 +497,6 @@ export default function HallintaPage() {
   return (
     <PageLayout subtitle={selectedTeam.name}>
       <Stack gap={3}>
-        {importStatus && (
-          <Alert severity={importStatus.type} onClose={() => setImportStatus(null)}>
-            {importStatus.message}
-          </Alert>
-        )}
-
         {/* Team Management */}
         <Box>
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
@@ -617,7 +640,7 @@ export default function HallintaPage() {
                   sx={{ mb: 3, p: 2, bgcolor: "grey.50", borderRadius: 1 }}
                 >
                   <Typography variant="subtitle2" gutterBottom>
-                    Lisää peli manuaalisesti
+                    Lisää ottelu manuaalisesti
                   </Typography>
                   <Stack gap={2}>
                     <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
@@ -697,7 +720,7 @@ export default function HallintaPage() {
                           ) : null
                         }
                       >
-                        {addManualGameMutation.isPending ? "Lisätään..." : "Lisää peli"}
+                        {addManualGameMutation.isPending ? "Lisätään..." : "Lisää ottelu"}
                       </Button>
                     </Stack>
                   </Stack>
@@ -712,9 +735,9 @@ export default function HallintaPage() {
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
                 <Stack>
-                  <Typography variant="h6">Esikatselu: {parsedGames.length} peliä</Typography>
+                  <Typography variant="h6">Esikatselu: {parsedGames.length} ottelua</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Merkitse kotipelit, jotka vaativat toimitsijat ja paina &quot;Tuo pelit&quot;.
+                    Merkitse kotipelit, jotka vaativat toimitsijat ja paina &quot;Tuo ottelut&quot;.
                   </Typography>
                 </Stack>
                 <Button
@@ -723,7 +746,7 @@ export default function HallintaPage() {
                   onClick={() => importMutation.mutate()}
                   disabled={importMutation.isPending}
                 >
-                  Tuo pelit
+                  Tuo otteluita
                 </Button>
               </Stack>
 
@@ -784,7 +807,7 @@ export default function HallintaPage() {
                   onClick={handleClearAll}
                   disabled={clearGamesMutation.isPending}
                 >
-                  Poista kaikki pelit
+                  Poista kaikki ottelut
                 </Button>
               </Box>
             </CardContent>
@@ -822,6 +845,23 @@ export default function HallintaPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Status Snackbar - for all status information messages! */}
+      <Snackbar
+        open={!!snackbar}
+        autoHideDuration={5000}
+        onClose={() => setSnackbar(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert
+          severity={snackbar?.type}
+          onClose={() => setSnackbar(null)}
+          sx={{ width: "100%" }}
+          variant="filled"
+        >
+          {snackbar?.message}
+        </Alert>
+      </Snackbar>
     </PageLayout>
   )
 }

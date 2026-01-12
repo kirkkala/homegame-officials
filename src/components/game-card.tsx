@@ -127,7 +127,7 @@ function OfficialButton({
     setAnchorEl(null)
     setConfirmDialog({
       open: true,
-      message: `Poistetaanko pelaajan ${assignment?.playerName} vastuu tästä pelistä?`,
+      message: `Poista pelaajan ${assignment?.playerName} toimitsijavastuu tästä ottelusta?`,
       onConfirm: () => mutation.mutate(null),
     })
   }

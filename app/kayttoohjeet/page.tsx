@@ -110,7 +110,7 @@ export default function KaijttoohjeetPage() {
               </ListItemIcon>
               <ListItemText
                 primary="4. Jaa vuorot (jojo tai kuka vain)"
-                secondary="Etusivulla näet tulevat kotipelit. Klikkaa peliä ja jaa pöytäkirja- ja kellovuorot pelaajille. Myös pelaajat/huoltajat voivat valita itselleen vuoroja etukäteen."
+                secondary="Etusivulla näet tulevat kotipelit. Klikkaa ottelua ja jaa pöytäkirja- ja kellovuorot pelaajille. Myös pelaajat/huoltajat voivat valita itselleen vuoroja etukäteen."
               />
             </ListItem>
             <ListItem sx={{ alignItems: "flex-start" }}>
