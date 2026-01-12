@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   Container,
   Box,
@@ -52,8 +53,6 @@ import {
   deletePlayer,
   updateGameHomeStatus,
   deleteGame,
-  type Player,
-  type Game,
 } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
@@ -168,41 +167,158 @@ function GamesTable({
 }
 
 export default function HallintaPage() {
+  const queryClient = useQueryClient()
   const { selectedTeam, isLoading: teamLoading, deleteTeam } = useTeam()
   const [parsedGames, setParsedGames] = useState<ParsedGame[]>([])
-  const [existingGames, setExistingGames] = useState<Game[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [importStatus, setImportStatus] = useState<{
     type: "success" | "error" | "info"
     message: string
   } | null>(null)
-  const [players, setPlayers] = useState<Player[]>([])
   const [playerNames, setPlayerNames] = useState("")
   const [showManualForm, setShowManualForm] = useState(false)
   const [manualGame, setManualGame] = useState(INITIAL_MANUAL_GAME)
   const [importExpanded, setImportExpanded] = useState(false)
   const [playersExpanded, setPlayersExpanded] = useState(false)
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (!selectedTeam) {
-        setExistingGames([])
-        setPlayers([])
-        return
+  // Queries
+  const { data: existingGames = [], isLoading: gamesLoading } = useQuery({
+    queryKey: ["games", selectedTeam?.id],
+    queryFn: () => getGames(selectedTeam!.id),
+    enabled: !!selectedTeam,
+  })
+
+  const { data: players = [], isLoading: playersLoading } = useQuery({
+    queryKey: ["players", selectedTeam?.id],
+    queryFn: () => getPlayers(selectedTeam!.id),
+    enabled: !!selectedTeam,
+  })
+
+  // Set accordion expansion based on data
+  const shouldExpandImport = existingGames.length === 0 && !gamesLoading
+  const shouldExpandPlayers = players.length === 0 && !playersLoading
+
+  // Mutations
+  const importMutation = useMutation({
+    mutationFn: async () => {
+      const saved = await saveGames(
+        parsedGames.map((g) => ({
+          divisionId: g.division,
+          homeTeam: g.homeTeam,
+          awayTeam: g.awayTeam,
+          isHomeGame: g.isHomeGame,
+          date: g.date,
+          time: g.time,
+          location: g.location,
+        })),
+        selectedTeam!.id
+      )
+      return { saved, total: parsedGames.length }
+    },
+    onSuccess: ({ saved, total }) => {
+      const skipped = total - saved.length
+      const homeGamesCount = saved.filter((g) => g.isHomeGame).length
+      setImportStatus({
+        type: "success",
+        message: `Tuotu ${saved.length} peliä (${homeGamesCount} kotipeliä)!${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
+      })
+      setParsedGames([])
+      queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+    },
+  })
+
+  const clearGamesMutation = useMutation({
+    mutationFn: () => clearAllGames(selectedTeam!.id),
+    onSuccess: () => {
+      setImportStatus({ type: "info", message: "Kaikki pelit poistettu" })
+      queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+    },
+  })
+
+  const toggleHomeGameMutation = useMutation({
+    mutationFn: ({ gameId, isHomeGame }: { gameId: string; isHomeGame: boolean }) =>
+      updateGameHomeStatus(gameId, isHomeGame),
+    onMutate: async ({ gameId, isHomeGame }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["games", selectedTeam?.id] })
+      // Optimistically update
+      queryClient.setQueryData(["games", selectedTeam?.id], (old: typeof existingGames) =>
+        old?.map((g) => (g.id === gameId ? { ...g, isHomeGame } : g))
+      )
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+    },
+  })
+
+  const deleteGameMutation = useMutation({
+    mutationFn: (gameId: string) => deleteGame(gameId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+    },
+  })
+
+  const addPlayersMutation = useMutation({
+    mutationFn: async (names: string[]) => {
+      const existingNames = new Set(players.map((p) => p.name.toLowerCase()))
+      const newNames = names.filter((n) => !existingNames.has(n.toLowerCase()))
+      const newPlayers = []
+      for (const name of newNames) {
+        newPlayers.push(await savePlayer(name, selectedTeam!.id))
       }
+      return { added: newPlayers.length, skipped: names.length - newPlayers.length }
+    },
+    onSuccess: ({ added, skipped }) => {
+      setPlayerNames("")
+      if (added > 0) {
+        setImportStatus({
+          type: "success",
+          message: `Lisätty ${added} pelaajaa${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
+        })
+      }
+      queryClient.invalidateQueries({ queryKey: ["players", selectedTeam?.id] })
+    },
+  })
 
-      const [games, loadedPlayers] = await Promise.all([
-        getGames(selectedTeam.id),
-        getPlayers(selectedTeam.id),
-      ])
-      setExistingGames(games)
-      setPlayers(loadedPlayers)
-      setImportExpanded(games.length === 0)
-      setPlayersExpanded(loadedPlayers.length === 0)
-    }
+  const deletePlayerMutation = useMutation({
+    mutationFn: (id: string) => deletePlayer(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["players", selectedTeam?.id] })
+    },
+  })
 
-    loadData()
-  }, [selectedTeam])
+  const addManualGameMutation = useMutation({
+    mutationFn: () =>
+      saveGames(
+        [
+          {
+            divisionId: manualGame.division,
+            homeTeam: manualGame.homeTeam,
+            awayTeam: manualGame.awayTeam,
+            date: manualGame.date,
+            time: manualGame.time,
+            location: manualGame.location,
+            isHomeGame: manualGame.isHomeGame,
+          },
+        ],
+        selectedTeam!.id
+      ),
+    onSuccess: (saved) => {
+      if (saved.length > 0) {
+        setImportStatus({ type: "success", message: "Peli lisätty!" })
+        setManualGame(INITIAL_MANUAL_GAME)
+        setShowManualForm(false)
+        queryClient.invalidateQueries({ queryKey: ["games", selectedTeam?.id] })
+      }
+    },
+  })
+
+  const deleteTeamMutation = useMutation({
+    mutationFn: () => deleteTeam(selectedTeam!.id),
+    onSuccess: () => {
+      setImportStatus({ type: "info", message: "Joukkue poistettu" })
+    },
+  })
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
@@ -229,145 +345,66 @@ export default function HallintaPage() {
     )
   }, [])
 
-  const handleImport = useCallback(async () => {
-    if (!selectedTeam) return
-    const saved = await saveGames(
-      parsedGames.map((g) => ({
-        divisionId: g.division,
-        homeTeam: g.homeTeam,
-        awayTeam: g.awayTeam,
-        isHomeGame: g.isHomeGame,
-        date: g.date,
-        time: g.time,
-        location: g.location,
-      })),
-      selectedTeam.id
-    )
-    const skipped = parsedGames.length - saved.length
-    const homeGamesCount = saved.filter((g) => g.isHomeGame).length
-    setImportStatus({
-      type: "success",
-      message: `Tuotu ${saved.length} peliä (${homeGamesCount} kotipeliä)!${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
-    })
-    setParsedGames([])
-    setExistingGames(await getGames(selectedTeam.id))
-  }, [parsedGames, selectedTeam])
-
-  const handleClearAll = useCallback(async () => {
-    if (!selectedTeam) return
-    if (confirm("Haluatko varmasti poistaa kaikki pelit?")) {
-      await clearAllGames(selectedTeam.id)
-      setExistingGames([])
-      setImportStatus({ type: "info", message: "Kaikki pelit poistettu" })
-    }
-  }, [selectedTeam])
-
-  const handleToggleExistingHomeGame = useCallback(async (gameId: string, isHomeGame: boolean) => {
-    const updated = await updateGameHomeStatus(gameId, isHomeGame)
-    setExistingGames((prev) => prev.map((g) => (g.id === gameId ? updated : g)))
-  }, [])
-
   const handleDeleteGame = useCallback(
-    async (gameId: string) => {
+    (gameId: string) => {
       const game = existingGames.find((g) => g.id === gameId)
       if (!game || !confirm(`Poistetaanko ${game.homeTeam} vs ${game.awayTeam}?`)) return
-      await deleteGame(gameId)
-      setExistingGames((prev) => prev.filter((g) => g.id !== gameId))
+      deleteGameMutation.mutate(gameId)
     },
-    [existingGames]
+    [existingGames, deleteGameMutation]
   )
 
   const handleAddPlayers = useCallback(
-    async (e: React.FormEvent) => {
+    (e: React.FormEvent) => {
       e.preventDefault()
-      if (!selectedTeam) return
       const names = playerNames
         .split("\n")
         .map((n) => n.trim())
         .filter(Boolean)
       if (names.length === 0) return
-
-      const existingNames = new Set(players.map((p) => p.name.toLowerCase()))
-      const newNames = names.filter((n) => !existingNames.has(n.toLowerCase()))
-
-      // Save players sequentially to avoid race condition in file-based DB
-      const newPlayers = []
-      for (const name of newNames) {
-        newPlayers.push(await savePlayer(name, selectedTeam.id))
-      }
-
-      setPlayers([...players, ...newPlayers])
-      setPlayerNames("")
-      if (newPlayers.length > 0) {
-        const skipped = names.length - newPlayers.length
-        setImportStatus({
-          type: "success",
-          message: `Lisätty ${newPlayers.length} pelaajaa${skipped > 0 ? ` (${skipped} duplikaattia ohitettu)` : ""}`,
-        })
-      }
+      addPlayersMutation.mutate(names)
     },
-    [playerNames, players, selectedTeam]
+    [playerNames, addPlayersMutation]
   )
 
   const handleDeletePlayer = useCallback(
-    async (id: string) => {
+    (id: string) => {
       const player = players.find((p) => p.id === id)
       if (!player || !confirm(`Haluatko varmasti poistaa pelaajan ${player.name}?`)) return
-      await deletePlayer(id)
-      setPlayers(players.filter((p) => p.id !== id))
+      deletePlayerMutation.mutate(id)
     },
-    [players]
+    [players, deletePlayerMutation]
   )
 
   const updateManualGame = (field: keyof typeof INITIAL_MANUAL_GAME, value: string | boolean) =>
     setManualGame((prev) => ({ ...prev, [field]: value }))
 
   const handleAddManualGame = useCallback(
-    async (e: React.FormEvent) => {
+    (e: React.FormEvent) => {
       e.preventDefault()
-      if (
-        !selectedTeam ||
-        !manualGame.homeTeam ||
-        !manualGame.awayTeam ||
-        !manualGame.date ||
-        !manualGame.time
-      )
+      if (!manualGame.homeTeam || !manualGame.awayTeam || !manualGame.date || !manualGame.time)
         return
-      const saved = await saveGames(
-        [
-          {
-            divisionId: manualGame.division,
-            homeTeam: manualGame.homeTeam,
-            awayTeam: manualGame.awayTeam,
-            date: manualGame.date,
-            time: manualGame.time,
-            location: manualGame.location,
-            isHomeGame: manualGame.isHomeGame,
-          },
-        ],
-        selectedTeam.id
-      )
-      if (saved.length > 0) {
-        setImportStatus({ type: "success", message: "Peli lisätty!" })
-        setManualGame(INITIAL_MANUAL_GAME)
-        setShowManualForm(false)
-        setExistingGames(await getGames(selectedTeam.id))
-      }
+      addManualGameMutation.mutate()
     },
-    [manualGame, selectedTeam]
+    [manualGame, addManualGameMutation]
   )
 
-  const handleDeleteTeam = useCallback(async () => {
+  const handleDeleteTeam = useCallback(() => {
     if (!selectedTeam) return
     if (
       confirm(
         `Haluatko varmasti poistaa joukkueen "${selectedTeam.name}"? Tämä poistaa myös kaikki joukkueen pelit ja pelaajat.`
       )
     ) {
-      await deleteTeam(selectedTeam.id)
-      setImportStatus({ type: "info", message: "Joukkue poistettu" })
+      deleteTeamMutation.mutate()
     }
-  }, [selectedTeam, deleteTeam])
+  }, [selectedTeam, deleteTeamMutation])
+
+  const handleClearAll = useCallback(() => {
+    if (confirm("Haluatko varmasti poistaa kaikki pelit?")) {
+      clearGamesMutation.mutate()
+    }
+  }, [clearGamesMutation])
 
   if (teamLoading) {
     return (
@@ -432,6 +469,7 @@ export default function HallintaPage() {
               size="small"
               startIcon={<DeleteForeverIcon />}
               onClick={handleDeleteTeam}
+              disabled={deleteTeamMutation.isPending}
             >
               Poista joukkue
             </Button>
@@ -442,7 +480,7 @@ export default function HallintaPage() {
 
         <Box>
           <Accordion
-            expanded={playersExpanded}
+            expanded={playersExpanded || shouldExpandPlayers}
             onChange={(_, isExpanded) => setPlayersExpanded(isExpanded)}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -452,19 +490,25 @@ export default function HallintaPage() {
             </AccordionSummary>
             <AccordionDetails>
               <Typography>Joukkueen pelaajat toimitsijavuorovastuun valintalistaan.</Typography>
-              {players.length > 0 && (
-                <Stack direction="row" flexWrap="wrap" gap={1} my={2}>
-                  {[...players]
-                    .sort((a, b) => a.name.localeCompare(b.name, "fi"))
-                    .map((player) => (
-                      <Chip
-                        key={player.id}
-                        label={player.name}
-                        onDelete={() => handleDeletePlayer(player.id)}
-                        deleteIcon={<CloseIcon />}
-                      />
-                    ))}
+              {playersLoading ? (
+                <Stack alignItems="center" py={2}>
+                  <CircularProgress size={24} />
                 </Stack>
+              ) : (
+                players.length > 0 && (
+                  <Stack direction="row" flexWrap="wrap" gap={1} my={2}>
+                    {[...players]
+                      .sort((a, b) => a.name.localeCompare(b.name, "fi"))
+                      .map((player) => (
+                        <Chip
+                          key={player.id}
+                          label={player.name}
+                          onDelete={() => handleDeletePlayer(player.id)}
+                          deleteIcon={<CloseIcon />}
+                        />
+                      ))}
+                  </Stack>
+                )
               )}
               <form onSubmit={handleAddPlayers}>
                 <TextField
@@ -476,15 +520,25 @@ export default function HallintaPage() {
                   placeholder="Lisää pelaajia (yksi per rivi)"
                   sx={{ mb: 2 }}
                 />
-                <Button type="submit" variant="contained" size="small">
-                  Lisää pelaajat
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="small"
+                  disabled={addPlayersMutation.isPending}
+                  startIcon={
+                    addPlayersMutation.isPending ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : null
+                  }
+                >
+                  {addPlayersMutation.isPending ? "Lisätään..." : "Lisää pelaajat"}
                 </Button>
               </form>
             </AccordionDetails>
           </Accordion>
 
           <Accordion
-            expanded={importExpanded}
+            expanded={importExpanded || shouldExpandImport}
             onChange={(_, isExpanded) => setImportExpanded(isExpanded)}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -610,8 +664,18 @@ export default function HallintaPage() {
                         />
                         <Typography variant="body2">Kotipeli (tarvitsee toimitsijat)</Typography>
                       </Stack>
-                      <Button type="submit" variant="contained" size="small">
-                        Lisää peli
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        size="small"
+                        disabled={addManualGameMutation.isPending}
+                        startIcon={
+                          addManualGameMutation.isPending ? (
+                            <CircularProgress size={20} color="inherit" />
+                          ) : null
+                        }
+                      >
+                        {addManualGameMutation.isPending ? "Lisätään..." : "Lisää peli"}
                       </Button>
                     </Stack>
                   </Stack>
@@ -631,7 +695,12 @@ export default function HallintaPage() {
                     Merkitse kotipelit, jotka vaativat toimitsijat ja paina &quot;Tuo pelit&quot;.
                   </Typography>
                 </Stack>
-                <Button variant="contained" color="success" onClick={handleImport}>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => importMutation.mutate()}
+                  disabled={importMutation.isPending}
+                >
                   Tuo pelit
                 </Button>
               </Stack>
@@ -680,7 +749,9 @@ export default function HallintaPage() {
                     location: g.location,
                     isHomeGame: g.isHomeGame,
                   }))}
-                onToggleHomeGame={handleToggleExistingHomeGame}
+                onToggleHomeGame={(gameId, isHomeGame) =>
+                  toggleHomeGameMutation.mutate({ gameId, isHomeGame })
+                }
                 onDelete={handleDeleteGame}
               />
               <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
@@ -689,6 +760,7 @@ export default function HallintaPage() {
                   size="small"
                   startIcon={<DeleteForeverIcon />}
                   onClick={handleClearAll}
+                  disabled={clearGamesMutation.isPending}
                 >
                   Poista kaikki pelit
                 </Button>

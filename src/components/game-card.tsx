@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   Box,
   Button,
   Card,
   CardContent,
   Chip,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -28,13 +30,7 @@ import {
   Person as PersonIcon,
   Timer as TimerIcon,
 } from "@mui/icons-material"
-import {
-  updateOfficial,
-  getPlayers,
-  type Player,
-  type Game,
-  type OfficialAssignment,
-} from "@/lib/storage"
+import { updateOfficial, getPlayers, type Game, type OfficialAssignment } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
 const ROLES = {
@@ -45,45 +41,58 @@ const ROLES = {
 type Role = "poytakirja" | "kello"
 
 function OfficialButton({
+  gameId,
   role,
   assignment,
-  onUpdate,
   teamId,
 }: {
+  gameId: string
   role: Role
   assignment: OfficialAssignment | null
-  onUpdate: (assignment: OfficialAssignment | null) => void
   teamId: string
 }) {
+  const queryClient = useQueryClient()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [players, setPlayers] = useState<Player[]>([])
-  const [loading, setLoading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<"guardian" | "pool">("guardian")
   const [name, setName] = useState("")
   const { label, Icon } = ROLES[role]
 
-  const isConfirmed = assignment?.handledBy != null
+  // Mutation for updating official
+  const mutation = useMutation({
+    mutationFn: (newAssignment: OfficialAssignment | null) =>
+      updateOfficial(gameId, role, newAssignment),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["games"] })
+    },
+  })
 
-  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    const target = event.currentTarget
-    setLoading(true)
-    const loadedPlayers = await getPlayers(teamId)
-    setPlayers(loadedPlayers)
-    setAnchorEl(target)
-    setLoading(false)
+  // Use mutation data until prop catches up (prevents flicker after save)
+  const isPropStale =
+    mutation.isSuccess && assignment?.playerName !== mutation.variables?.playerName
+  const displayAssignment = mutation.isPending || isPropStale ? mutation.variables : assignment
+  const isConfirmed = displayAssignment?.handledBy != null
+
+  // Query for loading players (only when menu is open)
+  const { data: players = [], isLoading: loadingPlayers } = useQuery({
+    queryKey: ["players", teamId],
+    queryFn: () => getPlayers(teamId),
+    enabled: !!anchorEl && !displayAssignment, // Only load when menu open and no assignment
+  })
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
   }
 
   const handleSelectPlayer = (playerName: string) => {
-    // Confirm if changing from existing assignment
     if (assignment && assignment.playerName !== playerName) {
       if (!confirm(`Vaihdetaanko ${assignment.playerName} → ${playerName}?`)) {
         setAnchorEl(null)
         return
       }
     }
-    onUpdate({ playerName, handledBy: null, confirmedBy: null })
     setAnchorEl(null)
+    mutation.mutate({ playerName, handledBy: null, confirmedBy: null })
   }
 
   const handleOpenDialog = (type: "guardian" | "pool") => {
@@ -95,53 +104,58 @@ function OfficialButton({
 
   const handleConfirm = () => {
     if (assignment) {
-      // Huoltaja requires name, pool doesn't
       if (dialogType === "guardian" && !name.trim()) return
-      onUpdate({
+      setDialogOpen(false)
+      mutation.mutate({
         ...assignment,
         handledBy: dialogType,
         confirmedBy: name.trim() || null,
       })
-      setDialogOpen(false)
     }
   }
 
   const handleClear = () => {
     if (confirm(`Poistetaanko pelaajan ${assignment?.playerName} vastuu tästä pelistä?`)) {
-      onUpdate(null)
+      setAnchorEl(null)
+      mutation.mutate(null)
+    } else {
+      setAnchorEl(null)
     }
-    setAnchorEl(null)
   }
 
   const getButtonColor = () => {
-    if (!assignment) return "warning"
+    if (!displayAssignment) return "warning"
     return isConfirmed ? "success" : "info"
   }
 
   const getStatusLabel = () => {
-    if (!assignment?.handledBy) return "Odottaa vahvistusta"
-    if (assignment.handledBy === "guardian") {
-      return assignment.confirmedBy
+    if (!displayAssignment?.handledBy) return "Odottaa vahvistusta"
+    if (displayAssignment.handledBy === "guardian") {
+      return displayAssignment.confirmedBy
     }
-    return assignment.confirmedBy ? `${assignment.confirmedBy} (poolista)` : "Juniori poolista"
+    return displayAssignment.confirmedBy
+      ? `${displayAssignment.confirmedBy} (poolista)`
+      : "Juniori poolista"
   }
+
+  const isBusy = mutation.isPending || isPropStale
 
   return (
     <>
       <Button
         variant="outlined"
         onClick={handleClick}
-        disabled={loading}
-        startIcon={<Icon />}
+        disabled={isBusy}
+        startIcon={isBusy ? <CircularProgress size={20} color="inherit" /> : <Icon />}
         color={getButtonColor()}
         sx={{ flex: 1, justifyContent: "flex-start", textAlign: "left" }}
       >
         <Stack alignItems="flex-start" sx={{ overflow: "hidden" }}>
           <Typography variant="caption">{label}</Typography>
-          <Typography variant="body2" fontWeight={assignment ? "bold" : "normal"} noWrap>
-            {loading ? "Ladataan..." : assignment?.playerName || "Valitse pelaaja..."}
+          <Typography variant="body2" fontWeight={displayAssignment ? "bold" : "normal"} noWrap>
+            {isBusy ? "Tallennetaan..." : displayAssignment?.playerName || "Valitse pelaaja..."}
           </Typography>
-          {assignment && (
+          {displayAssignment && !isBusy && (
             <Box sx={{ my: 0.5 }}>
               <Chip
                 label={getStatusLabel()}
@@ -156,7 +170,7 @@ function OfficialButton({
 
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
         {/* Confirmation options - only when player assigned but not yet confirmed */}
-        {assignment && !isConfirmed && (
+        {displayAssignment && !isConfirmed && (
           <MenuItem key="guardian" onClick={() => handleOpenDialog("guardian")}>
             <ListItemIcon>
               <GroupIcon color="primary" />
@@ -164,7 +178,7 @@ function OfficialButton({
             <ListItemText>Huoltaja tekee vuoron</ListItemText>
           </MenuItem>
         )}
-        {assignment && !isConfirmed && (
+        {displayAssignment && !isConfirmed && (
           <MenuItem key="pool" onClick={() => handleOpenDialog("pool")}>
             <ListItemIcon>
               <PersonIcon color="secondary" />
@@ -173,7 +187,7 @@ function OfficialButton({
           </MenuItem>
         )}
         {/* Remove option - when player assigned */}
-        {assignment && (
+        {displayAssignment && (
           <MenuItem key="clear" onClick={handleClear}>
             <ListItemIcon>
               <ClearIcon color="error" />
@@ -182,8 +196,13 @@ function OfficialButton({
           </MenuItem>
         )}
         {/* Player list - only when no assignment yet */}
-        {!assignment &&
-          (players.length === 0 ? (
+        {!displayAssignment &&
+          (loadingPlayers ? (
+            <MenuItem disabled>
+              <CircularProgress size={20} sx={{ mr: 1 }} />
+              <ListItemText>Ladataan...</ListItemText>
+            </MenuItem>
+          ) : players.length === 0 ? (
             <MenuItem key="empty" disabled>
               <ListItemText>
                 Ei pelaajia{" "}
@@ -244,14 +263,7 @@ function OfficialButton({
   )
 }
 
-export function GameCard({ game: initialGame }: { game: Game }) {
-  const [game, setGame] = useState(initialGame)
-
-  const handleUpdate = async (role: Role, assignment: OfficialAssignment | null) => {
-    const updated = await updateOfficial(game.id, role, assignment)
-    setGame(updated)
-  }
-
+export function GameCard({ game }: { game: Game }) {
   return (
     <Card variant="outlined">
       <CardContent sx={{ p: { xs: 1.5, sm: 2 }, "&:last-child": { pb: { xs: 1.5, sm: 2 } } }}>
@@ -320,15 +332,15 @@ export function GameCard({ game: initialGame }: { game: Game }) {
         {game.isHomeGame && (
           <Stack direction={{ xs: "column", sm: "row" }} gap={1} sx={{ mt: { xs: 0, sm: 1.5 } }}>
             <OfficialButton
+              gameId={game.id}
               role="poytakirja"
               assignment={game.officials.poytakirja}
-              onUpdate={(a) => handleUpdate("poytakirja", a)}
               teamId={game.teamId}
             />
             <OfficialButton
+              gameId={game.id}
               role="kello"
               assignment={game.officials.kello}
-              onUpdate={(a) => handleUpdate("kello", a)}
               teamId={game.teamId}
             />
           </Stack>

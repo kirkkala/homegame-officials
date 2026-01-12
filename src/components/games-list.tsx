@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
 import { Button, CircularProgress, Stack, Typography } from "@mui/material"
 import {
   CalendarMonth as CalendarMonthIcon,
@@ -11,39 +11,25 @@ import {
 import { TeamSelector } from "./team-selector"
 import { GameCard } from "./game-card"
 import { useTeam } from "./team-context"
-import { getGames, type Game } from "@/lib/storage"
+import { getGames } from "@/lib/storage"
 
 export function GamesList() {
   const { selectedTeam, isLoading: teamLoading } = useTeam()
-  const [games, setGames] = useState<Game[]>([])
-  const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    if (teamLoading) return
-
-    const loadGames = async () => {
-      if (!selectedTeam) {
-        setGames([])
-        setIsLoading(false)
-        return
-      }
-
-      setIsLoading(true)
-      const storedGames = await getGames(selectedTeam.id)
+  const { data: games = [], isLoading: gamesLoading } = useQuery({
+    queryKey: ["games", selectedTeam?.id],
+    queryFn: () => getGames(selectedTeam!.id),
+    enabled: !!selectedTeam,
+    select: (data) => {
       const now = new Date()
       now.setHours(0, 0, 0, 0)
-      setGames(
-        storedGames
-          .filter((game) => new Date(game.date) >= now)
-          .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
-      )
-      setIsLoading(false)
-    }
+      return data
+        .filter((game) => new Date(game.date) >= now)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
+    },
+  })
 
-    loadGames()
-  }, [selectedTeam, teamLoading])
-
-  if (isLoading || teamLoading) {
+  if (teamLoading || gamesLoading) {
     return (
       <Stack alignItems="center" py={8}>
         <CircularProgress />
