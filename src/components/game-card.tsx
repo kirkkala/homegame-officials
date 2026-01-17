@@ -28,6 +28,7 @@ import {
   Clear as ClearIcon,
   Group as GroupIcon,
   HourglassEmpty as HourglassEmptyIcon,
+  Place as PlaceIcon,
   Person as PersonIcon,
   Timer as TimerIcon,
 } from "@mui/icons-material"
@@ -269,7 +270,6 @@ function OfficialButton({
         </DialogActions>
       </Dialog>
 
-      {/* Confirmation Dialog */}
       <Dialog
         open={confirmDialog.open}
         onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
@@ -305,19 +305,21 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
   return (
     <Card variant="outlined">
       <CardContent sx={{ p: { xs: 1.5, sm: 2 }, "&:last-child": { pb: { xs: 1.5, sm: 2 } } }}>
-        {/* Mobile layout: stacked */}
-        <Box sx={{ display: { xs: "block", sm: "none" } }}>
-          {/* Top row: Date, time, division */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
-            <Stack direction="row" alignItems="center" gap={0.75}>
-              <Typography variant="body2" color="text.secondary" fontWeight="medium">
-                {formatDate(game.date)}
-              </Typography>
-              <Typography variant="body2" fontWeight="bold">
-                {game.time}
-              </Typography>
-            </Stack>
-            {isPast && <Chip label="Pelattu" size="small" sx={{ ml: 0.5, fontSize: "0.7rem" }} />}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr auto" },
+            gridTemplateAreas: {
+              xs: `"meta" "teams" "location"`,
+              sm: `"meta location" "teams ."`,
+            },
+            columnGap: 2,
+            rowGap: 0.5,
+            alignItems: { xs: "start", sm: "center" },
+            mb: 1,
+          }}
+        >
+          <Stack direction="row" alignItems="center" gap={0.75} sx={{ gridArea: "meta" }}>
             {game.divisionId && (
               <Chip
                 label={game.divisionId}
@@ -325,13 +327,40 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
                 sx={{ fontWeight: 600, bgcolor: "grey.200", color: "grey.800" }}
               />
             )}
+            {isPast && (
+              <Chip
+                label="Pelattu"
+                size="small"
+                sx={{ ml: 0.5, fontSize: "0.7rem", lineHeight: 1.3 }}
+              />
+            )}
+            <Typography variant="body2" color="text.secondary" fontWeight="medium">
+              {formatDate(game.date)} klo {game.time}
+            </Typography>
           </Stack>
 
-          {/* Teams */}
+          {game.location && (
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap={0.5}
+              sx={{ gridArea: "location", justifySelf: { xs: "flex-start", sm: "flex-end" } }}
+            >
+              <PlaceIcon sx={{ fontSize: "1rem", color: "text.secondary" }} />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                textAlign={{ xs: "left", sm: "right" }}
+              >
+                {game.location}
+              </Typography>
+            </Stack>
+          )}
+
           <Typography
             variant="body1"
             fontWeight={game.isHomeGame ? "bold" : "normal"}
-            sx={{ mb: 1, lineHeight: 1.3 }}
+            sx={{ gridArea: "teams", lineHeight: 1.3, textAlign: { xs: "left", sm: "left" } }}
           >
             {game.homeTeam}
             <Typography component="span" color="text.secondary" sx={{ mx: 0.5 }}>
@@ -341,34 +370,6 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
           </Typography>
         </Box>
 
-        {/* Desktop layout: horizontal */}
-        <Box sx={{ display: { xs: "none", sm: "block" } }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" alignItems="center" gap={1.5} sx={{ minWidth: 0, flex: 1 }}>
-              {isPast && <Chip label="Pelattu" size="small" sx={{ fontSize: "0.75rem" }} />}
-              {game.divisionId && (
-                <Chip
-                  label={game.divisionId}
-                  size="small"
-                  sx={{ fontWeight: 600, bgcolor: "grey.200", color: "grey.800" }}
-                />
-              )}
-              <Typography variant="body2" fontWeight={game.isHomeGame ? "bold" : "normal"} noWrap>
-                {game.homeTeam} vs. {game.awayTeam}
-              </Typography>
-            </Stack>
-            <Stack direction="row" alignItems="center" gap={2} sx={{ flexShrink: 0 }}>
-              <Typography variant="body2" color="text.secondary">
-                {formatDate(game.date)}
-              </Typography>
-              <Typography variant="body2" fontWeight="bold">
-                {game.time}
-              </Typography>
-            </Stack>
-          </Stack>
-        </Box>
-
-        {/* Officials section - only for home games */}
         {game.isHomeGame && (
           <Stack direction={{ xs: "column", sm: "row" }} gap={1} sx={{ mt: { xs: 0, sm: 1.5 } }}>
             <OfficialButton
