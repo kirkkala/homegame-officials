@@ -7,8 +7,8 @@ import {
   Alert,
   Button,
   Checkbox,
-  CircularProgress,
   FormControlLabel,
+  CircularProgress,
   Snackbar,
   Stack,
   Typography,
@@ -26,9 +26,26 @@ import { getGames } from "@/lib/storage"
 export function GamesList() {
   const { selectedTeam, isLoading: teamLoading } = useTeam()
   const [snackbar, setSnackbar] = useState<string | null>(null)
-  const [showPastGames, setShowPastGames] = useState(false)
-  const [showOnlyHomeGames, setShowOnlyHomeGames] = useState(false)
   const prevDataRef = useRef<string | null>(null)
+  const preferencesKey = "gamesListPreferences"
+  const readPreferences = () => {
+    if (typeof window === "undefined") return null
+    try {
+      const raw = localStorage.getItem(preferencesKey)
+      if (!raw) return null
+      return JSON.parse(raw) as { showPastGames?: boolean; showAwayGames?: boolean }
+    } catch {
+      return null
+    }
+  }
+  const [showPastGames, setShowPastGames] = useState(() => {
+    const prefs = readPreferences()
+    return typeof prefs?.showPastGames === "boolean" ? prefs.showPastGames : false
+  })
+  const [showAwayGames, setShowAwayGames] = useState(() => {
+    const prefs = readPreferences()
+    return typeof prefs?.showAwayGames === "boolean" ? prefs.showAwayGames : false
+  })
 
   const {
     data: allGames = [],
@@ -44,12 +61,20 @@ export function GamesList() {
       data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
   })
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(preferencesKey, JSON.stringify({ showPastGames, showAwayGames }))
+    } catch {
+      // Ignore storage errors
+    }
+  }, [showPastGames, showAwayGames])
+
   // Filter games based on checkboxes
   const now = new Date()
   now.setHours(0, 0, 0, 0)
   const games = allGames.filter((game) => {
     if (!showPastGames && new Date(game.date) < now) return false
-    if (showOnlyHomeGames && !game.isHomeGame) return false
+    if (!showAwayGames && !game.isHomeGame) return false
     return true
   })
   const pastGamesCount = allGames.filter((game) => new Date(game.date) < now).length
@@ -117,9 +142,6 @@ export function GamesList() {
     <>
       <Stack gap={{ xs: 2, sm: 3 }}>
         <Stack
-          direction={{ xs: "column", sm: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "flex-start", sm: "center" }}
           gap={1}
           sx={{
             bgcolor: "background.paper",
@@ -128,19 +150,30 @@ export function GamesList() {
             py: 1.5,
           }}
         >
-          <Typography
-            variant="h2"
-            fontWeight="bold"
-            sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            gap={1}
           >
-            {selectedTeam.name} {showPastGames ? "ottelut" : "seuraavat ottelut"}
-          </Typography>
-          <Stack direction={{ xs: "column", sm: "row" }} gap={{ xs: 0, sm: 2 }}>
+            <Typography
+              variant="h2"
+              fontWeight="bold"
+              sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+            >
+              {selectedTeam.name}
+            </Typography>
+          </Stack>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            gap={{ xs: 0.5, sm: 2 }}
+          >
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={showOnlyHomeGames}
-                  onChange={(e) => setShowOnlyHomeGames(e.target.checked)}
+                  checked={!showAwayGames}
+                  onChange={(e) => setShowAwayGames(!e.target.checked)}
                   size="small"
                 />
               }
@@ -156,7 +189,7 @@ export function GamesList() {
                     size="small"
                   />
                 }
-                label={`Näytä menneet (${pastGamesCount})`}
+                label="Näytä pelatut pelit"
                 slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
               />
             )}

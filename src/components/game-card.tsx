@@ -316,8 +316,8 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
               <Typography variant="body2" fontWeight="bold">
                 {game.time}
               </Typography>
-              {isPast && <Chip label="Pelattu" size="small" sx={{ ml: 0.5, fontSize: "0.7rem" }} />}
             </Stack>
+            {isPast && <Chip label="Pelattu" size="small" sx={{ ml: 0.5, fontSize: "0.7rem" }} />}
             {game.divisionId && (
               <Chip
                 label={game.divisionId}
@@ -345,6 +345,7 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
         <Box sx={{ display: { xs: "none", sm: "block" } }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" alignItems="center" gap={1.5} sx={{ minWidth: 0, flex: 1 }}>
+              {isPast && <Chip label="Pelattu" size="small" sx={{ fontSize: "0.75rem" }} />}
               {game.divisionId && (
                 <Chip
                   label={game.divisionId}
@@ -355,7 +356,6 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
               <Typography variant="body2" fontWeight={game.isHomeGame ? "bold" : "normal"} noWrap>
                 {game.homeTeam} vs. {game.awayTeam}
               </Typography>
-              {isPast && <Chip label="Pelattu" size="small" sx={{ fontSize: "0.75rem" }} />}
             </Stack>
             <Stack direction="row" alignItems="center" gap={2} sx={{ flexShrink: 0 }}>
               <Typography variant="body2" color="text.secondary">
