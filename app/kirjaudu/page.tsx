@@ -8,10 +8,18 @@ import { Footer } from "@/components/footer"
 import { theme } from "@/theme/theme"
 
 const providers: AuthProvider[] = [
-
+  { id: "google", name: "Google" },
 ]
 
 export default function LoginPage() {
+  const handleSignIn = (provider: AuthProvider) => {
+    if (provider.id === "google") {
+      window.location.href = "/api/auth/google"
+      return
+    }
+    return Promise.resolve({ error: "Kirjautumistapaa ei tueta vielä." })
+  }
+
   return (
     <Box sx={{ bgcolor: "background.default" }}>
       <Header title="Kirjautuminen" subtitle="Hallintakäyttöliittymä" backHref="/" />
@@ -20,7 +28,7 @@ export default function LoginPage() {
           <AppProvider theme={theme}>
             <SignInPage
               providers={providers}
-              signIn={() => {}}
+              signIn={handleSignIn}
               slotProps={{
                 form: { noValidate: true },
               }}
