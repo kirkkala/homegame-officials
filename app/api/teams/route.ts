@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import { getTeams, createTeam, getTeamById } from "@/lib/db"
+import { NextRequest, NextResponse } from "next/server"
+import { getTeams, createTeam, getTeamById, addTeamManager } from "@/lib/db"
+import { requireAuthUser } from "@/lib/auth-api"
 import { slugify } from "@/lib/utils"
 import { createTeamSchema, validate } from "@/lib/validation"
 
@@ -13,8 +14,12 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAuthUser(request)
+    if ("response" in auth) return auth.response
+    const { user } = auth
+
     const body = await request.json()
     const result = validate(createTeamSchema, body)
 
@@ -34,6 +39,7 @@ export async function POST(request: Request) {
     }
 
     const newTeam = await createTeam(id, name)
+    await addTeamManager(id, user.id)
     return NextResponse.json(newTeam)
   } catch (error) {
     console.error("Failed to create team:", error)

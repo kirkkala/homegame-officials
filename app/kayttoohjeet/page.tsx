@@ -23,7 +23,7 @@ import { Footer } from "@/components/footer"
 
 export default function KaijttoohjeetPage() {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
       <MainHeader />
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
         <Typography

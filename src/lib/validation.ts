@@ -5,6 +5,11 @@ const nameString = z.string().min(1).max(100).trim()
 const idString = z.string().min(1).max(100)
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)")
 const timeString = z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format (HH:mm)")
+const emailString = z
+  .string()
+  .email()
+  .max(255)
+  .transform((value) => value.trim().toLowerCase())
 
 // Team schemas
 export const createTeamSchema = z.object({
@@ -50,6 +55,10 @@ export const updateGameSchema = z.object({
     })
     .optional(),
   isHomeGame: z.boolean().optional(),
+})
+
+export const teamManagerSchema = z.object({
+  email: emailString,
 })
 
 // Helper to validate and return parsed data or error response

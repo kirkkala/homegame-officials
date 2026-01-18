@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getPlayers, createPlayer } from "@/lib/db"
+import { requireTeamManager } from "@/lib/auth-api"
 import { createPlayerSchema, validate } from "@/lib/validation"
 
 export async function GET(request: NextRequest) {
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const result = validate(createPlayerSchema, body)
@@ -23,6 +24,9 @@ export async function POST(request: Request) {
     }
 
     const { name, teamId } = result.data
+
+    const auth = await requireTeamManager(request, teamId)
+    if ("response" in auth) return auth.response
 
     const newPlayer = await createPlayer(crypto.randomUUID(), name, teamId)
     return NextResponse.json(newPlayer)

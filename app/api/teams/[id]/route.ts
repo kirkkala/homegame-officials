@@ -1,7 +1,11 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { deleteTeam, getTeamById } from "@/lib/db"
+import { requireTeamManager } from "@/lib/auth-api"
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params
 
@@ -9,6 +13,9 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     if (!team) {
       return NextResponse.json({ error: "Team not found" }, { status: 404 })
     }
+
+    const auth = await requireTeamManager(request, id)
+    if ("response" in auth) return auth.response
 
     // Games and players are deleted via cascade in the database
     await deleteTeam(id)

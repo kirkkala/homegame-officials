@@ -4,12 +4,14 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import {
   getTeams,
+  getManagedTeams,
   createTeam as apiCreateTeam,
   deleteTeam as apiDeleteTeam,
   getSelectedTeamId,
   setSelectedTeamId,
   type Team,
 } from "@/lib/storage"
+import { useAuth } from "@/components/auth-context"
 
 type TeamContextType = {
   teams: Team[]
@@ -27,16 +29,32 @@ export function TeamProvider({ children }: { children: ReactNode }) {
   const [teams, setTeams] = useState<Team[]>([])
   const [selectedTeamId, setSelectedTeamIdState] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { user, isLoading: authLoading } = useAuth()
 
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
+  const isHallinta = pathname.startsWith("/hallinta")
 
   const refreshTeams = useCallback(async () => {
-    const loadedTeams = await getTeams()
-    setTeams(loadedTeams)
-    return loadedTeams
-  }, [])
+    try {
+      if (isHallinta) {
+        if (!user) {
+          setTeams([])
+          return []
+        }
+        const loadedTeams = await getManagedTeams()
+        setTeams(loadedTeams)
+        return loadedTeams
+      }
+      const loadedTeams = await getTeams()
+      setTeams(loadedTeams)
+      return loadedTeams
+    } catch {
+      setTeams([])
+      return []
+    }
+  }, [isHallinta, user])
 
   const updateUrl = useCallback(
     (teamId: string | null) => {
@@ -56,6 +74,14 @@ export function TeamProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const init = async () => {
+      if (authLoading) return
+      if (isHallinta && !user) {
+        setTeams([])
+        setSelectedTeamIdState(null)
+        setSelectedTeamId(null)
+        setIsLoading(false)
+        return
+      }
       const loadedTeams = await refreshTeams()
       const urlTeamId = searchParams.get("team")
       const storedTeamId = getSelectedTeamId()
@@ -68,12 +94,15 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         setSelectedTeamIdState(teamId)
         setSelectedTeamId(teamId)
         if (urlTeamId !== teamId) updateUrl(teamId)
+      } else {
+        setSelectedTeamIdState(null)
+        setSelectedTeamId(null)
       }
 
       setIsLoading(false)
     }
     init()
-  }, [refreshTeams, searchParams, updateUrl])
+  }, [authLoading, isHallinta, refreshTeams, searchParams, updateUrl, user])
 
   const selectTeam = useCallback(
     (teamId: string | null) => {

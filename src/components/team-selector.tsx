@@ -22,6 +22,7 @@ import {
 } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
 import { useTeam } from "./team-context"
+import { useAuth } from "@/components/auth-context"
 
 type TeamSelectorProps = {
   showCreateButton?: boolean
@@ -37,6 +38,7 @@ export function TeamSelector({
   variant = "outlined",
 }: TeamSelectorProps) {
   const { teams, selectedTeam, selectTeam, createTeam, isLoading } = useTeam()
+  const { user } = useAuth()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newTeamName, setNewTeamName] = useState("")
 
@@ -82,6 +84,7 @@ export function TeamSelector({
           startIcon={<AddIcon />}
           onClick={() => setDialogOpen(true)}
           size={size}
+          disabled={!user}
         >
           Luo joukkue
         </Button>
@@ -100,7 +103,9 @@ export function TeamSelector({
                   {team.name}
                 </MenuItem>
               ))}
-              {showCreateButton && <MenuItem value="__create__">+ Luo uusi joukkue...</MenuItem>}
+              {showCreateButton && user && (
+                <MenuItem value="__create__">+ Luo uusi joukkue...</MenuItem>
+              )}
             </Select>
           </FormControl>
         </Stack>

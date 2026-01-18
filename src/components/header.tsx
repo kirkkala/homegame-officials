@@ -20,28 +20,34 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Menu,
-  MenuItem,
+  Button,
 } from "@mui/material"
 import {
   ArrowBack as ArrowBackIcon,
   Close as CloseIcon,
   HelpOutline as HelpOutlineIcon,
   Home as HomeIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
   Menu as MenuIcon,
   Settings as SettingsIcon,
   SportsBasketball as SportsBasketballIcon,
 } from "@mui/icons-material"
 import { TeamSelector } from "./team-selector"
 import { useTeam } from "./team-context"
+import { useAuth } from "./auth-context"
 import packageJson from "../../package.json"
 
-const PAGES = [
+type PageItem = {
+  path: string
+  label: string
+  icon: typeof HomeIcon
+  requiresAuth?: boolean
+}
+
+const PAGES: PageItem[] = [
   { path: "/", label: "Etusivu", icon: HomeIcon },
   { path: "/kayttoohjeet", label: "Käyttöohjeet", icon: HelpOutlineIcon },
-  { path: "/hallinta", label: "Hallinta", icon: SettingsIcon },
-] as const
+  { path: "/hallinta", label: "Hallinta", icon: SettingsIcon, requiresAuth: true },
+]
 
 type HeaderProps = {
   title: string
@@ -86,34 +92,13 @@ const versionChipSx = {
 export function MainHeader() {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [teamMenuAnchor, setTeamMenuAnchor] = useState<null | HTMLElement>(null)
-  const { teams, selectedTeam, selectTeam, isLoading } = useTeam()
+  const { selectedTeam } = useTeam()
+  const { user, isLoading: authLoading, logout } = useAuth()
+  const visiblePages = PAGES.filter((page) => !page.requiresAuth || !!user)
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open)
 
-  const handleTeamMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    if (teams.length > 1) {
-      setTeamMenuAnchor(event.currentTarget)
-    }
-  }
-
-  const handleTeamMenuClose = () => {
-    setTeamMenuAnchor(null)
-  }
-
-  const handleTeamSelect = (teamId: string) => {
-    selectTeam(teamId)
-    handleTeamMenuClose()
-  }
-
-  // Get the title based on selected team
-  const getTitle = () => {
-    if (isLoading) return "Kotipelien toimitsijat"
-    if (!selectedTeam) return "Kotipelien toimitsijat"
-    return `${selectedTeam.name}`
-  }
-
-  const getSubtitle = () => "Kotipelien toimitsijat"
+  const title = "Kotipelien toimitsijat"
 
   return (
     <>
@@ -131,37 +116,17 @@ export function MainHeader() {
 
           <SportsBasketballIcon color="primary" sx={{ mr: 1.5, fontSize: { xs: 24, sm: 28 } }} />
 
-          {/* Title with team name - clickable on desktop when multiple teams */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flexGrow: 1,
-              minWidth: 0,
-              cursor: teams.length > 1 ? "pointer" : "default",
-            }}
-            onClick={handleTeamMenuOpen}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <Typography
-                variant="h6"
-                component="h1"
-                fontWeight="bold"
-                noWrap
-                sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
-              >
-                {getTitle()}
-              </Typography>
-              {teams.length > 1 && !isLoading && (
-                <KeyboardArrowDownIcon
-                  sx={{
-                    fontSize: 20,
-                    color: "text.secondary",
-                    display: { xs: "none", sm: "block" },
-                  }}
-                />
-              )}
-            </Box>
+          {/* Title */}
+          <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
+            <Typography
+              variant="h6"
+              component="h1"
+              fontWeight="bold"
+              noWrap
+              sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+            >
+              {title}
+            </Typography>
             {selectedTeam && (
               <Typography
                 variant="body2"
@@ -169,7 +134,7 @@ export function MainHeader() {
                 noWrap
                 sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
               >
-                {getSubtitle()}
+                {selectedTeam.name}
               </Typography>
             )}
           </Box>
@@ -183,11 +148,11 @@ export function MainHeader() {
 
           {/* Desktop: tabs navigation */}
           <Tabs
-            value={PAGES.some((p) => p.path === pathname) ? pathname : false}
+            value={visiblePages.some((p) => p.path === pathname) ? pathname : false}
             component="nav"
             sx={{ display: { xs: "none", sm: "flex" } }}
           >
-            {PAGES.map((page) => (
+            {visiblePages.map((page) => (
               <Tab
                 key={page.path}
                 label={page.label}
@@ -200,27 +165,26 @@ export function MainHeader() {
               />
             ))}
           </Tabs>
+
+          {/* Desktop: team selector */}
+          <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", ml: 2 }}>
+            <TeamSelector size="small" showCreateButton />
+          </Box>
+
+          {!authLoading && (
+            <Button
+              component={user ? "button" : Link}
+              href={user ? undefined : "/kirjaudu"}
+              onClick={user ? () => logout() : undefined}
+              size="small"
+              variant={user ? "outlined" : "contained"}
+              sx={{ ml: 2, textTransform: "none" }}
+            >
+              {user ? "Kirjaudu ulos" : "Kirjaudu"}
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
-
-      {/* Desktop: Team switcher menu */}
-      <Menu
-        anchorEl={teamMenuAnchor}
-        open={Boolean(teamMenuAnchor)}
-        onClose={handleTeamMenuClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
-      >
-        {teams.map((team) => (
-          <MenuItem
-            key={team.id}
-            onClick={() => handleTeamSelect(team.id)}
-            selected={team.id === selectedTeam?.id}
-          >
-            {team.name}
-          </MenuItem>
-        ))}
-      </Menu>
 
       {/* Mobile drawer */}
       <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
@@ -253,7 +217,7 @@ export function MainHeader() {
           <Divider />
 
           <List sx={{ pt: 1 }}>
-            {PAGES.map((page) => {
+            {visiblePages.map((page) => {
               const Icon = page.icon
               const isActive = pathname === page.path
               return (
@@ -276,6 +240,29 @@ export function MainHeader() {
               )
             })}
           </List>
+
+          {!authLoading && (
+            <>
+              <Divider />
+              <List sx={{ pt: 1 }}>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={user ? "button" : Link}
+                    href={user ? undefined : "/kirjaudu"}
+                    onClick={() => {
+                      if (user) logout()
+                      toggleDrawer(false)()
+                    }}
+                  >
+                    <ListItemIcon>
+                      <SettingsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={user ? "Kirjaudu ulos" : "Kirjaudu"} />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </>
+          )}
 
           <Box sx={{ p: 2 }}>
             <Chip label={`v${packageJson.version}`} size="small" sx={versionChipSx} />
