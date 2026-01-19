@@ -38,21 +38,6 @@ export const users = pgTable(
   (table) => [uniqueIndex("users_email_idx").on(table.email)]
 )
 
-// Sessions
-export const sessions = pgTable(
-  "sessions",
-  {
-    id: text("id").primaryKey(), // UUID
-    userId: text("user_id")
-      .references(() => users.id, { onDelete: "cascade" })
-      .notNull(),
-    token: text("token").notNull(),
-    expiresAt: timestamp("expires_at").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => [uniqueIndex("sessions_token_idx").on(table.token)]
-)
-
 // Team managers (who can manage teams/games/players)
 export const teamManagers = pgTable(
   "team_managers",
@@ -107,6 +92,4 @@ export type Player = typeof players.$inferSelect
 export type NewPlayer = typeof players.$inferInsert
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
-export type Session = typeof sessions.$inferSelect
-export type NewSession = typeof sessions.$inferInsert
 export type TeamManager = typeof teamManagers.$inferSelect

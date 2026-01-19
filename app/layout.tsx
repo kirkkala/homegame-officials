@@ -4,7 +4,6 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
 import { Providers } from "@/components/providers"
 import { TeamProvider } from "@/components/team-context"
-import { AuthProvider } from "@/components/auth-context"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -30,11 +29,9 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeRegistry>
             <Providers>
-              <AuthProvider>
-                <Suspense>
-                  <TeamProvider>{children}</TeamProvider>
-                </Suspense>
-              </AuthProvider>
+              <Suspense>
+                <TeamProvider>{children}</TeamProvider>
+              </Suspense>
             </Providers>
           </ThemeRegistry>
         </AppRouterCacheProvider>

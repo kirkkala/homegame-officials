@@ -3,21 +3,19 @@
 import { Box, Container, Stack } from "@mui/material"
 import { AppProvider } from "@toolpad/core/AppProvider"
 import { SignInPage, type AuthProvider } from "@toolpad/core/SignInPage"
+import { signIn as nextAuthSignIn } from "next-auth/react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { theme } from "@/theme/theme"
 
-const providers: AuthProvider[] = [
-  { id: "google", name: "Google" },
-]
+const providers: AuthProvider[] = [{ id: "google", name: "Google" }]
 
 export default function LoginPage() {
-  const handleSignIn = (provider: AuthProvider) => {
-    if (provider.id === "google") {
-      window.location.href = "/api/auth/google"
-      return
+  const handleSignIn = async (provider: AuthProvider) => {
+    if (provider.id !== "google") {
+      return { error: "Kirjautumistapaa ei tueta vielä." }
     }
-    return Promise.resolve({ error: "Kirjautumistapaa ei tueta vielä." })
+    await nextAuthSignIn("google", { callbackUrl: "/hallinta" })
   }
 
   return (

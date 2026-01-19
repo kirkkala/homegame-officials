@@ -29,7 +29,6 @@ export type {
   OfficialAssignment,
   Officials,
   User,
-  Session,
   TeamManager,
 } from "@/db/schema"
 
@@ -54,7 +53,7 @@ export async function deleteTeam(id: string) {
   await db.delete(schema.teams).where(eq(schema.teams.id, id))
 }
 
-// ============ USERS & SESSIONS ============
+// ============ USERS ============
 
 export async function getUserByEmail(email: string) {
   const result = await db.select().from(schema.users).where(eq(schema.users.email, email))
@@ -69,20 +68,6 @@ export async function getUserById(id: string) {
 export async function createUser(user: schema.NewUser) {
   const result = await db.insert(schema.users).values(user).returning()
   return result[0]
-}
-
-export async function createSession(session: schema.NewSession) {
-  const result = await db.insert(schema.sessions).values(session).returning()
-  return result[0]
-}
-
-export async function getSessionByToken(token: string) {
-  const result = await db.select().from(schema.sessions).where(eq(schema.sessions.token, token))
-  return result[0] || null
-}
-
-export async function deleteSessionByToken(token: string) {
-  await db.delete(schema.sessions).where(eq(schema.sessions.token, token))
 }
 
 // ============ TEAM MANAGERS ============

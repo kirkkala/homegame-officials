@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { signOut, useSession } from "next-auth/react"
 import {
   Container,
   Box,
@@ -49,7 +50,6 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { TeamSelector } from "@/components/team-selector"
 import { useTeam } from "@/components/team-context"
-import { useAuth } from "@/components/auth-context"
 import { parseExcelFile, type ParsedGame } from "@/lib/excel-parser"
 import {
   saveGames,
@@ -188,7 +188,11 @@ function GamesTable({
 export default function HallintaPage() {
   const queryClient = useQueryClient()
   const { selectedTeam, isLoading: teamLoading, deleteTeam } = useTeam()
-  const { user, isLoading: authLoading, logout } = useAuth()
+  const { data: session, status } = useSession()
+  const user = session?.user
+  const authLoading = status === "loading"
+  const userEmail = user?.email ?? ""
+  const isAdmin = !!user?.isAdmin
   const [parsedGames, setParsedGames] = useState<ParsedGame[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [snackbar, setSnackbar] = useState<{
@@ -517,7 +521,12 @@ export default function HallintaPage() {
   }, [clearGamesMutation, openConfirmDialog])
 
   const headerAction = user ? (
-    <Button size="small" variant="outlined" onClick={() => logout()} sx={{ textTransform: "none" }}>
+    <Button
+      size="small"
+      variant="outlined"
+      onClick={() => void signOut({ callbackUrl: "/" })}
+      sx={{ textTransform: "none" }}
+    >
       Kirjaudu ulos
     </Button>
   ) : null
@@ -615,9 +624,9 @@ export default function HallintaPage() {
               ) : (
                 <Stack direction="row" flexWrap="wrap" gap={1}>
                   {managers.map((manager) => {
-                    const isSelf = manager.email === user.email
+                    const isSelf = manager.email === userEmail
                     const isLastManager = managers.length === 1
-                    const canRemove = user.isAdmin || !(isSelf && isLastManager)
+                    const canRemove = isAdmin || !(isSelf && isLastManager)
                     return (
                       <Chip
                         key={manager.id}

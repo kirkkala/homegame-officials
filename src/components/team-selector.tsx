@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
 import {
   Alert,
   Box,
@@ -22,7 +23,6 @@ import {
 } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
 import { useTeam } from "./team-context"
-import { useAuth } from "@/components/auth-context"
 
 type TeamSelectorProps = {
   showCreateButton?: boolean
@@ -38,7 +38,8 @@ export function TeamSelector({
   variant = "outlined",
 }: TeamSelectorProps) {
   const { teams, selectedTeam, selectTeam, createTeam, isLoading } = useTeam()
-  const { user } = useAuth()
+  const { data: session } = useSession()
+  const user = session?.user
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newTeamName, setNewTeamName] = useState("")
 

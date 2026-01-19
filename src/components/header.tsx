@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut, useSession } from "next-auth/react"
 import {
   AppBar,
   Toolbar,
@@ -33,7 +34,6 @@ import {
 } from "@mui/icons-material"
 import { TeamSelector } from "./team-selector"
 import { useTeam } from "./team-context"
-import { useAuth } from "./auth-context"
 import packageJson from "../../package.json"
 
 type PageItem = {
@@ -93,7 +93,9 @@ export function MainHeader() {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { selectedTeam } = useTeam()
-  const { user, isLoading: authLoading, logout } = useAuth()
+  const { data: session, status } = useSession()
+  const user = session?.user
+  const authLoading = status === "loading"
   const visiblePages = PAGES.filter((page) => !page.requiresAuth || !!user)
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open)
@@ -175,7 +177,7 @@ export function MainHeader() {
             <Button
               component={user ? "button" : Link}
               href={user ? undefined : "/kirjaudu"}
-              onClick={user ? () => logout() : undefined}
+              onClick={user ? () => void signOut({ callbackUrl: "/" }) : undefined}
               size="small"
               variant={user ? "outlined" : "contained"}
               sx={{ ml: 2, textTransform: "none" }}
@@ -250,7 +252,7 @@ export function MainHeader() {
                     component={user ? "button" : Link}
                     href={user ? undefined : "/kirjaudu"}
                     onClick={() => {
-                      if (user) logout()
+                      if (user) void signOut({ callbackUrl: "/" })
                       toggleDrawer(false)()
                     }}
                   >

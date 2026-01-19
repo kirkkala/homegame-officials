@@ -1,10 +1,15 @@
+import { randomUUID } from "crypto"
 import { NextRequest, NextResponse } from "next/server"
-import {
-  canManageTeam,
-  getAuthUserFromRequest,
-  getSessionCookieName,
-  type AuthUser,
-} from "@/lib/auth"
+import { getToken } from "next-auth/jwt"
+import { createUser, getUserByEmail, isUserTeamManager } from "@/lib/db"
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase()
+
+export type AuthUser = {
+  id: string
+  email: string
+  isAdmin: boolean
+}
 
 type AuthGuardResult = { user: AuthUser } | { response: NextResponse }
 
@@ -17,11 +22,20 @@ export function forbiddenResponse() {
 }
 
 export async function requireAuthUser(request: NextRequest): Promise<AuthGuardResult> {
-  const user = await getAuthUserFromRequest(request)
-  if (!user) {
+  const token = await getToken({ req: request, secret: process.env.AUTH_SECRET })
+  const email = token?.email?.toLowerCase()
+  if (!email) {
     return { response: unauthorizedResponse() }
   }
-  return { user }
+
+  let user = await getUserByEmail(email)
+  if (!user) {
+    user = await createUser({ id: randomUUID(), email })
+  }
+
+  return {
+    user: { id: user.id, email: user.email, isAdmin: !!ADMIN_EMAIL && user.email === ADMIN_EMAIL },
+  }
 }
 
 export async function requireTeamManager(
@@ -38,16 +52,7 @@ export async function requireTeamManager(
   return auth
 }
 
-export function setSessionCookie(response: NextResponse, token: string, expiresAt: Date) {
-  response.cookies.set(getSessionCookieName(), token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    expires: expiresAt,
-    path: "/",
-  })
-}
-
-export function clearSessionCookie(response: NextResponse) {
-  response.cookies.set(getSessionCookieName(), "", { maxAge: 0, path: "/" })
+async function canManageTeam(user: AuthUser, teamId: string) {
+  if (user.isAdmin) return true
+  return isUserTeamManager(user.id, teamId)
 }

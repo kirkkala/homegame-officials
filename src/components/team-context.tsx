@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 import {
   getTeams,
   getManagedTeams,
@@ -11,7 +12,6 @@ import {
   setSelectedTeamId,
   type Team,
 } from "@/lib/storage"
-import { useAuth } from "@/components/auth-context"
 
 type TeamContextType = {
   teams: Team[]
@@ -29,7 +29,9 @@ export function TeamProvider({ children }: { children: ReactNode }) {
   const [teams, setTeams] = useState<Team[]>([])
   const [selectedTeamId, setSelectedTeamIdState] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const { user, isLoading: authLoading } = useAuth()
+  const { data: session, status } = useSession()
+  const user = session?.user
+  const authLoading = status === "loading"
 
   const searchParams = useSearchParams()
   const router = useRouter()
