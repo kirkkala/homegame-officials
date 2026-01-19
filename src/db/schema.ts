@@ -33,7 +33,6 @@ export const users = pgTable(
   {
     id: text("id").primaryKey(), // UUID
     email: text("email").notNull(),
-    passwordHash: text("password_hash").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [uniqueIndex("users_email_idx").on(table.email)]

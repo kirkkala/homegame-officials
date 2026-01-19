@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
     user = await createUser({
       id: randomUUID(),
       email,
-      passwordHash: "google-oauth",
     })
   }
 

@@ -57,6 +57,8 @@ Create a `.env.local` file:
 
 ```bash
 POSTGRES_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 ```
 
 Push the database schema:
