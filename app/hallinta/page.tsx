@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import {
   Container,
   Box,
@@ -46,7 +46,8 @@ import {
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import NextLink from "next/link"
-import { Header } from "@/components/header"
+import { AuthActionButton } from "@/components/auth-action-button"
+import { MainHeader } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { TeamSelector } from "@/components/team-selector"
 import { useTeam } from "@/components/team-context"
@@ -87,17 +88,9 @@ const INITIAL_MANUAL_GAME = {
   isHomeGame: true,
 }
 
-const PageLayout = ({
-  subtitle,
-  children,
-  action,
-}: {
-  subtitle: string
-  children: React.ReactNode
-  action?: React.ReactNode
-}) => (
+const PageLayout = ({ children }: { subtitle: string; children: React.ReactNode }) => (
   <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-    <Header title="Hallinta" subtitle={subtitle} backHref="/" action={action} />
+    <MainHeader />
     <Container maxWidth="md" sx={{ py: 4 }}>
       {children}
     </Container>
@@ -520,17 +513,6 @@ export default function HallintaPage() {
     )
   }, [clearGamesMutation, openConfirmDialog])
 
-  const headerAction = user ? (
-    <Button
-      size="small"
-      variant="outlined"
-      onClick={() => void signOut({ callbackUrl: "/" })}
-      sx={{ textTransform: "none" }}
-    >
-      Kirjaudu ulos
-    </Button>
-  ) : null
-
   let subtitle = "Pelaajat ja otteluiden tuonti"
   let content: React.ReactNode
 
@@ -544,9 +526,7 @@ export default function HallintaPage() {
     subtitle = "Kirjautuminen"
     content = (
       <Stack gap={3}>
-        <Button component={NextLink} href="/kirjaudu" variant="text" sx={{ textTransform: "none" }}>
-          Kirjaudu sisään
-        </Button>
+        <AuthActionButton sx={{ alignSelf: "flex-start" }} />
       </Stack>
     )
   } else if (teamLoading) {
@@ -959,7 +939,7 @@ export default function HallintaPage() {
   }
 
   return (
-    <PageLayout subtitle={subtitle} action={headerAction}>
+    <PageLayout subtitle={subtitle}>
       {content}
 
       {/* Confirmation Dialog */}

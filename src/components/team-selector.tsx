@@ -22,6 +22,7 @@ import {
   type SelectChangeEvent,
 } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
+import { alpha } from "@mui/material/styles"
 import { useTeam } from "./team-context"
 
 type TeamSelectorProps = {
@@ -91,7 +92,16 @@ export function TeamSelector({
         </Button>
       ) : (
         <Stack direction="row" alignItems="center" gap={1}>
-          <FormControl size={size} fullWidth={fullWidth} variant={variant} sx={{ minWidth: 180 }}>
+          <FormControl
+            size={size}
+            fullWidth={fullWidth}
+            variant={variant}
+            sx={(theme) => ({
+              minWidth: 180,
+              bgcolor: alpha(theme.palette.background.paper, 0.7),
+              borderRadius: 1,
+            })}
+          >
             <InputLabel id="team-select-label">Joukkue</InputLabel>
             <Select
               labelId="team-select-label"

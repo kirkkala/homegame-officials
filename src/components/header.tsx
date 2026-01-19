@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import {
   AppBar,
   Toolbar,
@@ -21,7 +21,6 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Button,
 } from "@mui/material"
 import {
   ArrowBack as ArrowBackIcon,
@@ -32,6 +31,7 @@ import {
   Settings as SettingsIcon,
   SportsBasketball as SportsBasketballIcon,
 } from "@mui/icons-material"
+import { AuthActionButton } from "./auth-action-button"
 import { TeamSelector } from "./team-selector"
 import { useTeam } from "./team-context"
 import packageJson from "../../package.json"
@@ -81,14 +81,6 @@ export function Header({ title, subtitle, backHref, action }: HeaderProps) {
   )
 }
 
-const versionChipSx = {
-  bgcolor: "background.paper",
-  border: 1,
-  borderColor: "divider",
-  fontWeight: 600,
-  fontSize: "0.7rem",
-}
-
 export function MainHeader() {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -107,28 +99,46 @@ export function MainHeader() {
       <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0 }}>
         <Toolbar sx={{ minHeight: { xs: 64, sm: 70 } }}>
           {/* Mobile: hamburger menu */}
-          <IconButton
-            edge="start"
-            aria-label="menu"
-            onClick={toggleDrawer(true)}
-            sx={{ mr: 1, display: { sm: "none" } }}
-          >
+          <IconButton edge="start" aria-label="menu" onClick={toggleDrawer(true)} sx={{ mr: 1 }}>
             <MenuIcon />
           </IconButton>
 
           <SportsBasketballIcon color="primary" sx={{ mr: 1.5, fontSize: { xs: 24, sm: 28 } }} />
 
           {/* Title */}
-          <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
-            <Typography
-              variant="h6"
-              component="h1"
-              fontWeight="bold"
-              noWrap
-              sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
-            >
-              {title}
-            </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              flexGrow: 1,
+              minWidth: 0,
+              height: "100%",
+              justifyContent: "center",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", minWidth: 0, gap: 1 }}>
+              <Typography
+                variant="h6"
+                component="h1"
+                fontWeight="bold"
+                noWrap
+                sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+              >
+                {title}
+              </Typography>
+              {/* Version chip */}
+              <Chip
+                label={`v${packageJson.version}`}
+                size="small"
+                sx={{
+                  bgcolor: "background.paper",
+                  border: 1,
+                  borderColor: "divider",
+                  fontWeight: 600,
+                  fontSize: "0.7rem",
+                }}
+              />
+            </Box>
             {selectedTeam && (
               <Typography
                 variant="body2"
@@ -140,13 +150,6 @@ export function MainHeader() {
               </Typography>
             )}
           </Box>
-
-          {/* Desktop: version chip */}
-          <Chip
-            label={`v${packageJson.version}`}
-            size="small"
-            sx={{ ...versionChipSx, display: { xs: "none", md: "flex" }, mr: 2 }}
-          />
 
           {/* Desktop: tabs navigation */}
           <Tabs
@@ -168,23 +171,7 @@ export function MainHeader() {
             ))}
           </Tabs>
 
-          {/* Desktop: team selector */}
-          <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", ml: 2 }}>
-            <TeamSelector size="small" showCreateButton />
-          </Box>
-
-          {!authLoading && (
-            <Button
-              component={user ? "button" : Link}
-              href={user ? undefined : "/kirjaudu"}
-              onClick={user ? () => void signOut({ callbackUrl: "/" }) : undefined}
-              size="small"
-              variant={user ? "outlined" : "contained"}
-              sx={{ ml: 2, textTransform: "none" }}
-            >
-              {user ? "Kirjaudu ulos" : "Kirjaudu"}
-            </Button>
-          )}
+          {!authLoading && <AuthActionButton sx={{ ml: 2 }} />}
         </Toolbar>
       </AppBar>
 
@@ -246,29 +233,15 @@ export function MainHeader() {
           {!authLoading && (
             <>
               <Divider />
-              <List sx={{ pt: 1 }}>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component={user ? "button" : Link}
-                    href={user ? undefined : "/kirjaudu"}
-                    onClick={() => {
-                      if (user) void signOut({ callbackUrl: "/" })
-                      toggleDrawer(false)()
-                    }}
-                  >
-                    <ListItemIcon>
-                      <SettingsIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={user ? "Kirjaudu ulos" : "Kirjaudu"} />
-                  </ListItemButton>
-                </ListItem>
-              </List>
+              <Box sx={{ p: 2 }}>
+                <AuthActionButton
+                  fullWidth
+                  onAfterAction={toggleDrawer(false)}
+                  sx={{ justifyContent: "flex-start" }}
+                />
+              </Box>
             </>
           )}
-
-          <Box sx={{ p: 2 }}>
-            <Chip label={`v${packageJson.version}`} size="small" sx={versionChipSx} />
-          </Box>
         </Box>
       </Drawer>
     </>
