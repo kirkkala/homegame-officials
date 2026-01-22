@@ -12,8 +12,13 @@ function createDb() {
   if (isVercel) {
     return drizzleVercel(sql, { schema })
   } else {
+    const connectionString = process.env.POSTGRES_URL
+    if (!connectionString) {
+      throw new Error("POSTGRES_URL is not set")
+    }
     const pool = new Pool({
-      connectionString: process.env.POSTGRES_URL,
+      connectionString: connectionString,
+      ssl: false,
     })
     return drizzlePg(pool, { schema })
   }
