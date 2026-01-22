@@ -21,9 +21,9 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Link as MuiLink,
 } from "@mui/material"
 import {
-  ArrowBack as ArrowBackIcon,
   Close as CloseIcon,
   HelpOutline as HelpOutlineIcon,
   Home as HomeIcon,
@@ -49,38 +49,6 @@ const PAGES: PageItem[] = [
   { path: "/hallinta", label: "Hallinta", icon: SettingsIcon, requiresAuth: true },
 ]
 
-type HeaderProps = {
-  title: string
-  subtitle: string
-  backHref?: string
-  action?: React.ReactNode
-}
-
-export function Header({ title, subtitle, backHref, action }: HeaderProps) {
-  return (
-    <AppBar position="static" color="default" elevation={1}>
-      <Toolbar>
-        {backHref ? (
-          <IconButton component={Link} href={backHref} edge="start" sx={{ mr: 1 }}>
-            <ArrowBackIcon />
-          </IconButton>
-        ) : (
-          <SportsBasketballIcon color="primary" sx={{ mr: 1 }} />
-        )}
-        <Stack sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography variant="h6" component="h1" fontWeight="bold" noWrap>
-            {title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" noWrap>
-            {subtitle}
-          </Typography>
-        </Stack>
-        {action}
-      </Toolbar>
-    </AppBar>
-  )
-}
-
 export function MainHeader() {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -103,8 +71,9 @@ export function MainHeader() {
             <MenuIcon />
           </IconButton>
 
-          <SportsBasketballIcon color="primary" sx={{ mr: 1.5, fontSize: { xs: 24, sm: 28 } }} />
-
+          <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
+            <SportsBasketballIcon color="primary" sx={{ mr: 1.5, fontSize: { xs: 24, sm: 28 } }} />
+          </MuiLink>
           {/* Title */}
           <Box
             sx={{
@@ -124,7 +93,9 @@ export function MainHeader() {
                 noWrap
                 sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
               >
-                {title}
+                <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
+                  {title}
+                </MuiLink>
               </Typography>
               {/* Version chip */}
               <Chip
@@ -170,8 +141,6 @@ export function MainHeader() {
               />
             ))}
           </Tabs>
-
-          {!authLoading && <AuthActionButton sx={{ ml: 2 }} />}
         </Toolbar>
       </AppBar>
 

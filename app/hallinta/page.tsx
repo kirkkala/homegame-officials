@@ -571,15 +571,7 @@ export default function HallintaPage() {
         {/* Team Management */}
         <Box>
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
-            <Button
-              component={NextLink}
-              href="/kayttoohjeet"
-              size="small"
-              startIcon={<HelpOutlineIcon />}
-              sx={{ color: "text.secondary" }}
-            >
-              Käyttöohjeet
-            </Button>
+            {!authLoading && <AuthActionButton />}
             <Button
               color="error"
               size="small"
@@ -591,7 +583,6 @@ export default function HallintaPage() {
             </Button>
           </Stack>
         </Box>
-
         <TeamSelector showCreateButton />
 
         <Card>

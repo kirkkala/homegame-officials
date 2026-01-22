@@ -341,18 +341,10 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
         >
           <Stack direction="row" alignItems="center" gap={0.75} sx={{ gridArea: "meta" }}>
             {game.divisionId && (
-              <Chip
-                label={game.divisionId}
-                size="small"
-                sx={{ fontWeight: 600, bgcolor: "grey.200", color: "grey.800" }}
-              />
+              <Chip label={game.divisionId} size="small" sx={{ fontWeight: 600 }} />
             )}
             {isPast && (
-              <Chip
-                label="Pelattu"
-                size="small"
-                sx={{ ml: 0.5, fontSize: "0.7rem", lineHeight: 1.3 }}
-              />
+              <Chip label="Pelattu" size="small" sx={{ fontSize: "0.7rem", lineHeight: 1.4 }} />
             )}
             <Typography variant="body2" color="text.secondary" fontWeight="medium">
               {formatDate(game.date)} klo {game.time}

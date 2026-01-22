@@ -4,7 +4,7 @@ import { Box, Container, Stack } from "@mui/material"
 import { AppProvider } from "@toolpad/core/AppProvider"
 import { SignInPage, type AuthProvider, type AuthResponse } from "@toolpad/core/SignInPage"
 import { signIn as nextAuthSignIn } from "next-auth/react"
-import { Header } from "@/components/header"
+import { MainHeader } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { theme } from "@/theme/theme"
 
@@ -36,7 +36,7 @@ export function LoginClient({ adminEmail }: LoginClientProps) {
         flexDirection: "column",
       }}
     >
-      <Header title="Kirjautuminen" subtitle="Hallintakäyttöliittymä" backHref="/" />
+      <MainHeader />
       <Container maxWidth="sm" sx={{ py: 4, flex: 1 }}>
         <Stack gap={2}>
           <AppProvider theme={theme}>
