@@ -74,6 +74,9 @@ Push the database schema:
 pnpm db:push
 ```
 
+To push schema changes to **Vercel**, set `POSTGRES_URL` to your Vercel database URL (from Vercel Dashboard → Storage → your database → `.env.local`) and then run `pnpm db:push`. The command targets whatever database `POSTGRES_URL` points to.
+Might need to `NODE_TLS_REJECT_UNAUTHORIZED=0 pnpm db:push`
+
 To stop/start the database later:
 
 ```bash
