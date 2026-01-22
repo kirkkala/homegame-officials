@@ -22,7 +22,7 @@ import { Footer } from "@/components/footer"
 
 export default function KaijttoohjeetPage() {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <MainHeader />
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
         <Typography variant="h4" component="h2" gutterBottom fontWeight="bold">
@@ -110,13 +110,13 @@ export default function KaijttoohjeetPage() {
             Tietosuojaseloste
           </Typography>
           <Typography>
-            Kirjautuneen käyttäjän sähköpostiosoite on tallennettu tietokantaan. Tietoja ei
-            luovuteta kolmansille osapuolille. Palvelimet sijaitsevat EU-alueella AWS Tukholman
-            datakeskuksessa. Hosting on toteutettu{" "}
+            Kirjautuneen käyttäjän sähköpostiosoite on tallennettu tietokantaan, ja kirjautuminen on
+            toteutettu Google autentikoinnin avulla. Tietoja ei luovuteta kolmansille osapuolille.
+            Palvelimet sijaitsevat EU-alueella AWS Tukholman datakeskuksessa. Sivusto pyörii{" "}
             <Link href="https://vercel.com/" target="_blank" rel="noopener">
               Vercelin
             </Link>{" "}
-            avulla. Kirjautuminen on toistaiseksi mahdollista vain Google-tilillä.
+            hostingissa.
           </Typography>
         </Paper>
       </Container>

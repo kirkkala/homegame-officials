@@ -5,12 +5,12 @@ import { MainHeader } from "@/components/header"
 
 export default function Home() {
   return (
-    <Box>
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <MainHeader />
-      <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
+      <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
         <GamesList />
-        <Footer />
       </Container>
+      <Footer />
     </Box>
   )
 }

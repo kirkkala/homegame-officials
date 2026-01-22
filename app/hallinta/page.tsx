@@ -89,9 +89,16 @@ const INITIAL_MANUAL_GAME = {
 }
 
 const PageLayout = ({ children }: { subtitle: string; children: React.ReactNode }) => (
-  <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+  <Box
+    sx={{
+      minHeight: "100vh",
+      bgcolor: "background.default",
+      display: "flex",
+      flexDirection: "column",
+    }}
+  >
     <MainHeader />
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: 4, flex: 1 }}>
       {children}
     </Container>
     <Footer />

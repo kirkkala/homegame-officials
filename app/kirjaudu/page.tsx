@@ -24,9 +24,16 @@ export default function LoginPage() {
   }
 
   return (
-    <Box sx={{ bgcolor: "background.default" }}>
+    <Box
+      sx={{
+        bgcolor: "background.default",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Header title="Kirjautuminen" subtitle="Hallintakäyttöliittymä" backHref="/" />
-      <Container maxWidth="sm" sx={{ py: 4 }}>
+      <Container maxWidth="sm" sx={{ py: 4, flex: 1 }}>
         <Stack gap={2}>
           <AppProvider theme={theme}>
             <SignInPage
