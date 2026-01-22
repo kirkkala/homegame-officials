@@ -34,13 +34,13 @@ export default function KaijttoohjeetPage() {
             Mikä tämä on?
           </Typography>
           <Typography>
-            Kotipelien toimitsijat -sovellus auttaa jakamaan Namikan kotipelien toimitsijavuoroja. Kirjautuminen ei ole pakollista — sitä tarvitsee vain jojo hallintaa
-            varten.
+            Kotipelien toimitsijat -sovellus auttaa jakamaan Namikan kotipelien toimitsijavuoroja.
+            Kirjautuminen ei ole pakollista — sitä tarvitsee vain jojo hallintaa varten.
           </Typography>
           <Typography>
-            Timo Kirkkala askarteli applikaation harrasteprojektina AI:n kanssa että 
-            toimitsijavuorojen kanssa säätäminen veisi vähemmän aikaa excelin parissa. Koodi on julkaistu
-            avoimena lähdekoodina{" "}
+            Timo Kirkkala askarteli applikaation harrasteprojektina AI:n kanssa että
+            toimitsijavuorojen kanssa säätäminen veisi vähemmän aikaa excelin parissa. Koodi on
+            julkaistu avoimena lähdekoodina{" "}
             <Link
               href="https://github.com/kirkkala/homegame-officials"
               target="_blank"

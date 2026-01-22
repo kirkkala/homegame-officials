@@ -304,7 +304,13 @@ function OfficialButton({
 export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolean }) {
   return (
     <Card variant="outlined">
-      <CardContent sx={{ p: { xs: 1.5, sm: 2 }, "&:last-child": { pb: { xs: 1.5, sm: 2 } } }}>
+      <CardContent
+        sx={{
+          p: { xs: 1.5, sm: 2 },
+          "&:last-child": { pb: { xs: 1.5, sm: 2 } },
+          "& .MuiTypography-root": { marginTop: 0, marginBottom: 0 },
+        }}
+      >
         <Box
           sx={{
             display: "grid",

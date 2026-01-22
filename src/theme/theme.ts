@@ -37,8 +37,10 @@ export const theme = createTheme({
     MuiTypography: {
       styleOverrides: {
         root: {
-          marginTop: 8,
-          marginBottom: 8,
+          "&.MuiTypography-body1, &.MuiTypography-body2": {
+            marginTop: 8,
+            marginBottom: 8,
+          },
         },
       },
     },
