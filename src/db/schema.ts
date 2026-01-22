@@ -1,4 +1,12 @@
-import { pgTable, text, timestamp, boolean, jsonb } from "drizzle-orm/pg-core"
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  jsonb,
+  primaryKey,
+  uniqueIndex,
+} from "drizzle-orm/pg-core"
 
 // Officials assignment stored as JSON
 export type OfficialAssignment = {
@@ -18,6 +26,32 @@ export const teams = pgTable("teams", {
   name: text("name").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
+
+// Users
+export const users = pgTable(
+  "users",
+  {
+    id: text("id").primaryKey(), // UUID
+    email: text("email").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("users_email_idx").on(table.email)]
+)
+
+// Team managers (who can manage teams/games/players)
+export const teamManagers = pgTable(
+  "team_managers",
+  {
+    teamId: text("team_id")
+      .references(() => teams.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: text("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.teamId, table.userId] })]
+)
 
 // Games
 export const games = pgTable("games", {
@@ -56,3 +90,6 @@ export type Game = typeof games.$inferSelect
 export type NewGame = typeof games.$inferInsert
 export type Player = typeof players.$inferSelect
 export type NewPlayer = typeof players.$inferInsert
+export type User = typeof users.$inferSelect
+export type NewUser = typeof users.$inferInsert
+export type TeamManager = typeof teamManagers.$inferSelect

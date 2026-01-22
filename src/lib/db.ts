@@ -2,7 +2,7 @@ import { drizzle as drizzleVercel } from "drizzle-orm/vercel-postgres"
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
 import { sql } from "@vercel/postgres"
 import { Pool } from "pg"
-import { eq } from "drizzle-orm"
+import { eq, and } from "drizzle-orm"
 import * as schema from "@/db/schema"
 
 // Use @vercel/postgres on Vercel, pg locally
@@ -22,7 +22,15 @@ function createDb() {
 export const db = createDb()
 
 // Re-export types from schema
-export type { Team, Game, Player, OfficialAssignment, Officials } from "@/db/schema"
+export type {
+  Team,
+  Game,
+  Player,
+  OfficialAssignment,
+  Officials,
+  User,
+  TeamManager,
+} from "@/db/schema"
 
 // ============ TEAMS ============
 
@@ -43,6 +51,63 @@ export async function createTeam(id: string, name: string) {
 export async function deleteTeam(id: string) {
   // Games and players are deleted via cascade
   await db.delete(schema.teams).where(eq(schema.teams.id, id))
+}
+
+// ============ USERS ============
+
+export async function getUserByEmail(email: string) {
+  const result = await db.select().from(schema.users).where(eq(schema.users.email, email))
+  return result[0] || null
+}
+
+export async function getUserById(id: string) {
+  const result = await db.select().from(schema.users).where(eq(schema.users.id, id))
+  return result[0] || null
+}
+
+export async function createUser(user: schema.NewUser) {
+  const result = await db.insert(schema.users).values(user).returning()
+  return result[0]
+}
+
+// ============ TEAM MANAGERS ============
+
+export async function getManagedTeams(userId: string) {
+  const rows = await db
+    .select({ team: schema.teams })
+    .from(schema.teams)
+    .innerJoin(schema.teamManagers, eq(schema.teams.id, schema.teamManagers.teamId))
+    .where(eq(schema.teamManagers.userId, userId))
+    .orderBy(schema.teams.name)
+  return rows.map((row) => row.team)
+}
+
+export async function isUserTeamManager(userId: string, teamId: string) {
+  const result = await db
+    .select()
+    .from(schema.teamManagers)
+    .where(and(eq(schema.teamManagers.userId, userId), eq(schema.teamManagers.teamId, teamId)))
+  return result.length > 0
+}
+
+export async function addTeamManager(teamId: string, userId: string) {
+  await db.insert(schema.teamManagers).values({ teamId, userId }).onConflictDoNothing()
+}
+
+export async function removeTeamManager(teamId: string, userId: string) {
+  await db
+    .delete(schema.teamManagers)
+    .where(and(eq(schema.teamManagers.teamId, teamId), eq(schema.teamManagers.userId, userId)))
+}
+
+export async function getTeamManagers(teamId: string) {
+  const rows = await db
+    .select({ id: schema.users.id, email: schema.users.email })
+    .from(schema.teamManagers)
+    .innerJoin(schema.users, eq(schema.teamManagers.userId, schema.users.id))
+    .where(eq(schema.teamManagers.teamId, teamId))
+    .orderBy(schema.users.email)
+  return rows
 }
 
 // ============ GAMES ============

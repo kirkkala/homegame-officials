@@ -58,6 +58,11 @@ export async function getTeams(): Promise<Team[]> {
   return parseJsonResponse<Team[]>(res)
 }
 
+export async function getManagedTeams(): Promise<Team[]> {
+  const res = await fetch("/api/teams/managed")
+  return parseJsonResponse<Team[]>(res)
+}
+
 export async function createTeam(name: string): Promise<Team> {
   const res = await fetch("/api/teams", {
     method: "POST",
@@ -71,6 +76,36 @@ export async function deleteTeam(id: string): Promise<void> {
   const res = await fetch(`/api/teams/${id}`, { method: "DELETE" })
   if (!res.ok) {
     throw new Error("Joukkueen poisto epäonnistui")
+  }
+}
+
+// Team managers
+export async function getTeamManagers(teamId: string): Promise<{ id: string; email: string }[]> {
+  const res = await fetch(`/api/teams/${teamId}/managers`)
+  return parseJsonResponse<{ id: string; email: string }[]>(res)
+}
+
+export async function addTeamManager(teamId: string, email: string): Promise<void> {
+  const res = await fetch(`/api/teams/${teamId}/managers`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    throw new Error(data?.error || "Käyttäjän lisääminen epäonnistui")
+  }
+}
+
+export async function removeTeamManager(teamId: string, email: string): Promise<void> {
+  const res = await fetch(`/api/teams/${teamId}/managers`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    throw new Error(data?.error || "Käyttäjän poisto epäonnistui")
   }
 }
 

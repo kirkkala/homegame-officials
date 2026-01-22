@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
 import {
   Container,
   Box,
@@ -45,7 +46,8 @@ import {
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import NextLink from "next/link"
-import { Header } from "@/components/header"
+import { AuthActionButton } from "@/components/auth-action-button"
+import { MainHeader } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { TeamSelector } from "@/components/team-selector"
 import { useTeam } from "@/components/team-context"
@@ -59,6 +61,9 @@ import {
   deletePlayer,
   updateGameHomeStatus,
   deleteGame,
+  getTeamManagers,
+  addTeamManager,
+  removeTeamManager,
 } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
@@ -83,12 +88,13 @@ const INITIAL_MANUAL_GAME = {
   isHomeGame: true,
 }
 
-const PageLayout = ({ subtitle, children }: { subtitle: string; children: React.ReactNode }) => (
+const PageLayout = ({ children }: { subtitle: string; children: React.ReactNode }) => (
   <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-    <Header title="Hallinta" subtitle={subtitle} backHref="/" />
+    <MainHeader />
     <Container maxWidth="md" sx={{ py: 4 }}>
       {children}
     </Container>
+    <Footer />
   </Box>
 )
 
@@ -175,6 +181,11 @@ function GamesTable({
 export default function HallintaPage() {
   const queryClient = useQueryClient()
   const { selectedTeam, isLoading: teamLoading, deleteTeam } = useTeam()
+  const { data: session, status } = useSession()
+  const user = session?.user
+  const authLoading = status === "loading"
+  const userEmail = user?.email ?? ""
+  const isAdmin = !!user?.isAdmin
   const [parsedGames, setParsedGames] = useState<ParsedGame[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [snackbar, setSnackbar] = useState<{
@@ -182,6 +193,7 @@ export default function HallintaPage() {
     message: string
   } | null>(null)
   const [playerNames, setPlayerNames] = useState("")
+  const [managerEmail, setManagerEmail] = useState("")
   const [showManualForm, setShowManualForm] = useState(false)
   const [manualGame, setManualGame] = useState(INITIAL_MANUAL_GAME)
   const [importExpanded, setImportExpanded] = useState(false)
@@ -203,6 +215,12 @@ export default function HallintaPage() {
   const { data: players = [], isLoading: playersLoading } = useQuery({
     queryKey: ["players", selectedTeam?.id],
     queryFn: () => getPlayers(selectedTeam!.id),
+    enabled: !!selectedTeam,
+  })
+
+  const { data: managers = [], isLoading: managersLoading } = useQuery({
+    queryKey: ["team-managers", selectedTeam?.id],
+    queryFn: () => getTeamManagers(selectedTeam!.id),
     enabled: !!selectedTeam,
   })
 
@@ -319,6 +337,35 @@ export default function HallintaPage() {
     },
   })
 
+  const addManagerMutation = useMutation({
+    mutationFn: (email: string) => addTeamManager(selectedTeam!.id, email),
+    onSuccess: () => {
+      setManagerEmail("")
+      queryClient.invalidateQueries({ queryKey: ["team-managers", selectedTeam?.id] })
+      setSnackbar({ type: "success", message: "Käyttäjä lisätty" })
+    },
+    onError: (error) => {
+      setSnackbar({
+        type: "error",
+        message: error instanceof Error ? error.message : "Käyttäjän lisääminen epäonnistui",
+      })
+    },
+  })
+
+  const removeManagerMutation = useMutation({
+    mutationFn: (email: string) => removeTeamManager(selectedTeam!.id, email),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team-managers", selectedTeam?.id] })
+      setSnackbar({ type: "info", message: "Käyttäjä poistettu" })
+    },
+    onError: (error) => {
+      setSnackbar({
+        type: "error",
+        message: error instanceof Error ? error.message : "Käyttäjän poisto epäonnistui",
+      })
+    },
+  })
+
   const addManualGameMutation = useMutation({
     mutationFn: () =>
       saveGames(
@@ -418,6 +465,15 @@ export default function HallintaPage() {
     [playerNames, addPlayersMutation]
   )
 
+  const handleAddManager = useCallback(
+    (event: React.FormEvent) => {
+      event.preventDefault()
+      if (!managerEmail.trim()) return
+      addManagerMutation.mutate(managerEmail.trim())
+    },
+    [managerEmail, addManagerMutation]
+  )
+
   const handleDeletePlayer = useCallback(
     (id: string) => {
       const player = players.find((p) => p.id === id)
@@ -457,45 +513,53 @@ export default function HallintaPage() {
     )
   }, [clearGamesMutation, openConfirmDialog])
 
-  if (teamLoading) {
-    return (
-      <PageLayout subtitle="Pelaajat ja otteluiden tuonti">
-        <Stack alignItems="center" py={8}>
-          <CircularProgress />
-        </Stack>
-      </PageLayout>
-    )
-  }
+  let subtitle = "Pelaajat ja otteluiden tuonti"
+  let content: React.ReactNode
 
-  if (!selectedTeam) {
-    return (
-      <PageLayout subtitle="Pelaajat ja otteluiden tuonti">
-        <Stack alignItems="center" py={8}>
-          <GroupsIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
-          <Typography variant="h5" gutterBottom>
-            Valitse tai luo joukkue
-          </Typography>
-          <Typography color="text.secondary" mb={3} textAlign="center">
-            Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä kotipelit.
-          </Typography>
-          <TeamSelector showCreateButton />
-          <Button
-            component={NextLink}
-            href="/kayttoohjeet"
-            size="small"
-            startIcon={<HelpOutlineIcon />}
-            sx={{ mt: 4, color: "text.secondary" }}
-          >
-            Käyttöohjeet
-          </Button>
-        </Stack>
-        <Footer />
-      </PageLayout>
+  if (authLoading) {
+    content = (
+      <Stack alignItems="center" py={8}>
+        <CircularProgress />
+      </Stack>
     )
-  }
-
-  return (
-    <PageLayout subtitle={selectedTeam.name}>
+  } else if (!user) {
+    subtitle = "Kirjautuminen"
+    content = (
+      <Stack gap={3}>
+        <AuthActionButton sx={{ alignSelf: "flex-start" }} />
+      </Stack>
+    )
+  } else if (teamLoading) {
+    content = (
+      <Stack alignItems="center" py={8}>
+        <CircularProgress />
+      </Stack>
+    )
+  } else if (!selectedTeam) {
+    content = (
+      <Stack alignItems="center" py={8}>
+        <GroupsIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+        <Typography variant="h5" gutterBottom>
+          Valitse tai luo joukkue
+        </Typography>
+        <Typography color="text.secondary" mb={3} textAlign="center">
+          Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä kotipelit.
+        </Typography>
+        <TeamSelector showCreateButton />
+        <Button
+          component={NextLink}
+          href="/kayttoohjeet"
+          size="small"
+          startIcon={<HelpOutlineIcon />}
+          sx={{ mt: 4, color: "text.secondary" }}
+        >
+          Käyttöohjeet
+        </Button>
+      </Stack>
+    )
+  } else {
+    subtitle = selectedTeam.name
+    content = (
       <Stack gap={3}>
         {/* Team Management */}
         <Box>
@@ -522,6 +586,63 @@ export default function HallintaPage() {
         </Box>
 
         <TeamSelector showCreateButton />
+
+        <Card>
+          <CardContent>
+            <Stack gap={2}>
+              <Box>
+                <Typography variant="h6">Käyttöoikeudet</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Lisää käyttäjien sähköpostiosoitteet jotka voivat hallita tämän joukkueen
+                  otteluita ja pelaajia.
+                </Typography>
+              </Box>
+              {managersLoading ? (
+                <Stack alignItems="center" py={2}>
+                  <CircularProgress size={24} />
+                </Stack>
+              ) : (
+                <Stack direction="row" flexWrap="wrap" gap={1}>
+                  {managers.map((manager) => {
+                    const isSelf = manager.email === userEmail
+                    const isLastManager = managers.length === 1
+                    const canRemove = isAdmin || !(isSelf && isLastManager)
+                    return (
+                      <Chip
+                        key={manager.id}
+                        label={manager.email}
+                        onDelete={
+                          canRemove ? () => removeManagerMutation.mutate(manager.email) : undefined
+                        }
+                        deleteIcon={canRemove ? <CloseIcon /> : undefined}
+                      />
+                    )
+                  })}
+                </Stack>
+              )}
+              <Box component="form" onSubmit={handleAddManager}>
+                <Stack direction={{ xs: "column", sm: "row" }} gap={2} alignItems="center">
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Lisää käyttäjä sähköpostilla"
+                    type="email"
+                    value={managerEmail}
+                    onChange={(e) => setManagerEmail(e.target.value)}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="small"
+                    disabled={addManagerMutation.isPending}
+                  >
+                    Lisää
+                  </Button>
+                </Stack>
+              </Box>
+            </Stack>
+          </CardContent>
+        </Card>
 
         <Box>
           <Accordion
@@ -814,7 +935,12 @@ export default function HallintaPage() {
           </Card>
         )}
       </Stack>
-      <Footer />
+    )
+  }
+
+  return (
+    <PageLayout subtitle={subtitle}>
+      {content}
 
       {/* Confirmation Dialog */}
       <Dialog

@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { getGameById, updateGame, deleteGame } from "@/lib/db"
+import { requireTeamManager } from "@/lib/auth-api"
 import { updateGameSchema, validate } from "@/lib/validation"
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await request.json()
@@ -19,6 +20,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "Game not found" }, { status: 404 })
     }
 
+    const needsManageAccess = updates.isHomeGame !== undefined
+    if (needsManageAccess) {
+      const auth = await requireTeamManager(request, game.teamId)
+      if ("response" in auth) return auth.response
+    }
+
     const updatedGame = await updateGame(id, updates)
     return NextResponse.json(updatedGame)
   } catch (error) {
@@ -27,7 +34,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params
 
@@ -35,6 +45,9 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     if (!game) {
       return NextResponse.json({ error: "404 Game not found" }, { status: 404 })
     }
+
+    const auth = await requireTeamManager(request, game.teamId)
+    if ("response" in auth) return auth.response
 
     await deleteGame(id)
     return NextResponse.json({ success: true })

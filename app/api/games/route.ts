@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getGames, createGames, deleteGamesByTeam, deleteAllGames } from "@/lib/db"
+import { requireAuthUser, requireTeamManager } from "@/lib/auth-api"
 import { createGamesSchema, validate } from "@/lib/validation"
 
 export async function GET(request: NextRequest) {
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const result = validate(createGamesSchema, body)
@@ -23,6 +24,9 @@ export async function POST(request: Request) {
     }
 
     const { games: newGames, teamId } = result.data
+
+    const auth = await requireTeamManager(request, teamId)
+    if ("response" in auth) return auth.response
 
     const gamesWithIds = newGames.map((game) => ({
       id: crypto.randomUUID(),
@@ -50,8 +54,16 @@ export async function DELETE(request: NextRequest) {
     const teamId = request.nextUrl.searchParams.get("teamId")
 
     if (teamId) {
+      const auth = await requireTeamManager(request, teamId)
+      if ("response" in auth) return auth.response
       await deleteGamesByTeam(teamId)
     } else {
+      const auth = await requireAuthUser(request)
+      if ("response" in auth) return auth.response
+      const { user } = auth
+      if (!user.isAdmin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      }
       await deleteAllGames()
     }
 

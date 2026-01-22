@@ -1,6 +1,7 @@
 "use client"
 
 import { QueryClient, QueryClientProvider, useIsMutating } from "@tanstack/react-query"
+import { SessionProvider } from "next-auth/react"
 import { useState } from "react"
 import { LinearProgress, Box } from "@mui/material"
 
@@ -28,9 +29,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GlobalLoadingIndicator />
-      {children}
-    </QueryClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <GlobalLoadingIndicator />
+        {children}
+      </QueryClientProvider>
+    </SessionProvider>
   )
 }

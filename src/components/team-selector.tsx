@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
 import {
   Alert,
   Box,
@@ -21,6 +22,7 @@ import {
   type SelectChangeEvent,
 } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
+import { alpha } from "@mui/material/styles"
 import { useTeam } from "./team-context"
 
 type TeamSelectorProps = {
@@ -37,6 +39,8 @@ export function TeamSelector({
   variant = "outlined",
 }: TeamSelectorProps) {
   const { teams, selectedTeam, selectTeam, createTeam, isLoading } = useTeam()
+  const { data: session } = useSession()
+  const user = session?.user
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newTeamName, setNewTeamName] = useState("")
 
@@ -82,12 +86,22 @@ export function TeamSelector({
           startIcon={<AddIcon />}
           onClick={() => setDialogOpen(true)}
           size={size}
+          disabled={!user}
         >
           Luo joukkue
         </Button>
       ) : (
         <Stack direction="row" alignItems="center" gap={1}>
-          <FormControl size={size} fullWidth={fullWidth} variant={variant} sx={{ minWidth: 180 }}>
+          <FormControl
+            size={size}
+            fullWidth={fullWidth}
+            variant={variant}
+            sx={(theme) => ({
+              minWidth: 180,
+              bgcolor: alpha(theme.palette.background.paper, 0.7),
+              borderRadius: 1,
+            })}
+          >
             <InputLabel id="team-select-label">Joukkue</InputLabel>
             <Select
               labelId="team-select-label"
@@ -100,7 +114,9 @@ export function TeamSelector({
                   {team.name}
                 </MenuItem>
               ))}
-              {showCreateButton && <MenuItem value="__create__">+ Luo uusi joukkue...</MenuItem>}
+              {showCreateButton && user && (
+                <MenuItem value="__create__">+ Luo uusi joukkue...</MenuItem>
+              )}
             </Select>
           </FormControl>
         </Stack>

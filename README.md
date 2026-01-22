@@ -57,7 +57,16 @@ Create a `.env.local` file:
 
 ```bash
 POSTGRES_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+AUTH_SECRET=
+ADMIN_EMAIL=
 ```
+
+Auth notes:
+
+- `AUTH_SECRET` is required by Auth.js. Generate it with `npx auth secret`.
+- `ADMIN_EMAIL` grants admin privileges to the matching user email.
 
 Push the database schema:
 
