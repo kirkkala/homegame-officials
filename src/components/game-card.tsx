@@ -23,7 +23,7 @@ import {
   Typography,
 } from "@mui/material"
 import {
-  Assignment as AssignmentIcon,
+  LaptopChromebook as LaptopChromebookIcon,
   CheckCircle as CheckCircleIcon,
   Clear as ClearIcon,
   Group as GroupIcon,
@@ -36,7 +36,7 @@ import { updateOfficial, getPlayers, type Game, type OfficialAssignment } from "
 import { formatDate } from "@/lib/utils"
 
 const ROLES = {
-  poytakirja: { label: "Pöytäkirja (eSCO)", Icon: AssignmentIcon },
+  poytakirja: { label: "Pöytäkirja (eSCO)", Icon: LaptopChromebookIcon },
   kello: { label: "Kello (tulostaulu)", Icon: TimerIcon },
 } as const
 
@@ -79,6 +79,7 @@ function OfficialButton({
     mutation.isSuccess && assignment?.playerName !== mutation.variables?.playerName
   const displayAssignment = mutation.isPending || isPropStale ? mutation.variables : assignment
   const isConfirmed = displayAssignment?.handledBy != null
+  const isUnassigned = !displayAssignment
 
   // Query for loading players (only when menu is open)
   const { data: players = [], isLoading: loadingPlayers } = useQuery({
@@ -134,8 +135,8 @@ function OfficialButton({
   }
 
   const getButtonColor = () => {
-    if (!displayAssignment) return "warning"
-    return isConfirmed ? "success" : "info"
+    if (isUnassigned) return "warning"
+    return isConfirmed ? "success" : "warning"
   }
 
   const getStatusLabel = () => {
@@ -158,23 +159,36 @@ function OfficialButton({
         disabled={isBusy}
         startIcon={isBusy ? <CircularProgress size={20} color="inherit" /> : <Icon />}
         color={getButtonColor()}
-        sx={{ flex: 1, justifyContent: "flex-start", textAlign: "left" }}
+        sx={{
+          flex: 1,
+          justifyContent: "flex-start",
+          textAlign: "left",
+          pt: 2,
+          ...(isUnassigned && {
+            color: "text.secondary",
+            borderColor: "text.secondary",
+            "&:hover": {
+              color: "text.primary",
+              borderColor: "text.primary",
+            },
+          }),
+        }}
       >
         <Stack alignItems="flex-start" sx={{ overflow: "hidden" }}>
           <Typography variant="caption">{label}</Typography>
-          <Typography variant="body2" fontWeight={displayAssignment ? "bold" : "normal"} noWrap>
-            {isBusy ? "Tallennetaan..." : displayAssignment?.playerName || "Valitse pelaaja..."}
-          </Typography>
-          {displayAssignment && !isBusy && (
-            <Box sx={{ my: 0.5 }}>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+            <Typography noWrap>
+              {isBusy ? "Tallennetaan..." : displayAssignment?.playerName || "Valitse pelaaja..."}
+            </Typography>
+            {displayAssignment && !isBusy && (
               <Chip
                 label={getStatusLabel()}
                 size="small"
                 color={isConfirmed ? "success" : "warning"}
                 icon={isConfirmed ? <CheckCircleIcon /> : <HourglassEmptyIcon />}
               />
-            </Box>
-          )}
+            )}
+          </Stack>
         </Stack>
       </Button>
 
