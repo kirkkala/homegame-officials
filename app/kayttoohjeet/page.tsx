@@ -13,7 +13,6 @@ import {
 } from "@mui/material"
 import {
   CheckCircle as CheckCircleIcon,
-  Groups as GroupsIcon,
   PersonAdd as PersonAddIcon,
   AssignmentAdd as AssignmentAddIcon,
   UploadFile as UploadFileIcon,
@@ -26,27 +25,22 @@ export default function KaijttoohjeetPage() {
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <MainHeader />
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          fontWeight="bold"
-          sx={{ fontSize: { xs: "1.5rem", sm: "2.125rem" } }}
-        >
+        <Typography variant="h4" component="h2" gutterBottom fontWeight="bold">
           Käyttöohjeet
         </Typography>
 
         <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
+          <Typography component="h3" variant="h6" gutterBottom>
             Mikä tämä on?
           </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Kotipelien toimitsijat -sovellus auttaa hallitsemaan koripallo-otteluiden pöytäkirja- ja
-            kellovuoroja. Sovelluksella voit jakaa vuorot pelaajille ja seurata niiden vahvistuksia.
+          <Typography>
+            Kotipelien toimitsijat -sovellus auttaa jakamaan Namikan kotipelien toimitsijavuoroja. Kirjautuminen ei ole pakollista — sitä tarvitsee vain jojo hallintaa
+            varten.
           </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Timo askarteli applikaation AI:n kanssa että kotipelien toimitsijavuorojen jakaminen
-            veisi vähemmän aikaa excelin parissa. Koodi on julkaistu avoimena lähdekoodina{" "}
+          <Typography>
+            Timo Kirkkala askarteli applikaation harrasteprojektina AI:n kanssa että 
+            toimitsijavuorojen kanssa säätäminen veisi vähemmän aikaa excelin parissa. Koodi on julkaistu
+            avoimena lähdekoodina{" "}
             <Link
               href="https://github.com/kirkkala/homegame-officials"
               target="_blank"
@@ -59,70 +53,71 @@ export default function KaijttoohjeetPage() {
         </Paper>
 
         <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
+          <Typography component="h3" variant="h6" gutterBottom>
             Näin pääset alkuun
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Tässä vaiheessa kaikki toiminnot on saatavilla kirjautumatta. Joukkueenjohtajan
-            kirjautuminen lisätään myöhemmin.
+          <Typography>
+            Joukkueen vanhemmat voivat käyttää applikaatiota ilman kirjautumista.
+          </Typography>
+          <Typography>
+            Jojo kirjautuu sisään ja hallitsee joukkuetta: luo joukkueen, lisää pelaajat ja ottelut{" "}
+            <Link href="https://elsa-myclub.hnmky.fi/" target="_blank" rel="noopener">
+              eLSA → MyClub Muuntaja
+            </Link>{" "}
+            appilla tehdystä excel-tiedostosta.
           </Typography>
           <List sx={{ py: 0 }}>
             <ListItem sx={{ alignItems: "flex-start" }}>
-              <ListItemIcon sx={{ mt: 0.5 }}>
-                <GroupsIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="1. Luo joukkue (tulee kirjautumisen taakse)"
-                secondary="Luo itsellesi joukkue Hallinta-sivulla."
-              />
-            </ListItem>
-            <ListItem sx={{ alignItems: "flex-start" }}>
-              <ListItemIcon sx={{ mt: 0.5 }}>
+              <ListItemIcon>
                 <PersonAddIcon color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary="2. Lisää pelaajat (tulee kirjautumisen taakse)"
-                secondary="Lisää joukkueen pelaajat Hallinta-sivulla. Voit lisätä pelaajia manuaalisesti tai tuoda ne tiedostosta."
+                primary="1. Valitse joukkue"
+                secondary="Etusivulla valitse joukkue, jonka ottelut haluat nähdä. Valittu joukkue tallentuu selaimen välimuistiin."
               />
             </ListItem>
             <ListItem sx={{ alignItems: "flex-start" }}>
-              <ListItemIcon sx={{ mt: 0.5 }}>
+              <ListItemIcon>
                 <UploadFileIcon color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary="3. Lisää ottelut (tulee kirjautumisen taakse)"
-                secondary={
-                  <>
-                    Siirry Hallinta-sivulle ja lisää{" "}
-                    <Link href="https://elsa-myclub.vercel.app" target="_blank" rel="noopener">
-                      eLSA-excel
-                    </Link>{" "}
-                    muuntajalla tekemäsi excel-tiedosto, jossa on joukkuseesi ottelut. Pelejä voi
-                    lisätä myös käsin yksitellen. Merkitse kotipelit rastilla jotta niihin voi
-                    lisätä toimitsijat. Järjestelmä tallentaa valinnat automaattisesti.
-                  </>
-                }
+                primary="2. Valitse ottelu ja jaa vuorot"
+                secondary="Valitse kotipelille eSCO- ja kellovuoroon pelaajan vastuu. Tämän pelaajan vanhemmat ovat vastuussa toimitsijavuorosta. Joukkueenjohtajalta voi pyytää juniorin poolista tekemään toimitsijavuoron."
               />
             </ListItem>
             <ListItem sx={{ alignItems: "flex-start" }}>
-              <ListItemIcon sx={{ mt: 0.5 }}>
+              <ListItemIcon>
                 <AssignmentAddIcon color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary="4. Jaa vuorot (jojo tai kuka vain)"
-                secondary="Etusivulla näet tulevat kotipelit. Klikkaa ottelua ja jaa pöytäkirja- ja kellovuorot pelaajille. Myös pelaajat/huoltajat voivat valita itselleen vuoroja etukäteen."
+                primary="3. Vahvista vuoro"
+                secondary='Kun vuoro on sovittu, klikkaa "Odottaa vahvistusta" ja merkitse hoitaako vuoron huoltaja vai juniori poolista.'
               />
             </ListItem>
             <ListItem sx={{ alignItems: "flex-start" }}>
-              <ListItemIcon sx={{ mt: 0.5 }}>
+              <ListItemIcon>
                 <CheckCircleIcon color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary="5. Vahvista vuorot (kuka vain)"
-                secondary='Vahvista vuoro painalammalla "Odottaa vahvistusta" toimitsijavuoroon.'
+                primary="4. Seuraa tilannetta"
+                secondary="Vahvistetut vuorot näkyvät vihreänä, odottavat oranssina."
               />
             </ListItem>
           </List>
+        </Paper>
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
+          <Typography component="h3" variant="h6" gutterBottom>
+            Tietosuojaseloste
+          </Typography>
+          <Typography>
+            Kirjautuneen käyttäjän sähköpostiosoite on tallennettu tietokantaan. Tietoja ei
+            luovuteta kolmansille osapuolille. Palvelimet sijaitsevat EU-alueella AWS Tukholman
+            datakeskuksessa. Hosting on toteutettu{" "}
+            <Link href="https://vercel.com/" target="_blank" rel="noopener">
+              Vercelin
+            </Link>{" "}
+            avulla. Kirjautuminen on toistaiseksi mahdollista vain Google-tilillä.
+          </Typography>
         </Paper>
       </Container>
       <Footer />
