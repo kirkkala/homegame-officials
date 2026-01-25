@@ -157,7 +157,7 @@ function OfficialButton({
         variant="outlined"
         onClick={handleClick}
         disabled={isBusy}
-        startIcon={isBusy ? <CircularProgress size={20} color="inherit" /> : <Icon />}
+        startIcon={isBusy ? <CircularProgress size={20} color="inherit" /> : false}
         color={getButtonColor()}
         sx={{
           flex: 1,
@@ -175,9 +175,12 @@ function OfficialButton({
         }}
       >
         <Stack alignItems="flex-start" sx={{ overflow: "hidden" }}>
-          <Typography variant="caption">{label}</Typography>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
-            <Typography noWrap>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Icon sx={{ verticalAlign: "middle" }} />
+            <Typography>{label}</Typography>
+          </Stack>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography sx={{ fontWeight: "bold" }} noWrap>
               {isBusy ? "Tallennetaan..." : displayAssignment?.playerName || "Valitse pelaaja..."}
             </Typography>
             {displayAssignment && !isBusy && (
