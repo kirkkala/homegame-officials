@@ -44,6 +44,16 @@ export const theme = createTheme({
         },
       },
     },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          "& .MuiTypography-root": {
+            marginTop: 0,
+            marginBottom: 0,
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: { textTransform: "none" },

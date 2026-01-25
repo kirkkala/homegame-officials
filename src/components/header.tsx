@@ -91,7 +91,7 @@ export function MainHeader() {
                 component="h1"
                 fontWeight="bold"
                 noWrap
-                sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                sx={{ fontSize: { xs: "1rem", sm: "1.25rem" }, mt: 0, mb: 0 }}
               >
                 <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
                   {title}
@@ -115,7 +115,7 @@ export function MainHeader() {
                 variant="body2"
                 color="text.secondary"
                 noWrap
-                sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" }, mt: 0, mb: 0 }}
               >
                 {selectedTeam.name}
               </Typography>
@@ -159,7 +159,7 @@ export function MainHeader() {
           >
             <Stack direction="row" alignItems="center" gap={1}>
               <SportsBasketballIcon />
-              <Typography variant="h6" fontWeight="bold">
+              <Typography variant="h6" fontWeight="bold" sx={{ mt: 0, mb: 0 }}>
                 Toimitsijat
               </Typography>
             </Stack>

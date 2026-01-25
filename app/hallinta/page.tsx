@@ -530,12 +530,7 @@ export default function HallintaPage() {
       </Stack>
     )
   } else if (!user) {
-    subtitle = "Kirjautuminen"
-    content = (
-      <Stack gap={3}>
-        <AuthActionButton sx={{ alignSelf: "flex-start" }} />
-      </Stack>
-    )
+    content = <Typography>Hallinta käytettävissä vain kirjautuneille käyttäjille.</Typography>
   } else if (teamLoading) {
     content = (
       <Stack alignItems="center" py={8}>
