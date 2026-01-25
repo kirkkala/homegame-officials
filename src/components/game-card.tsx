@@ -13,7 +13,6 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -106,11 +105,16 @@ function OfficialButton({
     mutation.mutate({ playerName, handledBy: null, confirmedBy: null })
   }
 
+  const getDialogDefaultName = (type: "guardian" | "pool") => {
+    if (!displayAssignment || displayAssignment.handledBy !== type) return ""
+    return displayAssignment.confirmedBy ?? ""
+  }
+
   const handleOpenDialog = (type: "guardian" | "pool") => {
     setAnchorEl(null)
     setDialogType(type)
     setDialogOpen(true)
-    setName("")
+    setName(getDialogDefaultName(type))
   }
 
   const handleConfirm = () => {
@@ -129,7 +133,7 @@ function OfficialButton({
     setAnchorEl(null)
     setConfirmDialog({
       open: true,
-      message: `Poista pelaajan ${assignment?.playerName} toimitsijavastuu tästä ottelusta?`,
+      message: `Poista pelaajan ${assignment?.playerName} toimitsijavastuu sekä valittu toimitsijavuoron tekijä tästä ottelusta?`,
       onConfirm: () => mutation.mutate(null),
     })
   }
@@ -213,6 +217,24 @@ function OfficialButton({
             <ListItemText>Juniori poolista</ListItemText>
           </MenuItem>
         )}
+        {displayAssignment?.handledBy === "guardian" && (
+          <MenuItem key="guardian-edit" onClick={() => handleOpenDialog("guardian")}>
+            <ListItemIcon>
+              <GroupIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText>Muokkaa vuoron tekijän nimeä</ListItemText>
+          </MenuItem>
+        )}
+        {displayAssignment?.handledBy === "pool" && (
+          <MenuItem key="pool-edit" onClick={() => handleOpenDialog("pool")}>
+            <ListItemIcon>
+              <PersonIcon color="secondary" />
+            </ListItemIcon>
+            <ListItemText>
+              {displayAssignment.confirmedBy ? "Muokkaa juniorin nimeä" : "Lisää juniorin nimi"}
+            </ListItemText>
+          </MenuItem>
+        )}
         {/* Remove option - when player assigned */}
         {displayAssignment && (
           <MenuItem key="clear" onClick={handleClear}>
@@ -254,41 +276,59 @@ function OfficialButton({
       </Menu>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>
-          {dialogType === "guardian" ? "Huoltaja tekee vuoron" : "Juniori poolista"}
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" mb={2}>
+        <Box
+          component="form"
+          onSubmit={(event) => {
+            event.preventDefault()
+            if (dialogType === "guardian" && !name.trim()) return
+            handleConfirm()
+          }}
+        >
+          <DialogContent>
             {dialogType === "guardian" ? (
-              <>
-                Kuka hoitaa pelaajan <strong>{assignment?.playerName}</strong> toimitsijavuoron?
-              </>
+              <Typography variant="body2">
+                Huoltajan nimi joka hoitaa pelaajan <strong>{assignment?.playerName}</strong>{" "}
+                toimitsijavuoron.
+              </Typography>
             ) : (
               <>
-                Juniori poolista hoitaa pelaajan <strong>{assignment?.playerName}</strong>{" "}
-                toimitsija-vuoron. Nimi on valinnainen.
+                <Typography variant="body2">
+                  Juniori poolista valittu hoitamaan pelaajan{" "}
+                  <strong>{assignment?.playerName}</strong> toimitsijavuorovastuu{" "}
+                  <strong>20 €</strong> korvausta vastaan.
+                </Typography>
+                <Typography variant="body2">
+                  Jojo pyytää vuoroon tekijän ja huoltaja/vanhempi huolehtii korvauksen maksusta
+                  jojon välityksellä. Maksu menee kokonaisuudessaan toimitsijavuoron tehneelle
+                  juniorille.
+                </Typography>
               </>
             )}
-          </Typography>
-          <TextField
-            autoFocus
-            fullWidth
-            label={dialogType === "guardian" ? "Huoltajan nimi" : "Juniorin nimi (valinnainen)"}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            size="small"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Peruuta</Button>
-          <Button
-            onClick={handleConfirm}
-            variant="contained"
-            disabled={dialogType === "guardian" && !name.trim()}
-          >
-            Vahvista
-          </Button>
-        </DialogActions>
+            <TextField
+              autoFocus
+              fullWidth
+              label={
+                dialogType === "guardian"
+                  ? "Huoltajan/vuoron tekijän nimi"
+                  : "Juniorin nimi (valinnainen)"
+              }
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              size="small"
+              sx={{ mt: 2 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogOpen(false)}>Peruuta</Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={dialogType === "guardian" && !name.trim()}
+            >
+              Vahvista
+            </Button>
+          </DialogActions>
+        </Box>
       </Dialog>
 
       <Dialog
