@@ -242,7 +242,11 @@ function OfficialButton({
             [...players]
               .sort((a, b) => a.name.localeCompare(b.name, "fi"))
               .map((player) => (
-                <MenuItem key={player.id} onClick={() => handleSelectPlayer(player.name)}>
+                <MenuItem
+                  key={player.id}
+                  onClick={() => handleSelectPlayer(player.name)}
+                  sx={{ minWidth: "15rem" }}
+                >
                   <ListItemText>{player.name}</ListItemText>
                 </MenuItem>
               ))
