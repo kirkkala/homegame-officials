@@ -27,7 +27,7 @@ export default function KaijttoohjeetPage() {
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
         <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
           <Typography variant="h4" component="h2" gutterBottom>
-            Käyttöohjeet
+            Käyttöohjeet ja tietosuojaseloste
           </Typography>
         </Paper>
         <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
@@ -82,7 +82,7 @@ export default function KaijttoohjeetPage() {
                 <UploadFileIcon color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary="2. Jaa vuorot"
+                primary="2. Jaa toimitsijavuorot"
                 secondary="Valitse vastuut kotipelien eSCO- ja kellovuoroihin. Vanhemmat voivat tehdä tämän oma-aloitteisesti tai joukkueenjohtaja hoitaa nimeämisen peleihin mistä vastuun hoitaja puuttuu. Nimetyn pelaajan vanhemmat ovat vastuussa toimitsijavuoron hoitamisesta, tarvittaessa sovi toisen vanhemman kanssa mikäli haluat vaihtaa vuoroa. Mikäli et halua tai voi tehdä vuoroa, pyydä jokukkueenjohtajaa hoitamaan juniori poolista vuoron tekijäksi pientä korvausta vastaan."
                 className="steps-list-text"
               />
@@ -93,7 +93,7 @@ export default function KaijttoohjeetPage() {
               </ListItemIcon>
               <ListItemText
                 primary="3. Vahvista vuoro"
-                secondary='Kun vuoro on tilassa "Odottaa vahvistusta", paina toimitsijavuoron painiketta ja merkitse hoitaako vuoron huoltaja vai juniori poolista. Juniorille poolista maksetaan 20 € korvaus toimitsijavuoron tekemisestä. Pyydä joukkueenjohtajaa hankkimaan juniori toimitsijapoolista hyvissä ajoin mikäli haluat käyttää tätä vaihtoehtoa.'
+                secondary='Kun toimitsijavuoro on tilassa "Odottaa vahvistusta", paina toimitsijavuoron painiketta ja merkitse hoitaako vuoron huoltaja vai juniori poolista. Juniorille poolista maksetaan 20 € korvaus toimitsijavuoron tekemisestä. Pyydä joukkueenjohtajaa hankkimaan juniori toimitsijapoolista hyvissä ajoin mikäli haluat käyttää tätä vaihtoehtoa.'
                 className="steps-list-text"
               />
             </ListItem>
