@@ -12,8 +12,13 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "")
 }
 
-export function formatDate(dateStr: string): string {
+export function formatDate(dateStr: string, options: { includeWeekday?: boolean } = {}): string {
   const date = new Date(dateStr)
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  if (!options.includeWeekday) return `${day}.${month}.${year}`
+
   const weekdays = [
     "Sunnuntai",
     "Maanantai",
@@ -23,19 +28,5 @@ export function formatDate(dateStr: string): string {
     "Perjantai",
     "Lauantai",
   ]
-  const months = [
-    "tammi",
-    "helmi",
-    "maalis",
-    "huhti",
-    "touko",
-    "kesä",
-    "heinä",
-    "elo",
-    "syys",
-    "loka",
-    "marras",
-    "joulu",
-  ]
-  return `${weekdays[date.getDay()]} ${date.getDate()}. ${months[date.getMonth()]} ${date.getFullYear()}`
+  return `${weekdays[date.getDay()]} ${day}.${month}.${year}`
 }

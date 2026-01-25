@@ -9,6 +9,9 @@ import {
   CardContent,
   Chip,
   CircularProgress,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Dialog,
   DialogActions,
   DialogContent,
@@ -30,6 +33,7 @@ import {
   Place as PlaceIcon,
   Person as PersonIcon,
   Timer as TimerIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material"
 import { updateOfficial, getPlayers, type Game, type OfficialAssignment } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
@@ -46,14 +50,21 @@ function OfficialButton({
   role,
   assignment,
   teamId,
+  gameDivisionId,
+  gameDate,
+  gameTime,
 }: {
   gameId: string
   role: Role
   assignment: OfficialAssignment | null
   teamId: string
+  gameDivisionId?: string | null
+  gameDate: string
+  gameTime: string
 }) {
   const queryClient = useQueryClient()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [anchorWidth, setAnchorWidth] = useState<number | undefined>(undefined)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<"guardian" | "pool">("guardian")
   const [name, setName] = useState("")
@@ -84,11 +95,12 @@ function OfficialButton({
   const { data: players = [], isLoading: loadingPlayers } = useQuery({
     queryKey: ["players", teamId],
     queryFn: () => getPlayers(teamId),
-    enabled: !!anchorEl && !displayAssignment, // Only load when menu open and no assignment
+    enabled: !!anchorEl && (!displayAssignment || !isConfirmed), // Only load when menu open and unconfirmed
   })
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
+    setAnchorWidth(event.currentTarget.clientWidth || undefined)
   }
 
   const handleSelectPlayer = (playerName: string) => {
@@ -133,8 +145,18 @@ function OfficialButton({
     setAnchorEl(null)
     setConfirmDialog({
       open: true,
-      message: `Poista pelaajan ${assignment?.playerName} toimitsijavastuu sekä valittu toimitsijavuoron tekijä tästä ottelusta?`,
+      message: `Poista pelaajan ${assignment?.playerName} toimitsijavastuu tästä ottelusta?`,
       onConfirm: () => mutation.mutate(null),
+    })
+  }
+
+  const handleUnconfirm = () => {
+    setAnchorEl(null)
+    if (!displayAssignment) return
+    mutation.mutate({
+      ...displayAssignment,
+      handledBy: null,
+      confirmedBy: null,
     })
   }
 
@@ -154,6 +176,31 @@ function OfficialButton({
   }
 
   const isBusy = mutation.isPending || isPropStale
+  const playerMenuItems = loadingPlayers ? (
+    <MenuItem disabled>
+      <CircularProgress size={20} sx={{ mr: 1 }} />
+      <ListItemText>Ladataan...</ListItemText>
+    </MenuItem>
+  ) : players.length === 0 ? (
+    <MenuItem key="empty" disabled>
+      <ListItemText>
+        Ei pelaajia{" "}
+        <Typography sx={{ fontSize: "0.8rem" }}>(lisää pelaajia hallinnan kautta)</Typography>
+      </ListItemText>
+    </MenuItem>
+  ) : (
+    [...players]
+      .sort((a, b) => a.name.localeCompare(b.name, "fi"))
+      .map((player) => (
+        <MenuItem
+          key={player.id}
+          onClick={() => handleSelectPlayer(player.name)}
+          sx={{ minWidth: "15rem" }}
+        >
+          <ListItemText>{player.name}</ListItemText>
+        </MenuItem>
+      ))
+  )
 
   return (
     <>
@@ -199,7 +246,21 @@ function OfficialButton({
         </Stack>
       </Button>
 
-      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => setAnchorEl(null)}>
+      <Menu
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{ paper: { sx: { minWidth: anchorWidth } } }}
+      >
+        <MenuItem disabled>
+          <ListItemText
+            primary={[label, gameDivisionId ?? null, `${formatDate(gameDate)} klo ${gameTime}`]
+              .filter(Boolean)
+              .join(" / ")}
+          ></ListItemText>
+        </MenuItem>
         {/* Confirmation options - only when player assigned but not yet confirmed */}
         {displayAssignment && !isConfirmed && (
           <MenuItem key="guardian" onClick={() => handleOpenDialog("guardian")}>
@@ -235,6 +296,14 @@ function OfficialButton({
             </ListItemText>
           </MenuItem>
         )}
+        {displayAssignment && isConfirmed && (
+          <MenuItem key="unconfirm" onClick={handleUnconfirm}>
+            <ListItemIcon>
+              <HourglassEmptyIcon color="warning" />
+            </ListItemIcon>
+            <ListItemText>Poista vuoron tekijä</ListItemText>
+          </MenuItem>
+        )}
         {/* Remove option - when player assigned */}
         {displayAssignment && (
           <MenuItem key="clear" onClick={handleClear}>
@@ -245,34 +314,32 @@ function OfficialButton({
           </MenuItem>
         )}
         {/* Player list - only when no assignment yet */}
-        {!displayAssignment &&
-          (loadingPlayers ? (
-            <MenuItem disabled>
-              <CircularProgress size={20} sx={{ mr: 1 }} />
-              <ListItemText>Ladataan...</ListItemText>
-            </MenuItem>
-          ) : players.length === 0 ? (
-            <MenuItem key="empty" disabled>
-              <ListItemText>
-                Ei pelaajia{" "}
-                <Typography sx={{ fontSize: "0.8rem" }}>
-                  (lisää pelaajia hallinnan kautta)
-                </Typography>
-              </ListItemText>
-            </MenuItem>
-          ) : (
-            [...players]
-              .sort((a, b) => a.name.localeCompare(b.name, "fi"))
-              .map((player) => (
-                <MenuItem
-                  key={player.id}
-                  onClick={() => handleSelectPlayer(player.name)}
-                  sx={{ minWidth: "15rem" }}
-                >
-                  <ListItemText>{player.name}</ListItemText>
-                </MenuItem>
-              ))
-          ))}
+        {!displayAssignment && playerMenuItems}
+        {/* Change player list - hidden under accordion when unconfirmed */}
+        {displayAssignment && !isConfirmed && (
+          <Accordion
+            disableGutters
+            elevation={0}
+            square
+            sx={{ backgroundColor: "transparent", borderTop: 1, borderColor: "divider" }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="body2">Vaihda pelaaja</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 0 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  maxHeight: 240,
+                  overflowY: "auto",
+                }}
+              >
+                {playerMenuItems}
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+        )}
       </Menu>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
@@ -293,9 +360,8 @@ function OfficialButton({
             ) : (
               <>
                 <Typography variant="body2">
-                  Juniori poolista valittu hoitamaan pelaajan{" "}
-                  <strong>{assignment?.playerName}</strong> toimitsijavuorovastuu{" "}
-                  <strong>20 €</strong> korvausta vastaan.
+                  Juniori poolista tekee pelaajan <strong>{assignment?.playerName}</strong>{" "}
+                  toimitsijavuorovastuu <strong>20&nbsp;€</strong> korvausta vastaan.
                 </Typography>
                 <Typography variant="body2">
                   Jojo pyytää vuoroon tekijän ja huoltaja/vanhempi huolehtii korvauksen maksusta
@@ -393,8 +459,8 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
             {isPast && (
               <Chip label="Pelattu" size="small" sx={{ fontSize: "0.7rem", lineHeight: 1.4 }} />
             )}
-            <Typography variant="body2" color="text.secondary" fontWeight="medium">
-              {formatDate(game.date)} klo {game.time}
+            <Typography>
+              {formatDate(game.date, { includeWeekday: true })} klo {game.time}
             </Typography>
           </Stack>
 
@@ -436,12 +502,18 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
               role="poytakirja"
               assignment={game.officials.poytakirja}
               teamId={game.teamId}
+              gameDivisionId={game.divisionId}
+              gameDate={game.date}
+              gameTime={game.time}
             />
             <OfficialButton
               gameId={game.id}
               role="kello"
               assignment={game.officials.kello}
               teamId={game.teamId}
+              gameDivisionId={game.divisionId}
+              gameDate={game.date}
+              gameTime={game.time}
             />
           </Stack>
         )}
