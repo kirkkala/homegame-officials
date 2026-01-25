@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Suspense } from "react"
+import { Analytics } from "@vercel/analytics/next"
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
 import { Providers } from "@/components/providers"
@@ -40,6 +41,7 @@ export default function RootLayout({
             </Providers>
           </ThemeRegistry>
         </AppRouterCacheProvider>
+        <Analytics />
       </body>
     </html>
   )
