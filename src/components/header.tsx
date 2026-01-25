@@ -29,7 +29,6 @@ import {
   Home as HomeIcon,
   Menu as MenuIcon,
   Settings as SettingsIcon,
-  SportsBasketball as SportsBasketballIcon,
 } from "@mui/icons-material"
 import { AuthActionButton } from "./auth-action-button"
 import { TeamSelector } from "./team-selector"
@@ -60,8 +59,6 @@ export function MainHeader() {
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open)
 
-  const title = "Kotipelien toimitsijat"
-
   return (
     <>
       <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0 }}>
@@ -72,7 +69,19 @@ export function MainHeader() {
           </IconButton>
 
           <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
-            <SportsBasketballIcon color="primary" sx={{ mr: 1.5, fontSize: { xs: 24, sm: 28 } }} />
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="HMKY logo"
+              sx={{
+                mt: 1,
+                mr: 2,
+                mb: 0,
+                ml: 1,
+                width: { xs: 36, sm: 40 },
+                height: { xs: 36, sm: 40 },
+              }}
+            />
           </MuiLink>
           {/* Title */}
           <Box
@@ -94,7 +103,7 @@ export function MainHeader() {
                 sx={{ fontSize: { xs: "1rem", sm: "1.25rem" }, mt: 0, mb: 0 }}
               >
                 <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
-                  {title}
+                  Kotipelien toimitsijat
                 </MuiLink>
               </Typography>
               {/* Version chip */}
@@ -112,7 +121,7 @@ export function MainHeader() {
             </Box>
             {selectedTeam && (
               <Typography
-                variant="body2"
+                variant="caption"
                 color="text.secondary"
                 noWrap
                 sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" }, mt: 0, mb: 0 }}
@@ -158,9 +167,8 @@ export function MainHeader() {
             }}
           >
             <Stack direction="row" alignItems="center" gap={1}>
-              <SportsBasketballIcon />
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 0, mb: 0 }}>
-                Toimitsijat
+                Menu
               </Typography>
             </Stack>
             <IconButton onClick={toggleDrawer(false)} sx={{ color: "inherit" }}>

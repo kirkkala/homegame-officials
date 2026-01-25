@@ -25,10 +25,11 @@ export default function KaijttoohjeetPage() {
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <MainHeader />
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
-        <Typography variant="h4" component="h2" gutterBottom fontWeight="bold">
-          Käyttöohjeet
-        </Typography>
-
+        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            Käyttöohjeet
+          </Typography>
+        </Paper>
         <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
           <Typography component="h3" variant="h6" gutterBottom>
             Mikä tämä on?
