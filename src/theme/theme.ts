@@ -103,6 +103,70 @@ export const theme = createTheme({
             marginTop: 0,
             marginBottom: 0,
           },
+          "&.steps-list-text": {
+            "& .MuiListItemText-primary": {
+              fontWeight: 600,
+            },
+            "& .MuiListItemText-secondary": {
+              marginTop: 4,
+              lineHeight: 1.5,
+            },
+          },
+        },
+      },
+    },
+    MuiList: {
+      styleOverrides: {
+        root: {
+          "&.steps-list": {
+            paddingTop: 0,
+            paddingBottom: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+            "@media (min-width: 600px)": {
+              gap: 8,
+            },
+          },
+        },
+      },
+    },
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          "&.steps-list-item": {
+            alignItems: "flex-start",
+            flexDirection: "row",
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingTop: 8,
+            paddingBottom: 8,
+            "@media (min-width: 600px)": {
+              paddingLeft: 8,
+              paddingRight: 8,
+              paddingTop: 4,
+              paddingBottom: 4,
+            },
+          },
+        },
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          "&.steps-list-icon": {
+            minWidth: 32,
+            marginBottom: 0,
+            "& svg": {
+              fontSize: 24,
+            },
+            "@media (min-width: 600px)": {
+              minWidth: 40,
+              "& svg": {
+                fontSize: 24,
+              },
+            },
+          },
         },
       },
     },

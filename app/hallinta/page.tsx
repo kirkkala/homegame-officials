@@ -530,7 +530,14 @@ export default function HallintaPage() {
       </Stack>
     )
   } else if (!user) {
-    content = <Typography>Hallinta käytettävissä vain kirjautuneille käyttäjille.</Typography>
+    content = (
+      <Stack alignItems="center" py={8}>
+        <Typography>Joukkueenjohtajan hallintapaneeli, vain kirjautuneille käyttäjille.</Typography>
+        <Button component={NextLink} href="/">
+          Siirry etusivulle
+        </Button>
+      </Stack>
+    )
   } else if (teamLoading) {
     content = (
       <Stack alignItems="center" py={8}>
