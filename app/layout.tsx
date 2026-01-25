@@ -9,6 +9,11 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "Kotipelien toimitsijat",
   description: "Hallitse kotipelien toimitsijat helposti",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
 }
 
 export const viewport: Viewport = {
