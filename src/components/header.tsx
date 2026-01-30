@@ -107,17 +107,26 @@ export function MainHeader() {
                 </MuiLink>
               </Typography>
               {/* Version chip */}
-              <Chip
-                label={`v${packageJson.version}`}
-                size="small"
-                sx={{
-                  bgcolor: "background.paper",
-                  border: 1,
-                  borderColor: "divider",
-                  fontWeight: 600,
-                  fontSize: "0.7rem",
-                }}
-              />
+              <Link
+                href="https://github.com/kirkkala/homegame-officials/releases"
+                target="_blank"
+                rel="noopener"
+              >
+                <Chip
+                  label={`v${packageJson.version}`}
+                  size="small"
+                  sx={{
+                    bgcolor: "background.paper",
+                    border: 1,
+                    borderColor: "divider",
+                    fontWeight: 500,
+                    fontSize: "0.7rem",
+                    "&:hover": {
+                      fontWeight: 700,
+                    },
+                  }}
+                />
+              </Link>
             </Box>
             {selectedTeam && (
               <Typography
