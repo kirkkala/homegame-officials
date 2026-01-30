@@ -12,6 +12,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Dialog,
   DialogActions,
   DialogContent,
@@ -20,6 +21,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -68,6 +70,7 @@ function OfficialButton({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<"guardian" | "pool">("guardian")
   const [name, setName] = useState("")
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean
     message: string
@@ -78,9 +81,14 @@ function OfficialButton({
   // Mutation for updating official
   const mutation = useMutation({
     mutationFn: (newAssignment: OfficialAssignment | null) =>
-      updateOfficial(gameId, role, newAssignment),
+      updateOfficial(gameId, teamId, role, newAssignment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["games"] })
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Toimitsijavastuun päivitys epäonnistui"
+      setErrorMessage(message)
     },
   })
 
@@ -424,6 +432,17 @@ function OfficialButton({
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={4000}
+        onClose={() => setErrorMessage(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={() => setErrorMessage(null)} severity="error" variant="filled">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

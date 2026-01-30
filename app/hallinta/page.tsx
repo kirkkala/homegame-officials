@@ -235,6 +235,7 @@ export default function HallintaPage() {
   const shouldExpandImport = existingGames.length === 0 && !gamesLoading
   const shouldExpandPlayers = players.length === 0 && !playersLoading
 
+
   // Mutations
   const importMutation = useMutation({
     mutationFn: async () => {
