@@ -5,7 +5,7 @@ import { Pool } from "pg"
 import { eq, and } from "drizzle-orm"
 import * as schema from "@/db/schema"
 
-// Use Neon HTTP on Vercel when the URL is Neon; otherwise use pg.
+// Use Neon HTTP on Vercel, pg locally
 const isVercel = process.env.VERCEL === "1"
 
 function createDb() {
@@ -14,17 +14,14 @@ function createDb() {
     throw new Error("POSTGRES_URL is not set")
   }
 
-  const isNeon = connectionString.includes(".neon.tech")
-  const forcePg = process.env.DB_DRIVER === "pg"
-
-  if (isVercel && isNeon && !forcePg) {
+  if (isVercel) {
     const sql = neon(connectionString)
     return drizzleNeon(sql, { schema })
   }
 
   const pool = new Pool({
     connectionString: connectionString,
-    ssl: isVercel ? { rejectUnauthorized: false } : false,
+    ssl: false,
   })
   return drizzlePg(pool, { schema })
 }
