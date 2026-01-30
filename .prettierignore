@@ -6,6 +6,7 @@ out
 
 # Dependencies
 node_modules
+pnpm-lock.yaml
 
 # Coverage reports
 coverage
