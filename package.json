@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
@@ -34,6 +36,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.19.30",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.10",
@@ -41,6 +47,8 @@
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.1.1",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   }
