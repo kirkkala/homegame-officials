@@ -45,6 +45,13 @@ The application helps basketball team managers assign officials to home games:
 
 ## Development
 
+### Pnpm Note
+
+`pnpmfile.cjs` is used to strip the deprecated `@vercel/postgres` peer dependency
+from `drizzle-orm` during install/update. This avoids a deprecation warning for
+an optional peer we don't use. If Drizzle removes that peer in a future release,
+we can delete `pnpmfile.cjs` and the `.npmrc` entry.
+
 ### Local Database Setup
 
 Start a local Postgres database with Docker:
