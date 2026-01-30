@@ -100,9 +100,7 @@ describe("game-card official button", () => {
     const guardianOption = await screen.findByText("Huoltaja tekee vuoron")
     await user.click(guardianOption)
 
-    expect(
-      await screen.findByLabelText("Huoltajan/vuoron tekijän nimi")
-    ).toBeInTheDocument()
+    expect(await screen.findByLabelText("Huoltajan/vuoron tekijän nimi")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Vahvista" })).toBeDisabled()
   })
 
