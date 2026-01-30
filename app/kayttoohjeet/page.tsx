@@ -93,7 +93,7 @@ export default function KaijttoohjeetPage() {
               </ListItemIcon>
               <ListItemText
                 primary="3. Vahvista vuoro"
-                secondary='Kun toimitsijavuoro on tilassa "Odottaa vahvistusta", paina toimitsijavuoron painiketta ja merkitse hoitaako vuoron huoltaja vai juniori poolista. Juniorille poolista maksetaan 20 € korvaus toimitsijavuoron tekemisestä. Pyydä joukkueenjohtajaa hankkimaan juniori toimitsijapoolista hyvissä ajoin mikäli haluat käyttää tätä vaihtoehtoa.'
+                secondary='Kun toimitsijavuoro on tilassa "Vahvista", paina toimitsijavuoron painiketta ja merkitse hoitaako vuoron huoltaja vai juniori poolista. Juniorille poolista maksetaan 20 € korvaus toimitsijavuoron tekemisestä. Pyydä joukkueenjohtajaa hankkimaan juniori toimitsijapoolista hyvissä ajoin mikäli haluat käyttää tätä vaihtoehtoa.'
                 className="steps-list-text"
               />
             </ListItem>

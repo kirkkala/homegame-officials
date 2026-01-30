@@ -54,6 +54,7 @@ export const updateGameSchema = z.object({
       kello: officialAssignmentSchema.optional(),
     })
     .optional(),
+  teamId: idString.optional(),
   isHomeGame: z.boolean().optional(),
 })
 

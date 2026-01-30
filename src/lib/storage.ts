@@ -155,13 +155,14 @@ export async function clearAllGames(teamId?: string): Promise<void> {
 
 export async function updateOfficial(
   gameId: string,
+  teamId: string,
   role: "poytakirja" | "kello",
   assignment: OfficialAssignment | null
 ): Promise<Game> {
   const res = await fetch(`/api/games/${gameId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ officials: { [role]: assignment } }),
+    body: JSON.stringify({ officials: { [role]: assignment }, teamId }),
   })
   return parseJsonResponse<Game>(res)
 }

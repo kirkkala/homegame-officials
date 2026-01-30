@@ -13,7 +13,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: result.error }, { status: 400 })
     }
 
-    const updates = result.data
+    const { teamId, ...updates } = result.data
 
     const game = await getGameById(id)
     if (!game) {
@@ -24,6 +24,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (needsManageAccess) {
       const auth = await requireTeamManager(request, game.teamId)
       if ("response" in auth) return auth.response
+    }
+
+    if (updates.officials !== undefined) {
+      if (!teamId) {
+        return NextResponse.json({ error: "teamId is required" }, { status: 400 })
+      }
+      if (teamId !== game.teamId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      }
     }
 
     const updatedGame = await updateGame(id, updates)

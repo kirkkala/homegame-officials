@@ -12,14 +12,17 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
+  IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -34,6 +37,7 @@ import {
   Person as PersonIcon,
   Timer as TimerIcon,
   ExpandMore as ExpandMoreIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material"
 import { updateOfficial, getPlayers, type Game, type OfficialAssignment } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
@@ -68,6 +72,7 @@ function OfficialButton({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<"guardian" | "pool">("guardian")
   const [name, setName] = useState("")
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean
     message: string
@@ -78,9 +83,14 @@ function OfficialButton({
   // Mutation for updating official
   const mutation = useMutation({
     mutationFn: (newAssignment: OfficialAssignment | null) =>
-      updateOfficial(gameId, role, newAssignment),
+      updateOfficial(gameId, teamId, role, newAssignment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["games"] })
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Toimitsijavastuun päivitys epäonnistui"
+      setErrorMessage(message)
     },
   })
 
@@ -166,7 +176,7 @@ function OfficialButton({
   }
 
   const getStatusLabel = () => {
-    if (!displayAssignment?.handledBy) return "Odottaa vahvistusta"
+    if (!displayAssignment?.handledBy) return "Vahvista"
     if (displayAssignment.handledBy === "guardian") {
       return displayAssignment.confirmedBy
     }
@@ -252,15 +262,48 @@ function OfficialButton({
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
-        slotProps={{ paper: { sx: { minWidth: anchorWidth } } }}
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: anchorWidth,
+              maxWidth: 360,
+              width: "auto",
+            },
+          },
+        }}
       >
-        <MenuItem disabled>
-          <ListItemText
-            primary={[label, gameDivisionId ?? null, `${formatDate(gameDate)} klo ${gameTime}`]
+        <Stack
+          direction="row"
+          alignItems="flex-start"
+          justifyContent="space-between"
+          spacing={1}
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 2,
+            bgcolor: "background.paper",
+            borderBottom: 1,
+            borderColor: "divider",
+            px: 1.5,
+            py: 1,
+          }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {[label, gameDivisionId ?? null, `${formatDate(gameDate)} klo ${gameTime}`]
               .filter(Boolean)
               .join(" / ")}
-          ></ListItemText>
-        </MenuItem>
+          </Typography>
+          <IconButton
+            size="small"
+            aria-label="Sulje valikko"
+            onClick={(event) => {
+              event.stopPropagation()
+              setAnchorEl(null)
+            }}
+          >
+            <CloseIcon sx={{ fontSize: "1rem" }} />
+          </IconButton>
+        </Stack>
         {/* Confirmation options - only when player assigned but not yet confirmed */}
         {displayAssignment && !isConfirmed && (
           <MenuItem key="guardian" onClick={() => handleOpenDialog("guardian")}>
@@ -424,6 +467,17 @@ function OfficialButton({
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={4000}
+        onClose={() => setErrorMessage(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={() => setErrorMessage(null)} severity="error" variant="filled">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </>
   )
 }
