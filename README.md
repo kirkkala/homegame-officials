@@ -50,7 +50,8 @@ The application helps basketball team managers assign officials to home games:
 Start a local Postgres database with Docker:
 
 ```bash
-docker run --name homegame-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:16
+# Note the correct postrgres version, match with one at Vercel
+docker run --name homegame-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:17
 ```
 
 Create a `.env.local` file:
@@ -120,7 +121,7 @@ pnpm db:studio       # Open Drizzle Studio
 # Set the production URL (remove &supa=...)
 export HOMEGAME_OFFICIALS_PROD_DB="postgres://user:pass@host:6543/postgres?sslmode=require"
 
-# Dump production to file (use postgres:17 to match Vercel's version)
+# Dump production to file (use correct postgres:17 version)
 docker run --rm postgres:17 pg_dump "$HOMEGAME_OFFICIALS_PROD_DB" > prod-backup.sql
 
 # Import to local Docker
