@@ -33,8 +33,10 @@
 .DS_Store
 *.pem
 
-# db dumps
+# db dumps (keep drizzle migrations versioned)
 *.sql
+!drizzle/*.sql
+!drizzle/*.sql
 
 # debug
 npm-debug.log*
