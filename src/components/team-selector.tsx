@@ -87,6 +87,7 @@ export function TeamSelector({
           onClick={() => setDialogOpen(true)}
           size={size}
           disabled={!user}
+          data-testid="team-create-button"
         >
           Luo joukkue
         </Button>
@@ -108,21 +109,30 @@ export function TeamSelector({
               value={selectedTeam?.id ?? ""}
               label="Joukkue"
               onChange={handleChange}
+              data-testid="team-select"
             >
               {teams.map((team) => (
-                <MenuItem key={team.id} value={team.id}>
+                <MenuItem key={team.id} value={team.id} data-testid={`team-option-${team.id}`}>
                   {team.name}
                 </MenuItem>
               ))}
               {showCreateButton && user && (
-                <MenuItem value="__create__">+ Luo uusi joukkue...</MenuItem>
+                <MenuItem value="__create__" data-testid="team-option-create">
+                  + Luo uusi joukkue...
+                </MenuItem>
               )}
             </Select>
           </FormControl>
         </Stack>
       )}
 
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="xs" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="xs"
+        fullWidth
+        data-testid="team-create-dialog"
+      >
         <DialogTitle>Luo uusi joukkue</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
@@ -143,6 +153,7 @@ export function TeamSelector({
                 setNewTeamName(e.target.value)
                 createMutation.reset()
               }}
+              inputProps={{ "data-testid": "team-create-input" }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault()
@@ -164,6 +175,7 @@ export function TeamSelector({
             variant="contained"
             onClick={handleCreateTeam}
             disabled={!newTeamName.trim() || createMutation.isPending}
+            data-testid="team-create-submit"
             startIcon={
               createMutation.isPending ? <CircularProgress size={20} color="inherit" /> : null
             }

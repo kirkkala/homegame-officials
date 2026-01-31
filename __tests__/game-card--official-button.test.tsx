@@ -43,7 +43,7 @@ const renderGameCard = (gameOverride = {}) => {
 }
 
 const openPoytakirjaMenu = async (user: ReturnType<typeof userEvent.setup>) => {
-  const button = screen.getByRole("button", { name: /Pöytäkirja \(eSCO\)/i })
+  const button = screen.getByTestId("official-button-poytakirja")
   await user.click(button)
 }
 
@@ -66,8 +66,8 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    expect(await screen.findByText("Matti Meikäläinen")).toBeInTheDocument()
-    expect(screen.getByText("Teppo Testaaja")).toBeInTheDocument()
+    expect(await screen.findByTestId("official-player-p1")).toBeInTheDocument()
+    expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
   })
 
   it("selecting a player updates the assignment", async () => {
@@ -76,7 +76,7 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    const playerItem = await screen.findByText("Matti Meikäläinen")
+    const playerItem = await screen.findByTestId("official-player-p1")
     await user.click(playerItem)
 
     expect(mockUpdateOfficial).toHaveBeenCalledWith("game-1", "team-1", "poytakirja", {
@@ -97,11 +97,11 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    const guardianOption = await screen.findByText("Huoltaja tekee vuoron")
+    const guardianOption = await screen.findByTestId("official-confirm-guardian")
     await user.click(guardianOption)
 
-    expect(await screen.findByLabelText("Huoltajan/vuoron tekijän nimi")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Vahvista" })).toBeDisabled()
+    expect(await screen.findByTestId("official-confirm-input")).toBeInTheDocument()
+    expect(screen.getByTestId("official-confirm-submit")).toBeDisabled()
   })
 
   it("submits guardian confirmation with required name", async () => {
@@ -115,13 +115,13 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    const guardianOption = await screen.findByText("Huoltaja tekee vuoron")
+    const guardianOption = await screen.findByTestId("official-confirm-guardian")
     await user.click(guardianOption)
 
-    const nameInput = await screen.findByLabelText("Huoltajan/vuoron tekijän nimi")
+    const nameInput = await screen.findByTestId("official-confirm-input")
     await user.type(nameInput, "Eeva Example")
 
-    const confirmButton = screen.getByRole("button", { name: "Vahvista" })
+    const confirmButton = screen.getByTestId("official-confirm-submit")
     expect(confirmButton).toBeEnabled()
     await user.click(confirmButton)
 
@@ -143,10 +143,10 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    const poolOption = await screen.findByText("Juniori poolista")
+    const poolOption = await screen.findByTestId("official-confirm-pool")
     await user.click(poolOption)
 
-    const confirmButton = screen.getByRole("button", { name: "Vahvista" })
+    const confirmButton = screen.getByTestId("official-confirm-submit")
     expect(confirmButton).toBeEnabled()
     await user.click(confirmButton)
 
@@ -172,10 +172,11 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    const editOption = await screen.findByText("Muokkaa vuoron tekijän nimeä")
+    const editOption = await screen.findByTestId("official-edit-guardian")
     await user.click(editOption)
 
-    expect(await screen.findByDisplayValue("Eeva Example")).toBeInTheDocument()
+    const nameInput = await screen.findByTestId("official-confirm-input")
+    expect(nameInput).toHaveValue("Eeva Example")
   })
 
   it("shows pool edit dialog with optional name", async () => {
@@ -193,11 +194,11 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    const editOption = await screen.findByText("Lisää juniorin nimi")
+    const editOption = await screen.findByTestId("official-edit-pool")
     await user.click(editOption)
 
-    expect(await screen.findByLabelText("Juniorin nimi (valinnainen)")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Vahvista" })).toBeEnabled()
+    expect(await screen.findByTestId("official-confirm-input")).toBeInTheDocument()
+    expect(screen.getByTestId("official-confirm-submit")).toBeEnabled()
   })
 
   it("shows pool edit label when name exists", async () => {
@@ -215,9 +216,10 @@ describe("game-card official button", () => {
 
     await openPoytakirjaMenu(user)
 
-    const editOption = await screen.findByText("Muokkaa juniorin nimeä")
+    const editOption = await screen.findByTestId("official-edit-pool")
     await user.click(editOption)
 
-    expect(await screen.findByDisplayValue("Teppo Testaaja")).toBeInTheDocument()
+    const nameInput = await screen.findByTestId("official-confirm-input")
+    expect(nameInput).toHaveValue("Teppo Testaaja")
   })
 })

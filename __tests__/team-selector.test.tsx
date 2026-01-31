@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom" />
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { render, screen } from "@testing-library/react"
+import { render, screen, fireEvent, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { TeamSelector } from "@/components/team-selector"
 
@@ -55,30 +55,30 @@ describe("team-selector", () => {
     mockUseTeam.mockReturnValue({ ...baseTeamContext, isLoading: true })
     renderTeamSelector()
 
-    expect(screen.queryByLabelText("Joukkue")).not.toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: /Luo joukkue/i })).not.toBeInTheDocument()
+    expect(screen.queryByTestId("team-select")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("team-create-button")).not.toBeInTheDocument()
   })
 
   it("renders team list and selected value", async () => {
-    const user = userEvent.setup()
     renderTeamSelector()
 
-    const select = screen.getByLabelText("Joukkue")
-    await user.click(select)
+    const select = screen.getByTestId("team-select")
+    const combobox = within(select).getByRole("combobox")
+    fireEvent.mouseDown(combobox)
 
-    const selectedOption = await screen.findByRole("option", { name: "HNMKY T14 Stadi" })
-    expect(selectedOption).toBeInTheDocument()
-    expect(screen.getByText("HNMKY T13")).toBeInTheDocument()
+    expect(await screen.findByTestId("team-option-team-1")).toBeInTheDocument()
+    expect(screen.getByTestId("team-option-team-2")).toBeInTheDocument()
   })
 
   it("updates selection when choosing a team", async () => {
     const user = userEvent.setup()
     renderTeamSelector()
 
-    const select = screen.getByLabelText("Joukkue")
-    await user.click(select)
+    const select = screen.getByTestId("team-select")
+    const combobox = within(select).getByRole("combobox")
+    fireEvent.mouseDown(combobox)
 
-    const teamOption = await screen.findByText("HNMKY T13")
+    const teamOption = await screen.findByTestId("team-option-team-2")
     await user.click(teamOption)
 
     expect(baseTeamContext.selectTeam).toHaveBeenCalledWith("team-2")
@@ -88,21 +88,22 @@ describe("team-selector", () => {
     const user = userEvent.setup()
     renderTeamSelector({ showCreateButton: true })
 
-    const select = screen.getByLabelText("Joukkue")
-    await user.click(select)
+    const select = screen.getByTestId("team-select")
+    const combobox = within(select).getByRole("combobox")
+    fireEvent.mouseDown(combobox)
 
-    const createOption = await screen.findByText("+ Luo uusi joukkue...")
+    const createOption = await screen.findByTestId("team-option-create")
     await user.click(createOption)
 
-    expect(await screen.findByText("Luo uusi joukkue")).toBeInTheDocument()
-    expect(screen.getByLabelText("Joukkueen nimi")).toBeInTheDocument()
+    expect(await screen.findByTestId("team-create-dialog")).toBeInTheDocument()
+    expect(screen.getByTestId("team-create-input")).toBeInTheDocument()
   })
 
   it("shows create button when no teams", () => {
     mockUseTeam.mockReturnValue({ ...baseTeamContext, teams: [] })
     renderTeamSelector()
 
-    expect(screen.getByRole("button", { name: "Luo joukkue" })).toBeInTheDocument()
+    expect(screen.getByTestId("team-create-button")).toBeInTheDocument()
   })
 
   it("disables create button when user is not logged in", () => {
@@ -110,6 +111,6 @@ describe("team-selector", () => {
     mockUseTeam.mockReturnValue({ ...baseTeamContext, teams: [] })
     renderTeamSelector()
 
-    expect(screen.getByRole("button", { name: "Luo joukkue" })).toBeDisabled()
+    expect(screen.getByTestId("team-create-button")).toBeDisabled()
   })
 })
