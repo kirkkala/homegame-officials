@@ -61,4 +61,4 @@ jobs:
       - name: 'notify vercel'
         uses: 'vercel/repository-dispatch/actions/status@v1'
         with:
-          name: Vercel - homegame-officials: test
+          name: "Vercel - homegame-officials: test"
