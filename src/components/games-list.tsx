@@ -196,12 +196,22 @@ export function GamesList() {
           </Stack>
         </Stack>
         {games.length === 0 ? (
-          <Stack alignItems="center" py={6}>
+          <Stack
+            alignItems="center"
+            py={6}
+            sx={{
+              bgcolor: "background.paper",
+              borderRadius: 1,
+              px: 2,
+              py: 1.5,
+            }}
+          >
             <Typography variant="h6" gutterBottom>
               Ei otteluita valituilla suodattimilla
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Poista "Näytä vain kotipelit" tai valitse "Näytä pelatut pelit" nähdäksesi kaikki ottelut.
+              Poista &quot;Näytä vain kotipelit&quot; tai valitse &quot;Näytä pelatut pelit&quot;
+              nähdäksesi kaikki ottelut.
             </Typography>
           </Stack>
         ) : (
