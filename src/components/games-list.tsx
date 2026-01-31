@@ -119,7 +119,7 @@ export function GamesList() {
     )
   }
 
-  if (games.length === 0) {
+  if (allGames.length === 0) {
     return (
       <Stack alignItems="center" py={8}>
         <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
@@ -195,11 +195,22 @@ export function GamesList() {
             )}
           </Stack>
         </Stack>
-        <Stack gap={{ xs: 1.5, sm: 2 }}>
-          {games.map((game) => (
-            <GameCard key={game.id} game={game} isPast={isGamePast(game.date)} />
-          ))}
-        </Stack>
+        {games.length === 0 ? (
+          <Stack alignItems="center" py={6}>
+            <Typography variant="h6" gutterBottom>
+              Ei otteluita valituilla suodattimilla
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Poista "Näytä vain kotipelit" tai valitse "Näytä pelatut pelit" nähdäksesi kaikki ottelut.
+            </Typography>
+          </Stack>
+        ) : (
+          <Stack gap={{ xs: 1.5, sm: 2 }}>
+            {games.map((game) => (
+              <GameCard key={game.id} game={game} isPast={isGamePast(game.date)} />
+            ))}
+          </Stack>
+        )}
       </Stack>
 
       <Snackbar
