@@ -709,7 +709,7 @@ export default function HallintaPage() {
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography component="h2" sx={{ fontSize: "1.25rem" }}>
-                Tuo otteluita
+                Lisää otteluita
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -867,7 +867,7 @@ export default function HallintaPage() {
                   onClick={() => importMutation.mutate()}
                   disabled={importMutation.isPending}
                 >
-                  Tuo otteluita
+                  Tuo ottelut
                 </Button>
               </Stack>
 
