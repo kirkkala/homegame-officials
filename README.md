@@ -8,6 +8,7 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 - **Material UI 7** (MUI) for components and styling
 - **Drizzle ORM** + **Vercel Postgres** for database
 - **xlsx** (SheetJS) for Excel processing
+- **Jest** + **Testing Library** for tests
 - **ESLint** + **Prettier** for code quality
 
 ### Prerequisites
@@ -19,6 +20,7 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 
 ```
 homegame-officials/
+├── __tests__/              # Project jest tests
 ├── app/                    # Next.js App Router
 │   ├── api/                # API routes (games, players)
 │   ├── hallinta/           # Admin page (import, manage)
@@ -99,6 +101,8 @@ pnpm dev             # Development server
 pnpm build           # Production build
 pnpm start           # Production server
 pnpm lint            # Check linting
+pnpm test            # Run tests
+pnpm test:watch      # Run tests in watch mode
 pnpm format          # Format with Prettier
 pnpm format:check    # Check formatting
 ```
