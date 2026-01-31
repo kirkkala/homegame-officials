@@ -206,6 +206,7 @@ function OfficialButton({
           key={player.id}
           onClick={() => handleSelectPlayer(player.name)}
           sx={{ minWidth: "15rem" }}
+          data-testid={`official-player-${player.id}`}
         >
           <ListItemText>{player.name}</ListItemText>
         </MenuItem>
@@ -220,6 +221,7 @@ function OfficialButton({
         disabled={isBusy}
         startIcon={isBusy ? <CircularProgress size={20} color="inherit" /> : false}
         color={getButtonColor()}
+        data-testid={`official-button-${role}`}
         sx={{
           flex: 1,
           justifyContent: "flex-start",
@@ -260,6 +262,7 @@ function OfficialButton({
         anchorEl={anchorEl}
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}
+        data-testid={`official-menu-${role}`}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
         slotProps={{
@@ -306,7 +309,11 @@ function OfficialButton({
         </Stack>
         {/* Confirmation options - only when player assigned but not yet confirmed */}
         {displayAssignment && !isConfirmed && (
-          <MenuItem key="guardian" onClick={() => handleOpenDialog("guardian")}>
+          <MenuItem
+            key="guardian"
+            onClick={() => handleOpenDialog("guardian")}
+            data-testid="official-confirm-guardian"
+          >
             <ListItemIcon>
               <GroupIcon color="primary" />
             </ListItemIcon>
@@ -314,7 +321,11 @@ function OfficialButton({
           </MenuItem>
         )}
         {displayAssignment && !isConfirmed && (
-          <MenuItem key="pool" onClick={() => handleOpenDialog("pool")}>
+          <MenuItem
+            key="pool"
+            onClick={() => handleOpenDialog("pool")}
+            data-testid="official-confirm-pool"
+          >
             <ListItemIcon>
               <PersonIcon color="secondary" />
             </ListItemIcon>
@@ -322,7 +333,11 @@ function OfficialButton({
           </MenuItem>
         )}
         {displayAssignment?.handledBy === "guardian" && (
-          <MenuItem key="guardian-edit" onClick={() => handleOpenDialog("guardian")}>
+          <MenuItem
+            key="guardian-edit"
+            onClick={() => handleOpenDialog("guardian")}
+            data-testid="official-edit-guardian"
+          >
             <ListItemIcon>
               <GroupIcon color="primary" />
             </ListItemIcon>
@@ -330,7 +345,11 @@ function OfficialButton({
           </MenuItem>
         )}
         {displayAssignment?.handledBy === "pool" && (
-          <MenuItem key="pool-edit" onClick={() => handleOpenDialog("pool")}>
+          <MenuItem
+            key="pool-edit"
+            onClick={() => handleOpenDialog("pool")}
+            data-testid="official-edit-pool"
+          >
             <ListItemIcon>
               <PersonIcon color="secondary" />
             </ListItemIcon>
@@ -340,7 +359,7 @@ function OfficialButton({
           </MenuItem>
         )}
         {displayAssignment && isConfirmed && (
-          <MenuItem key="unconfirm" onClick={handleUnconfirm}>
+          <MenuItem key="unconfirm" onClick={handleUnconfirm} data-testid="official-unconfirm">
             <ListItemIcon>
               <HourglassEmptyIcon color="warning" />
             </ListItemIcon>
@@ -349,7 +368,7 @@ function OfficialButton({
         )}
         {/* Remove option - when player assigned */}
         {displayAssignment && (
-          <MenuItem key="clear" onClick={handleClear}>
+          <MenuItem key="clear" onClick={handleClear} data-testid="official-clear">
             <ListItemIcon>
               <ClearIcon color="error" />
             </ListItemIcon>
@@ -424,6 +443,7 @@ function OfficialButton({
               value={name}
               onChange={(e) => setName(e.target.value)}
               size="small"
+              inputProps={{ "data-testid": "official-confirm-input" }}
               sx={{ mt: 2 }}
             />
           </DialogContent>
@@ -433,6 +453,7 @@ function OfficialButton({
               type="submit"
               variant="contained"
               disabled={dialogType === "guardian" && !name.trim()}
+              data-testid="official-confirm-submit"
             >
               Vahvista
             </Button>

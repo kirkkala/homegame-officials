@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, type InputHTMLAttributes } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import {
@@ -109,10 +109,12 @@ function GamesTable({
   games,
   onToggleHomeGame,
   onDelete,
+  testIdPrefix,
 }: {
   games: GameRow[]
   onToggleHomeGame: (key: string, isHomeGame: boolean) => void
   onDelete?: (key: string) => void
+  testIdPrefix?: string
 }) {
   return (
     <TableContainer component={Paper} variant="outlined">
@@ -132,6 +134,7 @@ function GamesTable({
             <TableRow
               key={game.key}
               hover
+              data-testid={testIdPrefix ? `${testIdPrefix}-row-${game.key}` : undefined}
               onClick={() => onToggleHomeGame(game.key, !game.isHomeGame)}
               selected={game.isHomeGame}
               sx={{
@@ -149,6 +152,13 @@ function GamesTable({
                 <Checkbox
                   checked={game.isHomeGame}
                   color="success"
+                  slotProps={{
+                    input: {
+                      "data-testid": testIdPrefix
+                        ? `${testIdPrefix}-home-toggle-${game.key}`
+                        : undefined,
+                    } as InputHTMLAttributes<HTMLInputElement>,
+                  }}
                   onClick={(e) => e.stopPropagation()}
                   onChange={() => onToggleHomeGame(game.key, !game.isHomeGame)}
                 />
@@ -167,6 +177,7 @@ function GamesTable({
                 <TableCell padding="checkbox">
                   <IconButton
                     size="small"
+                    data-testid={testIdPrefix ? `${testIdPrefix}-delete-${game.key}` : undefined}
                     onClick={(e) => {
                       e.stopPropagation()
                       onDelete(game.key)
@@ -649,7 +660,10 @@ export default function HallintaPage() {
             expanded={playersExpanded || shouldExpandPlayers}
             onChange={(_, isExpanded) => setPlayersExpanded(isExpanded)}
           >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              data-testid="players-accordion-toggle"
+            >
               <Typography component="h2" sx={{ fontSize: "1.25rem" }}>
                 Joukkueen pelaajat ({players.length})
               </Typography>
@@ -670,7 +684,8 @@ export default function HallintaPage() {
                           key={player.id}
                           label={player.name}
                           onDelete={() => handleDeletePlayer(player.id)}
-                          deleteIcon={<CloseIcon />}
+                          deleteIcon={<CloseIcon data-testid={`player-delete-${player.id}`} />}
+                          data-testid={`player-chip-${player.id}`}
                         />
                       ))}
                   </Stack>
@@ -684,12 +699,14 @@ export default function HallintaPage() {
                   value={playerNames}
                   onChange={(e) => setPlayerNames(e.target.value)}
                   placeholder="Lisää pelaajia (yksi per rivi)"
+                  inputProps={{ "data-testid": "players-textarea" }}
                   sx={{ mb: 2 }}
                 />
                 <Button
                   type="submit"
                   variant="contained"
                   size="small"
+                  data-testid="players-add-submit"
                   disabled={addPlayersMutation.isPending}
                   startIcon={
                     addPlayersMutation.isPending ? (
@@ -707,9 +724,9 @@ export default function HallintaPage() {
             expanded={importExpanded || shouldExpandImport}
             onChange={(_, isExpanded) => setImportExpanded(isExpanded)}
           >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} data-testid="import-accordion-toggle">
               <Typography component="h2" sx={{ fontSize: "1.25rem" }}>
-                Tuo otteluita
+                Lisää otteluita
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -733,12 +750,18 @@ export default function HallintaPage() {
                 <Typography color="text.secondary" gutterBottom>
                   Vedä Excel-tiedosto tähän tai
                 </Typography>
-                <Button variant="contained" component="label" startIcon={<UploadFileIcon />}>
+                <Button
+                  variant="contained"
+                  component="label"
+                  startIcon={<UploadFileIcon />}
+                  data-testid="excel-upload-button"
+                >
                   Valitse tiedosto
                   <input
                     type="file"
                     hidden
                     accept=".xlsx,.xls"
+                    data-testid="excel-upload-input"
                     onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
                   />
                 </Button>
@@ -749,6 +772,7 @@ export default function HallintaPage() {
                   startIcon={showManualForm ? <RemoveIcon /> : <AddIcon />}
                   onClick={() => setShowManualForm(!showManualForm)}
                   variant="outlined"
+                  data-testid="manual-game-toggle"
                 >
                   {showManualForm ? "Piilota lomake" : "Lisää manuaalisesti"}
                 </Button>
@@ -757,6 +781,7 @@ export default function HallintaPage() {
               {showManualForm && (
                 <Box
                   component="form"
+                  data-testid="manual-game-form"
                   onSubmit={handleAddManualGame}
                   sx={{ mb: 3, p: 2, bgcolor: "grey.50", borderRadius: 1 }}
                 >
@@ -771,6 +796,7 @@ export default function HallintaPage() {
                         required
                         value={manualGame.homeTeam}
                         onChange={(e) => updateManualGame("homeTeam", e.target.value)}
+                        inputProps={{ "data-testid": "manual-game-home" }}
                         sx={{ flex: 1 }}
                       />
                       <TextField
@@ -779,6 +805,7 @@ export default function HallintaPage() {
                         required
                         value={manualGame.awayTeam}
                         onChange={(e) => updateManualGame("awayTeam", e.target.value)}
+                        inputProps={{ "data-testid": "manual-game-away" }}
                         sx={{ flex: 1 }}
                       />
                     </Stack>
@@ -791,6 +818,7 @@ export default function HallintaPage() {
                         value={manualGame.date}
                         onChange={(e) => updateManualGame("date", e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
+                        inputProps={{ "data-testid": "manual-game-date" }}
                         sx={{ flex: 1 }}
                       />
                       <TextField
@@ -801,6 +829,7 @@ export default function HallintaPage() {
                         value={manualGame.time}
                         onChange={(e) => updateManualGame("time", e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
+                        inputProps={{ "data-testid": "manual-game-time" }}
                         sx={{ flex: 1 }}
                       />
                     </Stack>
@@ -835,6 +864,7 @@ export default function HallintaPage() {
                         variant="contained"
                         size="small"
                         disabled={addManualGameMutation.isPending}
+                        data-testid="manual-game-submit"
                         startIcon={
                           addManualGameMutation.isPending ? (
                             <CircularProgress size={20} color="inherit" />
@@ -856,7 +886,9 @@ export default function HallintaPage() {
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
                 <Stack>
-                  <Typography variant="h6">Esikatselu: {parsedGames.length} ottelua</Typography>
+                  <Typography variant="h6" data-testid="import-preview-title">
+                    Esikatselu: {parsedGames.length} ottelua
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Merkitse kotipelit, jotka vaativat toimitsijat ja paina &quot;Tuo ottelut&quot;.
                   </Typography>
@@ -866,8 +898,9 @@ export default function HallintaPage() {
                   color="success"
                   onClick={() => importMutation.mutate()}
                   disabled={importMutation.isPending}
+                  data-testid="import-submit"
                 >
-                  Tuo otteluita
+                  Tuo ottelut
                 </Button>
               </Stack>
 
@@ -883,6 +916,7 @@ export default function HallintaPage() {
                   isHomeGame: g.isHomeGame,
                 }))}
                 onToggleHomeGame={(key) => handleToggleHomeGame(Number(key))}
+                testIdPrefix="import-preview"
               />
             </CardContent>
           </Card>
@@ -919,6 +953,7 @@ export default function HallintaPage() {
                   toggleHomeGameMutation.mutate({ gameId, isHomeGame })
                 }
                 onDelete={handleDeleteGame}
+                testIdPrefix="existing-games"
               />
               <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
                 <Button
@@ -966,6 +1001,7 @@ export default function HallintaPage() {
             }}
             color="error"
             autoFocus
+            data-testid="confirm-dialog-submit"
           >
             Poista
           </Button>
@@ -984,6 +1020,7 @@ export default function HallintaPage() {
           onClose={() => setSnackbar(null)}
           sx={{ width: "100%" }}
           variant="filled"
+          data-testid="status-snackbar"
         >
           {snackbar?.message}
         </Alert>
