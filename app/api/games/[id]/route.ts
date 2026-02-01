@@ -20,7 +20,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: "Game not found" }, { status: 404 })
     }
 
-    const needsManageAccess = updates.isHomeGame !== undefined
+    const needsManageAccess =
+      updates.isHomeGame !== undefined ||
+      updates.divisionId !== undefined ||
+      updates.homeTeam !== undefined ||
+      updates.awayTeam !== undefined ||
+      updates.date !== undefined ||
+      updates.time !== undefined ||
+      updates.location !== undefined
     if (needsManageAccess) {
       const auth = await requireTeamManager(request, game.teamId)
       if ("response" in auth) return auth.response

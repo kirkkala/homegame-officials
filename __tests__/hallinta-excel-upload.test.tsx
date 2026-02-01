@@ -47,6 +47,7 @@ jest.mock("@/lib/storage", () => ({
   savePlayer: jest.fn(),
   deletePlayer: jest.fn(),
   updateGameHomeStatus: jest.fn(),
+  updateGameDetails: jest.fn(),
   deleteGame: jest.fn(),
   addTeamManager: jest.fn(),
   removeTeamManager: jest.fn(),
@@ -84,6 +85,7 @@ describe("hallinta excel upload", () => {
     ;(storage.savePlayer as jest.Mock).mockResolvedValue(undefined)
     ;(storage.deletePlayer as jest.Mock).mockResolvedValue(undefined)
     ;(storage.updateGameHomeStatus as jest.Mock).mockResolvedValue(undefined)
+    ;(storage.updateGameDetails as jest.Mock).mockResolvedValue(undefined)
     ;(storage.deleteGame as jest.Mock).mockResolvedValue(undefined)
     ;(storage.addTeamManager as jest.Mock).mockResolvedValue(undefined)
     ;(storage.removeTeamManager as jest.Mock).mockResolvedValue(undefined)
@@ -111,6 +113,22 @@ describe("hallinta excel upload", () => {
     const errorMessage = await screen.findByTestId("status-snackbar")
     expect(errorMessage).toBeInTheDocument()
     expect(mockParseExcelFile).not.toHaveBeenCalled()
+  })
+
+  it("shows info snackbar when no games are found", async () => {
+    mockParseExcelFile.mockReturnValue([])
+    renderHallintaPage()
+
+    const input = screen.getByTestId("excel-upload-input") as HTMLInputElement
+    const file = new File(["excel"], "games.xlsx", {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    })
+
+    fireEvent.change(input, { target: { files: [file] } })
+
+    const message = await screen.findByTestId("status-snackbar")
+    expect(message).toBeInTheDocument()
+    expect(message).toHaveTextContent("Excel-tiedostosta ei löytynyt otteluita")
   })
 
   it("renders preview after successful excel upload", async () => {
