@@ -47,6 +47,7 @@ jest.mock("@/lib/storage", () => ({
   savePlayer: jest.fn(),
   deletePlayer: jest.fn(),
   updateGameHomeStatus: jest.fn(),
+  updateGameDetails: jest.fn(),
   deleteGame: jest.fn(),
   addTeamManager: jest.fn(),
   removeTeamManager: jest.fn(),
@@ -84,6 +85,7 @@ describe("hallinta excel upload", () => {
     ;(storage.savePlayer as jest.Mock).mockResolvedValue(undefined)
     ;(storage.deletePlayer as jest.Mock).mockResolvedValue(undefined)
     ;(storage.updateGameHomeStatus as jest.Mock).mockResolvedValue(undefined)
+    ;(storage.updateGameDetails as jest.Mock).mockResolvedValue(undefined)
     ;(storage.deleteGame as jest.Mock).mockResolvedValue(undefined)
     ;(storage.addTeamManager as jest.Mock).mockResolvedValue(undefined)
     ;(storage.removeTeamManager as jest.Mock).mockResolvedValue(undefined)

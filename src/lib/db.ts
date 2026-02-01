@@ -171,6 +171,12 @@ export async function updateGame(
   updates: {
     officials?: Partial<schema.Officials>
     isHomeGame?: boolean
+    divisionId?: string
+    homeTeam?: string
+    awayTeam?: string
+    date?: string
+    time?: string
+    location?: string
   }
 ) {
   const game = await getGameById(id)
@@ -190,6 +196,30 @@ export async function updateGame(
 
   if (updates.isHomeGame !== undefined) {
     updateData.isHomeGame = updates.isHomeGame
+  }
+
+  if (updates.divisionId !== undefined) {
+    updateData.divisionId = updates.divisionId
+  }
+
+  if (updates.homeTeam !== undefined) {
+    updateData.homeTeam = updates.homeTeam
+  }
+
+  if (updates.awayTeam !== undefined) {
+    updateData.awayTeam = updates.awayTeam
+  }
+
+  if (updates.date !== undefined) {
+    updateData.date = updates.date
+  }
+
+  if (updates.time !== undefined) {
+    updateData.time = updates.time
+  }
+
+  if (updates.location !== undefined) {
+    updateData.location = updates.location
   }
 
   const result = await db

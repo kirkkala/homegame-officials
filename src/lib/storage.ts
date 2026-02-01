@@ -176,6 +176,18 @@ export async function updateGameHomeStatus(gameId: string, isHomeGame: boolean):
   return parseJsonResponse<Game>(res)
 }
 
+export async function updateGameDetails(
+  gameId: string,
+  updates: Pick<Game, "divisionId" | "homeTeam" | "awayTeam" | "date" | "time" | "location">
+): Promise<Game> {
+  const res = await fetch(`/api/games/${gameId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  })
+  return parseJsonResponse<Game>(res)
+}
+
 export async function deleteGame(gameId: string): Promise<void> {
   const res = await fetch(`/api/games/${gameId}`, { method: "DELETE" })
   if (!res.ok) {

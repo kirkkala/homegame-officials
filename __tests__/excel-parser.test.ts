@@ -11,7 +11,7 @@ const toArrayBuffer = (buffer: Buffer) =>
 
 describe("excel parser with real file", () => {
   it("parses elsa-myclub-import.xlsx into games", async () => {
-    const filePath = path.join(process.cwd(), "elsa-myclub-import.xlsx")
+    const filePath = path.join(process.cwd(), "excel-test-sheets", "elsa-myclub-import.xlsx")
     const fileBuffer = await readFile(filePath)
     const games = parseExcelFile(toArrayBuffer(fileBuffer))
 

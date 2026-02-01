@@ -56,6 +56,12 @@ export const updateGameSchema = z.object({
     .optional(),
   teamId: idString.optional(),
   isHomeGame: z.boolean().optional(),
+  divisionId: z.string().max(50).optional(),
+  homeTeam: nameString.optional(),
+  awayTeam: nameString.optional(),
+  date: dateString.optional(),
+  time: timeString.optional(),
+  location: z.string().max(200).optional(),
 })
 
 export const teamManagerSchema = z.object({
