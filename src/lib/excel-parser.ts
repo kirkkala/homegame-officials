@@ -103,7 +103,8 @@ export function parseExcelFile(file: ArrayBuffer): ParsedGame[] {
       }
     }
 
-    const location = typeof row["Tapahtumapaikka"] === "string" ? row["Tapahtumapaikka"] : ""
+    const locationValue = row["Tapahtumapaikka"] ?? row["Paikka"]
+    const location = typeof locationValue === "string" ? locationValue : ""
 
     games.push({
       division,
