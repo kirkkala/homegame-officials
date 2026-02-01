@@ -113,6 +113,22 @@ describe("hallinta excel upload", () => {
     expect(mockParseExcelFile).not.toHaveBeenCalled()
   })
 
+  it("shows info snackbar when no games are found", async () => {
+    mockParseExcelFile.mockReturnValue([])
+    renderHallintaPage()
+
+    const input = screen.getByTestId("excel-upload-input") as HTMLInputElement
+    const file = new File(["excel"], "games.xlsx", {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    })
+
+    fireEvent.change(input, { target: { files: [file] } })
+
+    const message = await screen.findByTestId("status-snackbar")
+    expect(message).toBeInTheDocument()
+    expect(message).toHaveTextContent("Excel-tiedostosta ei löytynyt otteluita")
+  })
+
   it("renders preview after successful excel upload", async () => {
     mockParseExcelFile.mockReturnValue([
       {
