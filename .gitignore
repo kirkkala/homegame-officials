@@ -22,7 +22,7 @@
 # excel imports
 *.xlsx
 # Excep the test file
-!elsa-myclub-import.xlsx
+!excel-test-sheets/*.xlsx
 
 # next.js
 /.next/
