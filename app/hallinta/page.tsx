@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, type InputHTMLAttributes } from "react"
+import { useState, useCallback, useRef, type InputHTMLAttributes } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import {
@@ -204,6 +204,7 @@ export default function HallintaPage() {
   const authLoading = status === "loading"
   const userEmail = user?.email ?? ""
   const isAdmin = !!user?.isAdmin
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [parsedGames, setParsedGames] = useState<ParsedGame[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [snackbar, setSnackbar] = useState<{
@@ -429,7 +430,12 @@ export default function HallintaPage() {
       return
     }
     const arrayBuffer = await file.arrayBuffer()
-    setParsedGames(parseExcelFile(arrayBuffer))
+    const parsed = parseExcelFile(arrayBuffer)
+    setParsedGames(parsed)
+    if (parsed.length === 0) {
+      setSnackbar({ type: "info", message: "Excel-tiedostosta ei löytynyt otteluita" })
+      return
+    }
     setSnackbar(null)
   }, [])
 
@@ -446,6 +452,13 @@ export default function HallintaPage() {
     setParsedGames((prev) =>
       prev.map((g, i) => (i === index ? { ...g, isHomeGame: !g.isHomeGame } : g))
     )
+  }, [])
+
+  const handleCancelImport = useCallback(() => {
+    setParsedGames([])
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
   }, [])
 
   const openConfirmDialog = useCallback(
@@ -762,6 +775,7 @@ export default function HallintaPage() {
                     hidden
                     accept=".xlsx,.xls"
                     data-testid="excel-upload-input"
+                    ref={fileInputRef}
                     onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
                   />
                 </Button>
@@ -893,15 +907,26 @@ export default function HallintaPage() {
                     Merkitse kotipelit, jotka vaativat toimitsijat ja paina &quot;Tuo ottelut&quot;.
                   </Typography>
                 </Stack>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => importMutation.mutate()}
-                  disabled={importMutation.isPending}
-                  data-testid="import-submit"
-                >
-                  Tuo ottelut
-                </Button>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    onClick={handleCancelImport}
+                    disabled={importMutation.isPending}
+                    data-testid="import-cancel"
+                  >
+                    Peruuta
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => importMutation.mutate()}
+                    disabled={importMutation.isPending}
+                    data-testid="import-submit"
+                  >
+                    Tuo ottelut
+                  </Button>
+                </Stack>
               </Stack>
 
               <GamesTable
