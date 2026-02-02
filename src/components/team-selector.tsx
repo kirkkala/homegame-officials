@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useMutation } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
+import { useTeam } from "./team-context"
+import { Add as AddIcon } from "@mui/icons-material"
 import {
   Alert,
   Box,
@@ -21,9 +20,10 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material"
-import { Add as AddIcon } from "@mui/icons-material"
 import { alpha } from "@mui/material/styles"
-import { useTeam } from "./team-context"
+import { useMutation } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
+import { useState } from "react"
 
 type TeamSelectorProps = {
   showCreateButton?: boolean

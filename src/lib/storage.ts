@@ -36,6 +36,11 @@ export type Player = {
   createdAt: string
 }
 
+export type User = {
+  id: string
+  email: string
+}
+
 // Helper to safely parse JSON response
 async function parseJsonResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -107,6 +112,12 @@ export async function removeTeamManager(teamId: string, email: string): Promise<
     const data = await res.json().catch(() => null)
     throw new Error(data?.error || "Käyttäjän poisto epäonnistui")
   }
+}
+
+// Users (admin-only)
+export async function getUsers(): Promise<User[]> {
+  const res = await fetch("/api/users")
+  return parseJsonResponse<User[]>(res)
 }
 
 // Selected team (localStorage for persistence)

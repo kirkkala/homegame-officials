@@ -1,9 +1,9 @@
 "use client"
 
-import Link from "next/link"
-import { signOut, useSession } from "next-auth/react"
-import { Button, type SxProps, type Theme } from "@mui/material"
 import { Login as LoginIcon, Logout as LogoutIcon } from "@mui/icons-material"
+import { Button, type SxProps, type Theme } from "@mui/material"
+import { signOut, useSession } from "next-auth/react"
+import Link from "next/link"
 
 type AuthActionButtonProps = {
   size?: "small" | "medium"

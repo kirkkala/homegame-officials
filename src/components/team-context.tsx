@@ -1,8 +1,5 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
-import { useSearchParams, useRouter, usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
 import {
   getTeams,
   getManagedTeams,
@@ -12,6 +9,9 @@ import {
   setSelectedTeamId,
   type Team,
 } from "@/lib/storage"
+import { useSession } from "next-auth/react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react"
 
 type TeamContextType = {
   teams: Team[]

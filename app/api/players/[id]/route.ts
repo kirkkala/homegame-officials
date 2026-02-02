@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
-import { deletePlayer, getPlayerById } from "@/lib/db"
 import { requireTeamManager } from "@/lib/auth-api"
+import { deletePlayer, getPlayerById } from "@/lib/db"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function DELETE(
   request: NextRequest,

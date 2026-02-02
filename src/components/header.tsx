@@ -1,28 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Stack,
-  Box,
-  Chip,
-  Tab,
-  Tabs,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Link as MuiLink,
-} from "@mui/material"
+import { AuthActionButton } from "./auth-action-button"
+import { useTeam } from "./team-context"
+import { TeamSelector } from "./team-selector"
+import packageJson from "../../package.json"
 import {
   Close as CloseIcon,
   HelpOutline as HelpOutlineIcon,
@@ -30,10 +11,29 @@ import {
   Menu as MenuIcon,
   Settings as SettingsIcon,
 } from "@mui/icons-material"
-import { AuthActionButton } from "./auth-action-button"
-import { TeamSelector } from "./team-selector"
-import { useTeam } from "./team-context"
-import packageJson from "../../package.json"
+import {
+  AppBar,
+  Box,
+  Chip,
+  Divider,
+  Drawer,
+  IconButton,
+  Link as MuiLink,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Stack,
+  Tab,
+  Tabs,
+  Toolbar,
+  Typography,
+} from "@mui/material"
+import { useSession } from "next-auth/react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
 
 type PageItem = {
   path: string

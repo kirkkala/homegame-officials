@@ -1,9 +1,9 @@
-import { drizzle as drizzleVercel } from "drizzle-orm/vercel-postgres"
-import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
-import { sql } from "@vercel/postgres"
-import { Pool } from "pg"
-import { eq, and } from "drizzle-orm"
 import * as schema from "@/db/schema"
+import { sql } from "@vercel/postgres"
+import { and, eq } from "drizzle-orm"
+import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
+import { drizzle as drizzleVercel } from "drizzle-orm/vercel-postgres"
+import { Pool } from "pg"
 
 // Use @vercel/postgres on Vercel, pg locally
 const isVercel = process.env.VERCEL === "1"
@@ -73,6 +73,13 @@ export async function getUserById(id: string) {
 export async function createUser(user: schema.NewUser) {
   const result = await db.insert(schema.users).values(user).returning()
   return result[0]
+}
+
+export async function getUsers() {
+  return db
+    .select({ id: schema.users.id, email: schema.users.email })
+    .from(schema.users)
+    .orderBy(schema.users.email)
 }
 
 // ============ TEAM MANAGERS ============

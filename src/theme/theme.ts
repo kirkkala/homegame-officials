@@ -115,6 +115,24 @@ export const theme = createTheme({
         },
       },
     },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected": {
+            backgroundColor: "rgba(46, 125, 50, 0.03)",
+          },
+          "&.Mui-selected:hover": {
+            backgroundColor: "rgba(46, 125, 50, 0.06)",
+          },
+          "&.Mui-selected > .MuiTableCell-root": {
+            backgroundColor: "rgba(46, 125, 50, 0.03)",
+          },
+          "&.Mui-selected:hover > .MuiTableCell-root": {
+            backgroundColor: "rgba(46, 125, 50, 0.06)",
+          },
+        },
+      },
+    },
     MuiList: {
       styleOverrides: {
         root: {

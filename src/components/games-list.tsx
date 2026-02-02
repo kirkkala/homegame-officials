@@ -1,8 +1,14 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import Link from "next/link"
-import { useQuery } from "@tanstack/react-query"
+import { GameCard } from "./game-card"
+import { useTeam } from "./team-context"
+import { TeamSelector } from "./team-selector"
+import { getGames } from "@/lib/storage"
+import {
+  CalendarMonth as CalendarMonthIcon,
+  Groups as GroupsIcon,
+  UploadFile as UploadFileIcon,
+} from "@mui/icons-material"
 import {
   Alert,
   Button,
@@ -13,15 +19,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material"
-import {
-  CalendarMonth as CalendarMonthIcon,
-  Groups as GroupsIcon,
-  UploadFile as UploadFileIcon,
-} from "@mui/icons-material"
-import { TeamSelector } from "./team-selector"
-import { GameCard } from "./game-card"
-import { useTeam } from "./team-context"
-import { getGames } from "@/lib/storage"
+import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
 
 export function GamesList() {
   const { selectedTeam, isLoading: teamLoading } = useTeam()

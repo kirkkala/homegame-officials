@@ -1,5 +1,5 @@
-import { Box, Container, Link as MuiLink, Typography } from "@mui/material"
 import { Favorite as FavoriteIcon } from "@mui/icons-material"
+import { Box, Container, Link as MuiLink, Typography } from "@mui/material"
 
 export function Footer() {
   return (
