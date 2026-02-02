@@ -134,12 +134,6 @@ function GamesTable({
               selected={game.isHomeGame}
               sx={{
                 cursor: "pointer",
-                "&.Mui-selected": {
-                  bgcolor: "success.50",
-                },
-                "&.Mui-selected:hover": {
-                  bgcolor: "success.100",
-                },
                 transition: "background-color 0.15s ease-in-out",
               }}
             >
@@ -755,9 +749,9 @@ export default function HallintaPage() {
           aria-label="Hallinnan välilehdet"
           sx={{ borderBottom: 1, borderColor: "divider" }}
         >
-          <Tab label="Yleiset" data-testid="general-tab" />
-          <Tab label={`Pelaajat (${players.length})`} data-testid="players-tab" />
-          <Tab label="Ottelut" data-testid="games-tab" />
+          <Tab label="Yleiset asetukset" data-testid="general-tab" />
+          <Tab label={`Joukkueen pelaajat (${players.length})`} data-testid="players-tab" />
+          <Tab label={`Joukkueen ottelut (${existingGames.length})`} data-testid="games-tab" />
         </Tabs>
 
         {activeTab === 0 && (
@@ -887,7 +881,10 @@ export default function HallintaPage() {
                 setImportExpanded(isExpanded)
               }}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{ "&:hover": { backgroundColor: "action.hover" } }}
+              >
                 <Typography component="h2" variant="h5">
                   Tuo otteluita
                 </Typography>
