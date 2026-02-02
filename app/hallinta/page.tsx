@@ -1,8 +1,38 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect, type InputHTMLAttributes } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
+import { AuthActionButton } from "@/components/auth-action-button"
+import { Footer } from "@/components/footer"
+import { MainHeader } from "@/components/header"
+import { useTeam } from "@/components/team-context"
+import { TeamSelector } from "@/components/team-selector"
+import { parseExcelFile, type ParsedGame } from "@/lib/excel-parser"
+import {
+  saveGames,
+  clearAllGames,
+  getGames,
+  getPlayers,
+  savePlayer,
+  deletePlayer,
+  updateGameHomeStatus,
+  updateGameDetails,
+  deleteGame,
+  getTeamManagers,
+  getUsers,
+  addTeamManager,
+  removeTeamManager,
+} from "@/lib/storage"
+import { formatDate } from "@/lib/utils"
+import {
+  Add as AddIcon,
+  Close as CloseIcon,
+  DeleteForever as DeleteForeverIcon,
+  DeleteOutline as DeleteOutlineIcon,
+  EditOutlined as EditOutlinedIcon,
+  ExpandMore as ExpandMoreIcon,
+  Groups as GroupsIcon,
+  HelpOutline as HelpOutlineIcon,
+  UploadFile as UploadFileIcon,
+} from "@mui/icons-material"
 import {
   Container,
   Box,
@@ -35,40 +65,10 @@ import {
   Snackbar,
   Link,
 } from "@mui/material"
-import {
-  Add as AddIcon,
-  Close as CloseIcon,
-  DeleteForever as DeleteForeverIcon,
-  DeleteOutline as DeleteOutlineIcon,
-  EditOutlined as EditOutlinedIcon,
-  ExpandMore as ExpandMoreIcon,
-  Groups as GroupsIcon,
-  HelpOutline as HelpOutlineIcon,
-  UploadFile as UploadFileIcon,
-} from "@mui/icons-material"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
 import NextLink from "next/link"
-import { AuthActionButton } from "@/components/auth-action-button"
-import { MainHeader } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { TeamSelector } from "@/components/team-selector"
-import { useTeam } from "@/components/team-context"
-import { parseExcelFile, type ParsedGame } from "@/lib/excel-parser"
-import {
-  saveGames,
-  clearAllGames,
-  getGames,
-  getPlayers,
-  savePlayer,
-  deletePlayer,
-  updateGameHomeStatus,
-  updateGameDetails,
-  deleteGame,
-  getTeamManagers,
-  getUsers,
-  addTeamManager,
-  removeTeamManager,
-} from "@/lib/storage"
-import { formatDate } from "@/lib/utils"
+import { useState, useCallback, useRef, useEffect, type InputHTMLAttributes } from "react"
 
 type GameRow = {
   key: string

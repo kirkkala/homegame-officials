@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getTeams, createTeam, getTeamById, addTeamManager } from "@/lib/db"
 import { requireAuthUser } from "@/lib/auth-api"
+import { getTeams, createTeam, getTeamById, addTeamManager } from "@/lib/db"
 import { slugify } from "@/lib/utils"
 import { createTeamSchema, validate } from "@/lib/validation"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function GET() {
   try {

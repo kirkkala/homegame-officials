@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getGames, createGames, deleteGamesByTeam, deleteAllGames } from "@/lib/db"
 import { requireAuthUser, requireTeamManager } from "@/lib/auth-api"
+import { getGames, createGames, deleteGamesByTeam, deleteAllGames } from "@/lib/db"
 import { createGamesSchema, validate } from "@/lib/validation"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   try {

@@ -1,5 +1,13 @@
 "use client"
 
+import { Footer } from "@/components/footer"
+import { MainHeader } from "@/components/header"
+import {
+  AssignmentAdd as AssignmentAddIcon,
+  CheckCircle as CheckCircleIcon,
+  PersonAdd as PersonAddIcon,
+  UploadFile as UploadFileIcon,
+} from "@mui/icons-material"
 import {
   Box,
   Container,
@@ -11,14 +19,6 @@ import {
   Paper,
   Typography,
 } from "@mui/material"
-import {
-  CheckCircle as CheckCircleIcon,
-  PersonAdd as PersonAddIcon,
-  AssignmentAdd as AssignmentAddIcon,
-  UploadFile as UploadFileIcon,
-} from "@mui/icons-material"
-import { MainHeader } from "@/components/header"
-import { Footer } from "@/components/footer"
 
 export default function KaijttoohjeetPage() {
   return (

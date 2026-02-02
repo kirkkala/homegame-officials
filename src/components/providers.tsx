@@ -1,9 +1,9 @@
 "use client"
 
+import { Box, LinearProgress } from "@mui/material"
 import { QueryClient, QueryClientProvider, useIsMutating } from "@tanstack/react-query"
 import { SessionProvider } from "next-auth/react"
 import { useState } from "react"
-import { LinearProgress, Box } from "@mui/material"
 
 function GlobalLoadingIndicator() {
   const isMutating = useIsMutating()

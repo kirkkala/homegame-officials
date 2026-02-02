@@ -1,7 +1,7 @@
-import { Box, Container } from "@mui/material"
-import { GamesList } from "@/components/games-list"
 import { Footer } from "@/components/footer"
+import { GamesList } from "@/components/games-list"
 import { MainHeader } from "@/components/header"
+import { Box, Container } from "@mui/material"
 
 export default function Home() {
   return (

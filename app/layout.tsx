@@ -1,11 +1,11 @@
-import type { Metadata, Viewport } from "next"
-import { Suspense } from "react"
-import { Analytics } from "@vercel/analytics/next"
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
-import { ThemeRegistry } from "@/theme/ThemeRegistry"
+import "./globals.css"
 import { Providers } from "@/components/providers"
 import { TeamProvider } from "@/components/team-context"
-import "./globals.css"
+import { ThemeRegistry } from "@/theme/ThemeRegistry"
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
+import { Analytics } from "@vercel/analytics/next"
+import type { Metadata, Viewport } from "next"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Kotipelien toimitsijat",

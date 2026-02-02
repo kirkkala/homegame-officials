@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server"
+import { requireTeamManager } from "@/lib/auth-api"
 import {
+  addTeamManager,
   getTeamById,
   getTeamManagers,
   getUserByEmail,
-  addTeamManager,
   removeTeamManager,
 } from "@/lib/db"
-import { requireTeamManager } from "@/lib/auth-api"
 import { teamManagerSchema, validate } from "@/lib/validation"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
