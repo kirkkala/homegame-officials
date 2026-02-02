@@ -75,6 +75,13 @@ export async function createUser(user: schema.NewUser) {
   return result[0]
 }
 
+export async function getUsers() {
+  return db
+    .select({ id: schema.users.id, email: schema.users.email })
+    .from(schema.users)
+    .orderBy(schema.users.email)
+}
+
 // ============ TEAM MANAGERS ============
 
 export async function getManagedTeams(userId: string) {

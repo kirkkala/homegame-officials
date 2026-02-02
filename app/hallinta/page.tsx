@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef, type InputHTMLAttributes } from "react"
+import { useState, useCallback, useRef, useEffect, type InputHTMLAttributes } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import {
@@ -64,6 +64,7 @@ import {
   updateGameDetails,
   deleteGame,
   getTeamManagers,
+  getUsers,
   addTeamManager,
   removeTeamManager,
 } from "@/lib/storage"
@@ -217,6 +218,7 @@ export default function HallintaPage() {
   const [managerEmail, setManagerEmail] = useState("")
   const [activeTab, setActiveTab] = useState(0)
   const [importExpanded, setImportExpanded] = useState(false)
+  const [adminEmail, setAdminEmail] = useState<string | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean
     title?: string
@@ -248,6 +250,25 @@ export default function HallintaPage() {
     isHomeGame: true,
     dateLabel: "",
   })
+
+  useEffect(() => {
+    let isMounted = true
+    const loadAdminEmail = async () => {
+      try {
+        const response = await fetch("/api/admin-email")
+        if (!response.ok) return
+        const data = (await response.json()) as { email?: string | null }
+        if (isMounted) setAdminEmail(data.email ?? null)
+      } catch {
+        // Silent: admin email is optional for the UI
+      }
+    }
+
+    loadAdminEmail()
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const renderEditField = (
     label: string,
@@ -288,6 +309,12 @@ export default function HallintaPage() {
     queryKey: ["team-managers", selectedTeam?.id],
     queryFn: () => getTeamManagers(selectedTeam!.id),
     enabled: !!selectedTeam,
+  })
+
+  const { data: users = [], isLoading: usersLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+    enabled: isAdmin,
   })
 
   // Mutations
@@ -759,10 +786,13 @@ export default function HallintaPage() {
             <Stack gap={2}>
               <Box>
                 <Typography component="h2" variant="h5">
-                  Käyttöoikeudet
+                  Joukkueen {selectedTeam.name} Käyttöoikeudet
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Käyttäjät, jotka voivat hallita tämän joukkueen otteluita ja pelaajia.
+                  {adminEmail
+                    ? ` Järjestelmän pääkäyttäjä ${adminEmail} voi hallita kaikkia joukkueita.`
+                    : " Järjestelmän pääkäyttäjä voi hallita kaikkia joukkueita."}
                 </Typography>
               </Box>
               {managersLoading ? (
@@ -773,8 +803,7 @@ export default function HallintaPage() {
                 <Stack direction="row" flexWrap="wrap" gap={1}>
                   {managers.map((manager) => {
                     const isSelf = manager.email === userEmail
-                    const isLastManager = managers.length === 1
-                    const canRemove = isAdmin || !(isSelf && isLastManager)
+                    const canRemove = !isSelf
                     return (
                       <Chip
                         key={manager.id}
@@ -809,6 +838,34 @@ export default function HallintaPage() {
                 </Stack>
               </Box>
             </Stack>
+
+            {isAdmin && (
+              <Stack gap={2}>
+                <Box>
+                  <Typography component="h3" variant="h6">
+                    Rekisteröidyt käyttäjät ({users.length})
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Näkyy vain järjestelmän pääkäyttäjälle.
+                  </Typography>
+                </Box>
+                {usersLoading ? (
+                  <Stack alignItems="center" py={2}>
+                    <CircularProgress size={24} />
+                  </Stack>
+                ) : users.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    Ei rekisteröityneitä käyttäjiä.
+                  </Typography>
+                ) : (
+                  <Stack direction="row" flexWrap="wrap" gap={1}>
+                    {users.map((user) => (
+                      <Chip key={user.id} label={user.email} />
+                    ))}
+                  </Stack>
+                )}
+              </Stack>
+            )}
           </Stack>
         )}
 
@@ -816,7 +873,7 @@ export default function HallintaPage() {
           <Stack gap={2}>
             <Box>
               <Typography component="h2" variant="h5">
-                Joukkueen pelaajat ({players.length})
+                Joukkueen {selectedTeam.name} pelaajat ({players.length})
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Joukkueen pelaajat toimitsijavuorovastuun valintalistaan.
@@ -874,6 +931,9 @@ export default function HallintaPage() {
 
         {activeTab === 2 && (
           <Stack gap={3}>
+            <Typography component="h2" variant="h5">
+              Joukkueen {selectedTeam.name} ottelut ({existingGames.length})
+            </Typography>
             <Accordion
               expanded={shouldExpandImport || importExpanded}
               onChange={(_, isExpanded) => {
@@ -1036,7 +1096,6 @@ export default function HallintaPage() {
             {/* Existing Games */}
             {existingGames.length > 0 && (
               <>
-                <Typography variant="h6">Ottelut ({existingGames.length})</Typography>
                 <Typography variant="body2" color="text.secondary" mb={2}>
                   Merkitse kotipelit rastilla jotta niihin voi lisätä toimitsijoita. Voit myös
                   poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa valinnan

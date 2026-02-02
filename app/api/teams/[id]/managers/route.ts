@@ -48,7 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const targetUser = await getUserByEmail(result.data.email)
     if (!targetUser) {
       return NextResponse.json(
-        { error: "Käyttäjää ei löydy. Pyydä häntä luomaan tunnus ensin." },
+        { error: "Käyttäjää ei löydy. Pyydä häntä luomaan tunnus kirjautumalla sovellukseen." },
         { status: 404 }
       )
     }
