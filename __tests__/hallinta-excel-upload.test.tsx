@@ -103,8 +103,10 @@ describe("hallinta excel upload", () => {
   })
 
   it("shows error snackbar when uploading non-excel file", async () => {
+    const user = userEvent.setup()
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("games-tab"))
     const input = screen.getByTestId("excel-upload-input") as HTMLInputElement
     const file = new File(["not excel"], "games.txt", { type: "text/plain" })
 
@@ -116,9 +118,11 @@ describe("hallinta excel upload", () => {
   })
 
   it("shows info snackbar when no games are found", async () => {
+    const user = userEvent.setup()
     mockParseExcelFile.mockReturnValue([])
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("games-tab"))
     const input = screen.getByTestId("excel-upload-input") as HTMLInputElement
     const file = new File(["excel"], "games.xlsx", {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -132,6 +136,7 @@ describe("hallinta excel upload", () => {
   })
 
   it("renders preview after successful excel upload", async () => {
+    const user = userEvent.setup()
     mockParseExcelFile.mockReturnValue([
       {
         division: "I div.",
@@ -156,6 +161,7 @@ describe("hallinta excel upload", () => {
     ])
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("games-tab"))
     const input = screen.getByTestId("excel-upload-input") as HTMLInputElement
     const file = new File(["excel"], "games.xlsx", {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -172,6 +178,7 @@ describe("hallinta excel upload", () => {
     const user = userEvent.setup()
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("players-tab"))
     const textarea = screen.getByTestId("players-textarea")
     await user.type(textarea, "Matti Meikäläinen\nTeppo Testaaja")
 
@@ -191,8 +198,7 @@ describe("hallinta excel upload", () => {
     ])
     renderHallintaPage()
 
-    const accordion = await screen.findByTestId("players-accordion-toggle")
-    await user.click(accordion)
+    await user.click(screen.getByTestId("players-tab"))
 
     const chipRoot = screen.getByTestId("player-chip-p1")
     const deleteIcon = within(chipRoot).getByTestId("player-delete-p1")
@@ -223,6 +229,7 @@ describe("hallinta excel upload", () => {
     ])
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("games-tab"))
     const checkbox = await screen.findByTestId("existing-games-home-toggle-g1")
     await user.click(checkbox)
 
@@ -233,24 +240,22 @@ describe("hallinta excel upload", () => {
     const user = userEvent.setup()
     renderHallintaPage()
 
-    const importAccordion = await screen.findByTestId("import-accordion-toggle")
-    await user.click(importAccordion)
+    await user.click(screen.getByTestId("games-tab"))
 
     const manualToggle = await screen.findByTestId("manual-game-toggle")
     await user.click(manualToggle)
 
-    const manualForm = await screen.findByTestId("manual-game-form")
-    const homeInput = within(manualForm).getByTestId("manual-game-home")
-    const awayInput = within(manualForm).getByTestId("manual-game-away")
-    const dateInput = within(manualForm).getByTestId("manual-game-date")
-    const timeInput = within(manualForm).getByTestId("manual-game-time")
+    const homeInput = await screen.findByTestId("edit-game-home")
+    const awayInput = screen.getByTestId("edit-game-away")
+    const dateInput = screen.getByTestId("edit-game-date")
+    const timeInput = screen.getByTestId("edit-game-time")
 
     await user.type(homeInput, "HNMKY")
     await user.type(awayInput, "KlaNMKY")
     await user.type(dateInput, "2025-02-10")
     await user.type(timeInput, "19:00")
 
-    await user.click(screen.getByTestId("manual-game-submit"))
+    await user.click(screen.getByTestId("game-dialog-submit"))
 
     await waitFor(() => {
       expect(storage.saveGames).toHaveBeenCalledTimes(1)
@@ -290,6 +295,7 @@ describe("hallinta excel upload", () => {
     ])
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("games-tab"))
     const deleteButton = await screen.findByTestId("existing-games-delete-g2")
     await user.click(deleteButton)
 
