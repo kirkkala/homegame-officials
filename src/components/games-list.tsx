@@ -1,12 +1,15 @@
 "use client"
 
 import { GameCard } from "./game-card"
+import { StatisticsDialog } from "./statistics-dialog"
 import { useTeam } from "./team-context"
 import { TeamSelector } from "./team-selector"
 import { getGames } from "@/lib/storage"
+import { computePlayerStats } from "@/lib/utils"
 import {
   CalendarMonth as CalendarMonthIcon,
   Groups as GroupsIcon,
+  Leaderboard as LeaderboardIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import {
@@ -15,8 +18,10 @@ import {
   Checkbox,
   FormControlLabel,
   CircularProgress,
+  IconButton,
   Snackbar,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
@@ -26,6 +31,7 @@ import { useEffect, useRef, useState } from "react"
 export function GamesList() {
   const { selectedTeam, isLoading: teamLoading } = useTeam()
   const [snackbar, setSnackbar] = useState<string | null>(null)
+  const [statsDialogOpen, setStatsDialogOpen] = useState(false)
   const prevDataRef = useRef<string | null>(null)
   const preferencesKey = "gamesListPreferences"
   const readPreferences = () => {
@@ -99,6 +105,9 @@ export function GamesList() {
   // Helper to check if a game is in the past
   const isGamePast = (gameDate: string) => new Date(gameDate) < now
 
+  // Compute confirmed shift counts per player (for dropdown display)
+  const playerStats = computePlayerStats(allGames)
+
   if (teamLoading || gamesLoading) {
     return (
       <Stack alignItems="center" py={8}>
@@ -156,13 +165,25 @@ export function GamesList() {
             alignItems={{ xs: "flex-start", sm: "center" }}
             gap={1}
           >
-            <Typography
-              variant="h2"
-              fontWeight="bold"
-              sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
-            >
-              {selectedTeam.name}
-            </Typography>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <Typography
+                variant="h2"
+                fontWeight="bold"
+                sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+              >
+                {selectedTeam.name}
+              </Typography>
+              <Tooltip title="Toimitsijavuorotilasto">
+                <IconButton
+                  size="small"
+                  onClick={() => setStatsDialogOpen(true)}
+                  color="primary"
+                  aria-label="Näytä tilasto"
+                >
+                  <LeaderboardIcon />
+                </IconButton>
+              </Tooltip>
+            </Stack>
           </Stack>
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -217,7 +238,12 @@ export function GamesList() {
         ) : (
           <Stack gap={{ xs: 1.5, sm: 2 }}>
             {games.map((game) => (
-              <GameCard key={game.id} game={game} isPast={isGamePast(game.date)} />
+              <GameCard
+                key={game.id}
+                game={game}
+                isPast={isGamePast(game.date)}
+                playerStats={playerStats}
+              />
             ))}
           </Stack>
         )}
@@ -233,6 +259,12 @@ export function GamesList() {
           {snackbar}
         </Alert>
       </Snackbar>
+
+      <StatisticsDialog
+        open={statsDialogOpen}
+        onClose={() => setStatsDialogOpen(false)}
+        games={allGames}
+      />
     </>
   )
 }
