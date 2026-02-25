@@ -102,7 +102,7 @@ describe("StatisticsDialog", () => {
     expect(trophyIcons).toHaveLength(2)
   })
 
-  it("shares medal position when players are tied", () => {
+  it("shares medal position when 2 players are tied", () => {
     // Camilla 3, Hilkka 3, Freyja 2, Julia 1
     const games = [
       makeGame({
@@ -149,7 +149,54 @@ describe("StatisticsDialog", () => {
     expect(trophyIcons).toHaveLength(3) // 2 gold + 1 bronze
   })
 
-  it("does not show medals when all players are tied with count of 1", () => {
+  it("does not award medal when more than 2 players share a position", () => {
+    // Hilkka 4, Camilla 3, then many with 1
+    const games = [
+      makeGame({
+        id: "g1",
+        officials: {
+          poytakirja: { playerName: "Hilkka", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Camilla", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g2",
+        officials: {
+          poytakirja: { playerName: "Hilkka", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Camilla", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g3",
+        officials: {
+          poytakirja: { playerName: "Hilkka", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Camilla", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g4",
+        officials: {
+          poytakirja: { playerName: "Hilkka", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Freyja", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g5",
+        officials: {
+          poytakirja: { playerName: "Julia", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Kira", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+    ]
+
+    render(<StatisticsDialog open={true} onClose={() => {}} games={games} />)
+
+    // Hilkka (4) gold, Camilla (3) silver, but Freyja/Julia/Kira (1 each) - no bronze (3+ tied)
+    const trophyIcons = screen.getAllByTestId("EmojiEventsIcon")
+    expect(trophyIcons).toHaveLength(2) // gold + silver only
+  })
+
+  it("does not show medals when all players have the same count", () => {
     const games = [
       makeGame({
         id: "g1",
@@ -162,8 +209,8 @@ describe("StatisticsDialog", () => {
 
     render(<StatisticsDialog open={true} onClose={() => {}} games={games} />)
 
-    // Both have 1 shift - both share gold
-    const trophyIcons = screen.getAllByTestId("EmojiEventsIcon")
-    expect(trophyIcons).toHaveLength(2)
+    // Both have 1 shift - no clear winner, no medals
+    const trophyIcons = screen.queryAllByTestId("EmojiEventsIcon")
+    expect(trophyIcons).toHaveLength(0)
   })
 })

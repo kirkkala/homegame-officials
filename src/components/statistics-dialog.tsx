@@ -32,23 +32,20 @@ function getMedalColor(stats: { count: number }[], index: number): string | unde
   const currentCount = stats[index]?.count
   if (currentCount === undefined) return undefined
 
-  // Calculate the rank (1-based position accounting for ties)
-  // Players with the same count share the same rank
-  let rank = 1
-  for (let i = 0; i < index; i++) {
-    if (stats[i].count > currentCount) {
-      rank = i + 2 // +2 because: +1 for 1-based, +1 for being after this player
-    }
-  }
-  // Recalculate: rank is 1 + count of players with higher scores
-  rank = stats.filter((s) => s.count > currentCount).length + 1
+  // No medals if everyone has the same count (no clear winner)
+  const uniqueCounts = new Set(stats.map((s) => s.count))
+  if (uniqueCounts.size === 1) return undefined
 
-  // Check if tied with next player (no medal if tied at the boundary)
-  const nextCount = stats[index + 1]?.count
-  if (nextCount === currentCount) {
-    // Still give medal if sharing a medal position (rank 1, 2, or 3)
-    if (rank > 3) return undefined
-  }
+  // Rank is 1 + count of players with higher scores
+  const rank = stats.filter((s) => s.count > currentCount).length + 1
+
+  if (rank > 3) return undefined
+
+  // Count how many players share this rank
+  const playersAtThisRank = stats.filter((s) => s.count === currentCount).length
+
+  // No medal if more than 2 players share the position
+  if (playersAtThisRank > 2) return undefined
 
   switch (rank) {
     case 1:
