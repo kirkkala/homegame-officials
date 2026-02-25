@@ -76,4 +76,94 @@ describe("StatisticsDialog", () => {
 
     expect(screen.queryByText("Toimitsijavuorotilasto")).not.toBeInTheDocument()
   })
+
+  it("shows medals when there are clear winners", () => {
+    const games = [
+      makeGame({
+        id: "g1",
+        officials: {
+          poytakirja: { playerName: "Matti", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Matti", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g2",
+        officials: {
+          poytakirja: { playerName: "Teppo", handledBy: "guardian", confirmedBy: "E" },
+          kello: null,
+        },
+      }),
+    ]
+
+    render(<StatisticsDialog open={true} onClose={() => {}} games={games} />)
+
+    // Matti has 2, Teppo has 1 - both get medals (gold and silver)
+    const trophyIcons = screen.getAllByTestId("EmojiEventsIcon")
+    expect(trophyIcons).toHaveLength(2)
+  })
+
+  it("shares medal position when players are tied", () => {
+    // Camilla 3, Hilkka 3, Freyja 2, Julia 1
+    const games = [
+      makeGame({
+        id: "g1",
+        officials: {
+          poytakirja: { playerName: "Camilla", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Hilkka", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g2",
+        officials: {
+          poytakirja: { playerName: "Camilla", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Hilkka", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g3",
+        officials: {
+          poytakirja: { playerName: "Camilla", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Hilkka", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g4",
+        officials: {
+          poytakirja: { playerName: "Freyja", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Julia", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+      makeGame({
+        id: "g5",
+        officials: {
+          poytakirja: { playerName: "Freyja", handledBy: "guardian", confirmedBy: "E" },
+          kello: null,
+        },
+      }),
+    ]
+
+    render(<StatisticsDialog open={true} onClose={() => {}} games={games} />)
+
+    // Camilla & Hilkka tied for 1st (gold), Freyja is 3rd (bronze), Julia has no medal
+    const trophyIcons = screen.getAllByTestId("EmojiEventsIcon")
+    expect(trophyIcons).toHaveLength(3) // 2 gold + 1 bronze
+  })
+
+  it("does not show medals when all players are tied with count of 1", () => {
+    const games = [
+      makeGame({
+        id: "g1",
+        officials: {
+          poytakirja: { playerName: "Matti", handledBy: "guardian", confirmedBy: "E" },
+          kello: { playerName: "Teppo", handledBy: "guardian", confirmedBy: "E" },
+        },
+      }),
+    ]
+
+    render(<StatisticsDialog open={true} onClose={() => {}} games={games} />)
+
+    // Both have 1 shift - both share gold
+    const trophyIcons = screen.getAllByTestId("EmojiEventsIcon")
+    expect(trophyIcons).toHaveLength(2)
+  })
 })

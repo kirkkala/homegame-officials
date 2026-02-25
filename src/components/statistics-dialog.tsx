@@ -20,14 +20,43 @@ import {
   Typography,
 } from "@mui/material"
 
-function getMedalColor(position: number): string | undefined {
-  switch (position) {
-    case 0:
-      return "#FFD700" // Gold
+const MEDAL_COLORS = {
+  gold: "#FFD700",
+  silver: "#C0C0C0",
+  bronze: "#CD7F32",
+} as const
+
+function getMedalColor(stats: { count: number }[], index: number): string | undefined {
+  if (stats.length === 0) return undefined
+
+  const currentCount = stats[index]?.count
+  if (currentCount === undefined) return undefined
+
+  // Calculate the rank (1-based position accounting for ties)
+  // Players with the same count share the same rank
+  let rank = 1
+  for (let i = 0; i < index; i++) {
+    if (stats[i].count > currentCount) {
+      rank = i + 2 // +2 because: +1 for 1-based, +1 for being after this player
+    }
+  }
+  // Recalculate: rank is 1 + count of players with higher scores
+  rank = stats.filter((s) => s.count > currentCount).length + 1
+
+  // Check if tied with next player (no medal if tied at the boundary)
+  const nextCount = stats[index + 1]?.count
+  if (nextCount === currentCount) {
+    // Still give medal if sharing a medal position (rank 1, 2, or 3)
+    if (rank > 3) return undefined
+  }
+
+  switch (rank) {
     case 1:
-      return "#C0C0C0" // Silver
+      return MEDAL_COLORS.gold
     case 2:
-      return "#CD7F32" // Bronze
+      return MEDAL_COLORS.silver
+    case 3:
+      return MEDAL_COLORS.bronze
     default:
       return undefined
   }
@@ -71,7 +100,7 @@ export function StatisticsDialog({ open, onClose, games }: StatisticsDialogProps
         ) : (
           <List disablePadding>
             {stats.map((stat, index) => {
-              const medalColor = getMedalColor(index)
+              const medalColor = getMedalColor(stats, index)
               return (
                 <ListItem
                   key={stat.name}
@@ -97,13 +126,13 @@ export function StatisticsDialog({ open, onClose, games }: StatisticsDialogProps
                   <ListItemText
                     primary={stat.name}
                     slotProps={{
-                      primary: { fontWeight: index < 3 ? 600 : 400 },
+                      primary: { fontWeight: medalColor ? 600 : 400 },
                     }}
                   />
                   <Typography
                     variant="body1"
                     fontWeight="bold"
-                    color={index < 3 ? "primary.main" : "text.secondary"}
+                    color={medalColor ? "primary.main" : "text.secondary"}
                   >
                     {stat.count}
                   </Typography>
