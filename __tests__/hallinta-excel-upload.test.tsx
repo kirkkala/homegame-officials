@@ -42,6 +42,7 @@ jest.mock("@/lib/storage", () => ({
   getGames: jest.fn(),
   getPlayers: jest.fn(),
   getTeamManagers: jest.fn(),
+  getUsers: jest.fn(),
   saveGames: jest.fn(),
   clearAllGames: jest.fn(),
   savePlayer: jest.fn(),
@@ -80,6 +81,7 @@ describe("hallinta excel upload", () => {
     ;(storage.getGames as jest.Mock).mockResolvedValue([])
     ;(storage.getPlayers as jest.Mock).mockResolvedValue([])
     ;(storage.getTeamManagers as jest.Mock).mockResolvedValue([])
+    ;(storage.getUsers as jest.Mock).mockResolvedValue([])
     ;(storage.saveGames as jest.Mock).mockResolvedValue([])
     ;(storage.clearAllGames as jest.Mock).mockResolvedValue(undefined)
     ;(storage.savePlayer as jest.Mock).mockResolvedValue(undefined)

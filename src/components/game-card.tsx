@@ -57,6 +57,7 @@ function OfficialButton({
   gameDivisionId,
   gameDate,
   gameTime,
+  playerStats,
 }: {
   gameId: string
   role: Role
@@ -65,6 +66,7 @@ function OfficialButton({
   gameDivisionId?: string | null
   gameDate: string
   gameTime: string
+  playerStats?: Map<string, number>
 }) {
   const queryClient = useQueryClient()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -201,16 +203,22 @@ function OfficialButton({
   ) : (
     [...players]
       .sort((a, b) => a.name.localeCompare(b.name, "fi"))
-      .map((player) => (
-        <MenuItem
-          key={player.id}
-          onClick={() => handleSelectPlayer(player.name)}
-          sx={{ minWidth: "15rem" }}
-          data-testid={`official-player-${player.id}`}
-        >
-          <ListItemText>{player.name}</ListItemText>
-        </MenuItem>
-      ))
+      .map((player) => {
+        const shiftCount = playerStats?.get(player.name) ?? 0
+        return (
+          <MenuItem
+            key={player.id}
+            onClick={() => handleSelectPlayer(player.name)}
+            sx={{ minWidth: "15rem" }}
+            data-testid={`official-player-${player.id}`}
+          >
+            <ListItemText>{player.name}</ListItemText>
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+              {shiftCount}
+            </Typography>
+          </MenuItem>
+        )
+      })
   )
 
   return (
@@ -503,7 +511,15 @@ function OfficialButton({
   )
 }
 
-export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolean }) {
+export function GameCard({
+  game,
+  isPast = false,
+  playerStats,
+}: {
+  game: Game
+  isPast?: boolean
+  playerStats?: Map<string, number>
+}) {
   return (
     <Card variant="outlined">
       <CardContent
@@ -580,6 +596,7 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
               gameDivisionId={game.divisionId}
               gameDate={game.date}
               gameTime={game.time}
+              playerStats={playerStats}
             />
             <OfficialButton
               gameId={game.id}
@@ -589,6 +606,7 @@ export function GameCard({ game, isPast = false }: { game: Game; isPast?: boolea
               gameDivisionId={game.divisionId}
               gameDate={game.date}
               gameTime={game.time}
+              playerStats={playerStats}
             />
           </Stack>
         )}
