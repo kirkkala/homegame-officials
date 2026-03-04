@@ -133,7 +133,7 @@ export function GamesList() {
       <Stack alignItems="center" py={8}>
         <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
         <Typography variant="h5" gutterBottom>
-          Ei otteluita
+          Ei otteluita joukkueella {selectedTeam.name}
         </Typography>
         <Button
           component={Link}
