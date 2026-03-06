@@ -5,28 +5,27 @@ import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 import * as schema from "@/db/schema"
 
-// Use Neon serverless on Vercel, pg locally
-const isVercel = process.env.VERCEL === "1"
+const connectionString = process.env.POSTGRES_URL ?? ""
+if (!connectionString) {
+  throw new Error("POSTGRES_URL is not set")
+}
+
+// Neon serverless only works with Neon. Use pg for Supabase, local, or other Postgres.
+const isNeon = connectionString.includes("neon.tech")
+const isLocal = process.env.VERCEL !== "1"
 
 function createDb() {
-  if (isVercel) {
-    const connectionString = process.env.POSTGRES_URL
-    if (!connectionString) {
-      throw new Error("POSTGRES_URL is not set")
-    }
+  if (isNeon) {
     const sql = neon(connectionString)
     return drizzleNeon({ client: sql, schema })
-  } else {
-    const connectionString = process.env.POSTGRES_URL
-    if (!connectionString) {
-      throw new Error("POSTGRES_URL is not set")
-    }
-    const pool = new Pool({
-      connectionString: connectionString,
-      ssl: false,
-    })
-    return drizzlePg(pool, { schema })
   }
+  return drizzlePg(
+    new Pool({
+      connectionString,
+      ssl: isLocal ? false : { rejectUnauthorized: true },
+    }),
+    { schema }
+  )
 }
 
 export const db = createDb()
