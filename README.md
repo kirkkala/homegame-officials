@@ -13,7 +13,7 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 24 (with nvm)
 - pnpm
 
 ## Project Structure
