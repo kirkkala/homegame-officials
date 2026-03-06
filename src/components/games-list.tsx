@@ -1,11 +1,5 @@
 "use client"
 
-import { GameCard } from "./game-card"
-import { StatisticsDialog } from "./statistics-dialog"
-import { useTeam } from "./team-context"
-import { TeamSelector } from "./team-selector"
-import { getGames } from "@/lib/storage"
-import { computePlayerStats } from "@/lib/utils"
 import {
   CalendarMonth as CalendarMonthIcon,
   Groups as GroupsIcon,
@@ -16,8 +10,8 @@ import {
   Alert,
   Button,
   Checkbox,
-  FormControlLabel,
   CircularProgress,
+  FormControlLabel,
   IconButton,
   Snackbar,
   Stack,
@@ -27,6 +21,12 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { getGames } from "@/lib/storage"
+import { computePlayerStats } from "@/lib/utils"
+import { GameCard } from "./game-card"
+import { StatisticsDialog } from "./statistics-dialog"
+import { useTeam } from "./team-context"
+import { TeamSelector } from "./team-selector"
 
 export function GamesList() {
   const { selectedTeam, isLoading: teamLoading } = useTeam()

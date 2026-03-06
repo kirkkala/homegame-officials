@@ -1,6 +1,6 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { requireAuthUser } from "@/lib/auth-api"
-import { getTeams, getManagedTeams } from "@/lib/db"
-import { NextRequest, NextResponse } from "next/server"
+import { getManagedTeams, getTeams } from "@/lib/db"
 
 export async function GET(request: NextRequest) {
   try {

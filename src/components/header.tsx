@@ -1,9 +1,5 @@
 "use client"
 
-import { AuthActionButton } from "./auth-action-button"
-import { useTeam } from "./team-context"
-import { TeamSelector } from "./team-selector"
-import packageJson from "../../package.json"
 import {
   Close as CloseIcon,
   HelpOutline as HelpOutlineIcon,
@@ -18,22 +14,26 @@ import {
   Divider,
   Drawer,
   IconButton,
-  Link as MuiLink,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Link as MuiLink,
   Stack,
   Tab,
   Tabs,
   Toolbar,
   Typography,
 } from "@mui/material"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { useState } from "react"
+import packageJson from "../../package.json"
+import { AuthActionButton } from "./auth-action-button"
+import { useTeam } from "./team-context"
+import { TeamSelector } from "./team-selector"
 
 type PageItem = {
   path: string

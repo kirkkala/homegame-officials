@@ -1,7 +1,5 @@
 "use client"
 
-import { type Game } from "@/lib/storage"
-import { computePlayerStatsArray } from "@/lib/utils"
 import {
   Close as CloseIcon,
   EmojiEvents as EmojiEventsIcon,
@@ -19,6 +17,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material"
+import type { Game } from "@/lib/storage"
+import { computePlayerStatsArray } from "@/lib/utils"
 
 const MEDAL_COLORS = {
   gold: "#FFD700",

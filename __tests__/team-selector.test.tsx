@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom" />
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { render, screen, fireEvent, within } from "@testing-library/react"
+import { fireEvent, render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { TeamSelector } from "@/components/team-selector"
 

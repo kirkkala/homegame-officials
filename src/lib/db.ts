@@ -1,9 +1,9 @@
-import * as schema from "@/db/schema"
 import { neon } from "@neondatabase/serverless"
 import { and, eq } from "drizzle-orm"
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-http"
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
+import * as schema from "@/db/schema"
 
 // Use Neon serverless on Vercel, pg locally
 const isVercel = process.env.VERCEL === "1"
@@ -33,13 +33,13 @@ export const db = createDb()
 
 // Re-export types from schema
 export type {
-  Team,
   Game,
-  Player,
   OfficialAssignment,
   Officials,
-  User,
+  Player,
+  Team,
   TeamManager,
+  User,
 } from "@/db/schema"
 
 // ============ TEAMS ============

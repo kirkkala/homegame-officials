@@ -1,6 +1,5 @@
 "use client"
 
-import { useTeam } from "./team-context"
 import { Add as AddIcon } from "@mui/icons-material"
 import {
   Alert,
@@ -15,15 +14,16 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  type SelectChangeEvent,
   Stack,
   TextField,
   Typography,
-  type SelectChangeEvent,
 } from "@mui/material"
 import { alpha } from "@mui/material/styles"
 import { useMutation } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
 import { useState } from "react"
+import { useTeam } from "./team-context"
 
 type TeamSelectorProps = {
   showCreateButton?: boolean

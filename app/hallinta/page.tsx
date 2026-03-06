@@ -1,27 +1,5 @@
 "use client"
 
-import { AuthActionButton } from "@/components/auth-action-button"
-import { Footer } from "@/components/footer"
-import { MainHeader } from "@/components/header"
-import { useTeam } from "@/components/team-context"
-import { TeamSelector } from "@/components/team-selector"
-import { parseExcelFile, type ParsedGame } from "@/lib/excel-parser"
-import {
-  saveGames,
-  clearAllGames,
-  getGames,
-  getPlayers,
-  savePlayer,
-  deletePlayer,
-  updateGameHomeStatus,
-  updateGameDetails,
-  deleteGame,
-  getTeamManagers,
-  getUsers,
-  addTeamManager,
-  removeTeamManager,
-} from "@/lib/storage"
-import { formatDate } from "@/lib/utils"
 import {
   Add as AddIcon,
   Close as CloseIcon,
@@ -34,18 +12,26 @@ import {
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import {
-  Container,
-  Box,
-  Typography,
-  Button,
-  TextField,
-  Chip,
-  Alert,
-  Stack,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Tabs,
+  AccordionSummary,
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Link,
+  Paper,
+  Snackbar,
+  Stack,
   Tab,
   Table,
   TableBody,
@@ -53,22 +39,36 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Checkbox,
-  IconButton,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Snackbar,
-  Link,
+  Tabs,
+  TextField,
+  Typography,
 } from "@mui/material"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import NextLink from "next/link"
-import { useState, useCallback, useRef, useEffect, type InputHTMLAttributes } from "react"
+import { useSession } from "next-auth/react"
+import { type InputHTMLAttributes, useCallback, useEffect, useRef, useState } from "react"
+import { AuthActionButton } from "@/components/auth-action-button"
+import { Footer } from "@/components/footer"
+import { MainHeader } from "@/components/header"
+import { useTeam } from "@/components/team-context"
+import { TeamSelector } from "@/components/team-selector"
+import { type ParsedGame, parseExcelFile } from "@/lib/excel-parser"
+import {
+  addTeamManager,
+  clearAllGames,
+  deleteGame,
+  deletePlayer,
+  getGames,
+  getPlayers,
+  getTeamManagers,
+  getUsers,
+  removeTeamManager,
+  saveGames,
+  savePlayer,
+  updateGameDetails,
+  updateGameHomeStatus,
+} from "@/lib/storage"
+import { formatDate } from "@/lib/utils"
 
 type GameRow = {
   key: string

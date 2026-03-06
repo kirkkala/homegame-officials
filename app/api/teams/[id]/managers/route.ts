@@ -1,3 +1,4 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { requireTeamManager } from "@/lib/auth-api"
 import {
   addTeamManager,
@@ -7,7 +8,6 @@ import {
   removeTeamManager,
 } from "@/lib/db"
 import { teamManagerSchema, validate } from "@/lib/validation"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

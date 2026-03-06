@@ -1,7 +1,5 @@
 "use client"
 
-import { Footer } from "@/components/footer"
-import { MainHeader } from "@/components/header"
 import {
   AssignmentAdd as AssignmentAddIcon,
   CheckCircle as CheckCircleIcon,
@@ -19,6 +17,8 @@ import {
   Paper,
   Typography,
 } from "@mui/material"
+import { Footer } from "@/components/footer"
+import { MainHeader } from "@/components/header"
 
 export default function KaijttoohjeetPage() {
   return (

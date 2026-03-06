@@ -1,7 +1,7 @@
-import { createUser, getUserByEmail, isUserTeamManager } from "@/lib/db"
-import { randomUUID } from "crypto"
+import { randomUUID } from "node:crypto"
+import { type NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
-import { NextRequest, NextResponse } from "next/server"
+import { createUser, getUserByEmail, isUserTeamManager } from "@/lib/db"
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase()
 

@@ -1,7 +1,7 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { requireTeamManager } from "@/lib/auth-api"
-import { getPlayers, createPlayer } from "@/lib/db"
+import { createPlayer, getPlayers } from "@/lib/db"
 import { createPlayerSchema, validate } from "@/lib/validation"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   try {

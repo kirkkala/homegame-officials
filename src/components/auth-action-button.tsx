@@ -2,8 +2,8 @@
 
 import { Login as LoginIcon, Logout as LogoutIcon } from "@mui/icons-material"
 import { Button, type SxProps, type Theme } from "@mui/material"
-import { signOut, useSession } from "next-auth/react"
 import Link from "next/link"
+import { signOut, useSession } from "next-auth/react"
 
 type AuthActionButtonProps = {
   size?: "small" | "medium"

@@ -1,7 +1,7 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { requireTeamManager } from "@/lib/auth-api"
-import { getGameById, updateGame, deleteGame } from "@/lib/db"
+import { deleteGame, getGameById, updateGame } from "@/lib/db"
 import { updateGameSchema, validate } from "@/lib/validation"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
