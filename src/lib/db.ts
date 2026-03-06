@@ -10,8 +10,16 @@ if (!connectionString) {
   throw new Error("POSTGRES_URL is not set")
 }
 
+const dbUrl = new URL(connectionString)
+const hostname = dbUrl.hostname
+
 // Neon serverless only works with Neon. Use pg for Supabase, local, or other Postgres.
-const isNeon = connectionString.includes("neon.tech")
+const isNeon = hostname === "neon.tech" || hostname.endsWith(".neon.tech")
+const isSupabase =
+  hostname === "supabase.com" ||
+  hostname.endsWith(".supabase.com") ||
+  hostname === "supabase.co" ||
+  hostname.endsWith(".supabase.co")
 const isLocal = process.env.VERCEL !== "1"
 
 function createDb() {
@@ -22,7 +30,11 @@ function createDb() {
   return drizzlePg(
     new Pool({
       connectionString,
-      ssl: isLocal ? false : { rejectUnauthorized: true },
+      ssl: isLocal
+        ? false
+        : isSupabase
+          ? { rejectUnauthorized: false }
+          : { rejectUnauthorized: true },
     }),
     { schema }
   )
