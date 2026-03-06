@@ -1,16 +1,21 @@
 import * as schema from "@/db/schema"
-import { sql } from "@vercel/postgres"
+import { neon } from "@neondatabase/serverless"
 import { and, eq } from "drizzle-orm"
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-http"
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
-import { drizzle as drizzleVercel } from "drizzle-orm/vercel-postgres"
 import { Pool } from "pg"
 
-// Use @vercel/postgres on Vercel, pg locally
+// Use Neon serverless on Vercel, pg locally
 const isVercel = process.env.VERCEL === "1"
 
 function createDb() {
   if (isVercel) {
-    return drizzleVercel(sql, { schema })
+    const connectionString = process.env.POSTGRES_URL
+    if (!connectionString) {
+      throw new Error("POSTGRES_URL is not set")
+    }
+    const sql = neon(connectionString)
+    return drizzleNeon({ client: sql, schema })
   } else {
     const connectionString = process.env.POSTGRES_URL
     if (!connectionString) {
