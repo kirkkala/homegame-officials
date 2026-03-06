@@ -9,7 +9,7 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 - **Drizzle ORM** + **Vercel Postgres** for database
 - **xlsx** (SheetJS) for Excel processing
 - **Jest** + **Testing Library** for tests
-- **ESLint** + **Prettier** for code quality
+- **Biome** for lint and format
 
 ### Prerequisites
 
@@ -100,11 +100,10 @@ pnpm dev             # Start dev server at http://localhost:3000
 pnpm dev             # Development server
 pnpm build           # Production build
 pnpm start           # Production server
-pnpm lint            # Check linting
+pnpm lint            # Check lint and format (CI)
+pnpm lint:fix        # Fix lint and format issues
 pnpm test            # Run tests
 pnpm test:watch      # Run tests in watch mode
-pnpm format          # Format with Prettier
-pnpm format:check    # Check formatting
 ```
 
 ### Database Scripts
@@ -144,14 +143,6 @@ Deploy to Vercel with Vercel Postgres:
 
 ```bash
 vercel --prod
-```
-
-## Code Quality
-
-```bash
-pnpm lint            # Check for issues
-pnpm format          # Format with Prettier
-pnpm format:check    # Check formatting
 ```
 
 ## Credits

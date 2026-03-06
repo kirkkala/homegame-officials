@@ -1,5 +1,5 @@
+import { existsSync, readFileSync } from "node:fs"
 import { defineConfig } from "drizzle-kit"
-import { readFileSync, existsSync } from "fs"
 
 // Load environment variables from .env.local for local development
 if (existsSync(".env.local")) {
