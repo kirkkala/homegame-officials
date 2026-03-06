@@ -38,7 +38,12 @@
   "pnpm": {
     "overrides": {
       "@vercel/postgres": "npm:@neondatabase/serverless@^1.0.0"
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
