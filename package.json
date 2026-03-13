@@ -2,7 +2,22 @@
   "name": "homegame-officials",
   "version": "1.0.9",
   "private": true,
+  "scriptDescriptions": {
+    "help": "Lists available scripts, you probably just issues this command",
+    "dev": "Start development server",
+    "build": "Build for production",
+    "start": "Start production server",
+    "lint": "Check lint and format",
+    "lint:fix": "Fix linting and formatting issues",
+    "test": "Run tests",
+    "test:watch": "Run tests in watch mode",
+    "db:generate": "Generate migrations",
+    "db:migrate": "Run migrations",
+    "db:push": "Push schema to database",
+    "db:studio": "Open Drizzle Studio"
+  },
   "scripts": {
+    "help": "node scripts/pnpm-help.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
