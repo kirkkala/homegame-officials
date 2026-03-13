@@ -6,9 +6,9 @@ import { Pool } from "pg"
 import * as schema from "@/db/schema"
 
 // @todo: change variable names in vercel, POSTGRES_NEON_POSTGRES_URL was semi accidental.
-const connectionString = process.env.POSTGRES_URL ?? process.env.POSTGRES_NEON_POSTGRES_URL ?? ""
+const connectionString = process.env.POSTGRES_NEON_POSTGRES_URL ?? process.env.POSTGRES_URL ?? ""
 if (!connectionString) {
-  throw new Error("POSTGRES_URL or POSTGRES_NEON_POSTGRES_URL is not set")
+  throw new Error("POSTGRES_NEON_POSTGRES_URL or POSTGRES_URL is not set")
 }
 
 const isVercel = process.env.VERCEL === "1"
