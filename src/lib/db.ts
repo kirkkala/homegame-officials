@@ -5,9 +5,9 @@ import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 import * as schema from "@/db/schema"
 
-const connectionString = process.env.POSTGRES_URL ?? ""
+const connectionString = process.env.POSTGRES_NEON_POSTGRES_URL ?? ""
 if (!connectionString) {
-  throw new Error("POSTGRES_URL is not set")
+  throw new Error("POSTGRES_NEON_POSTGRES_URL is not set")
 }
 
 const dbUrl = new URL(connectionString)
