@@ -6,7 +6,7 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 
 - **Next.js 16** (App Router) + **React 19** + **TypeScript**
 - **Material UI 7** (MUI) for components and styling
-- **Drizzle ORM** + **Vercel Postgres** for database
+- **Drizzle ORM** + **Neon postgres** for database
 - **xlsx** (SheetJS) for Excel processing
 - **Jest** + **Testing Library** for tests
 - **Biome** for lint and format
@@ -139,11 +139,11 @@ docker exec -i homegame-postgres psql -U postgres -c "DROP SCHEMA public CASCADE
 
 ## Deployment
 
-Deploy to Vercel with Vercel Postgres:
+Github Actions and Vercel CI does all magic.
 
-```bash
-vercel --prod
-```
+* Git push and create PR -> development environment.
+* Merge to main -> production deployment
+    * Create tag after deploy
 
 ## Credits
 

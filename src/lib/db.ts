@@ -5,42 +5,19 @@ import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 import * as schema from "@/db/schema"
 
-const connectionString = process.env.POSTGRES_NEON_POSTGRES_URL ?? ""
+// @todo: change variable names in vercel, POSTGRES_NEON_POSTGRES_URL was semi accidental.
+const connectionString = process.env.POSTGRES_URL ?? process.env.POSTGRES_NEON_POSTGRES_URL ?? ""
 if (!connectionString) {
-  throw new Error("POSTGRES_NEON_POSTGRES_URL is not set")
+  throw new Error("POSTGRES_URL or POSTGRES_NEON_POSTGRES_URL is not set")
 }
 
-const dbUrl = new URL(connectionString)
-const hostname = dbUrl.hostname
+const isVercel = process.env.VERCEL === "1"
 
-// Neon serverless only works with Neon. Use pg for Supabase, local, or other Postgres.
-const isNeon = hostname === "neon.tech" || hostname.endsWith(".neon.tech")
-const isSupabase =
-  hostname === "supabase.com" ||
-  hostname.endsWith(".supabase.com") ||
-  hostname === "supabase.co" ||
-  hostname.endsWith(".supabase.co")
-const isLocal = process.env.VERCEL !== "1"
+const db = isVercel
+  ? drizzleNeon({ client: neon(connectionString), schema })
+  : drizzlePg(new Pool({ connectionString, ssl: false }), { schema })
 
-function createDb() {
-  if (isNeon) {
-    const sql = neon(connectionString)
-    return drizzleNeon({ client: sql, schema })
-  }
-  return drizzlePg(
-    new Pool({
-      connectionString,
-      ssl: isLocal
-        ? false
-        : isSupabase
-          ? { rejectUnauthorized: false }
-          : { rejectUnauthorized: true },
-    }),
-    { schema }
-  )
-}
-
-export const db = createDb()
+export { db }
 
 // Re-export types from schema
 export type {
