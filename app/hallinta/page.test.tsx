@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import * as storage from "@/lib/storage"
-import HallintaPage from "../app/hallinta/page"
+import HallintaPage from "./page"
 
 const mockParseExcelFile = jest.fn()
 const mockUseTeam = jest.fn()
@@ -66,7 +66,7 @@ const renderHallintaPage = () => {
   )
 }
 
-describe("hallinta", () => {
+describe("HallintaPage", () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue({
       data: { user: { email: "test@example.com", isAdmin: true } },
@@ -308,7 +308,7 @@ describe("hallinta", () => {
   })
 })
 
-describe("delete team", () => {
+describe("HallintaPage delete team", () => {
   const mockDeleteTeam = jest.fn()
 
   beforeEach(() => {

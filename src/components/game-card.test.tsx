@@ -47,7 +47,7 @@ const openPoytakirjaMenu = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(button)
 }
 
-describe("game-card official button", () => {
+describe("GameCard", () => {
   beforeEach(() => {
     mockGetPlayers.mockResolvedValue([
       { id: "p1", teamId: "team-1", name: "Matti Meikäläinen", createdAt: "2025-01-01" },
