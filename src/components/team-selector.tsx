@@ -30,6 +30,7 @@ type TeamSelectorProps = {
   size?: "small" | "medium"
   fullWidth?: boolean
   variant?: "standard" | "outlined" | "filled"
+  compact?: boolean
 }
 
 export function TeamSelector({
@@ -37,6 +38,7 @@ export function TeamSelector({
   size = "small",
   fullWidth = false,
   variant = "outlined",
+  compact = false,
 }: TeamSelectorProps) {
   const { teams, selectedTeam, selectTeam, createTeam, isLoading } = useTeam()
   const { data: session } = useSession()
@@ -98,7 +100,7 @@ export function TeamSelector({
             fullWidth={fullWidth}
             variant={variant}
             sx={(theme) => ({
-              minWidth: 180,
+              minWidth: compact ? 140 : 180,
               bgcolor: alpha(theme.palette.background.paper, 0.7),
               borderRadius: 1,
             })}
