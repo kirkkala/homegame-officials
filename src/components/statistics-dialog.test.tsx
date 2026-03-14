@@ -3,7 +3,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { StatisticsDialog } from "@/components/statistics-dialog"
-import { makeGame } from "./helpers"
+import { makeGame } from "@/test-utils"
 
 describe("StatisticsDialog", () => {
   it("shows empty state when no confirmed shifts", () => {

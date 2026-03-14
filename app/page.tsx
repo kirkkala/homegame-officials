@@ -17,8 +17,8 @@ export default function Home() {
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
         {!selectedTeam && (
           <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-            <Typography component="h3" variant="h6" gutterBottom>
-              Kotipelien toimitsijat -appi
+            <Typography component="h2" variant="h5" gutterBottom>
+              HNMKY kotipelien toimitsijat
             </Typography>
 
             <Typography>
@@ -27,7 +27,7 @@ export default function Home() {
             </Typography>
             <Typography>
               Pelaajien vanhemmat voivat käyttää sovellusta ilman kirjautumista. Valitse joukkueesi
-              alta tai lue lisää{" "}
+              yläpalkista tai lue lisää{" "}
               <Link component={NextLink} href="/kayttoohjeet">
                 käyttöohjeet
               </Link>{" "}

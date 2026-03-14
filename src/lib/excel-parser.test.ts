@@ -9,7 +9,7 @@ import { parseExcelFile } from "@/lib/excel-parser"
 const toArrayBuffer = (buffer: Buffer) =>
   buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
 
-describe("excel parser with real file", () => {
+describe("excel-parser", () => {
   it("parses elsa-myclub-import.xlsx into games", async () => {
     const filePath = path.join(process.cwd(), "excel-test-sheets", "elsa-myclub-import.xlsx")
     const fileBuffer = await readFile(filePath)

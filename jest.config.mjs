@@ -10,7 +10,7 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  testPathIgnorePatterns: ["/node_modules/", "/__tests__/helpers\\.ts$"],
+  testPathIgnorePatterns: ["/node_modules/"],
 }
 
 export default createJestConfig(customJestConfig)

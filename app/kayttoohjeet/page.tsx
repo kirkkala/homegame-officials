@@ -27,11 +27,9 @@ export default function KaijttoohjeetPage() {
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
         <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
           <Typography variant="h4" component="h2" gutterBottom>
-            Käyttöohjeet ja tietosuojaseloste
+            Tietoja ja käyttöohjeet
           </Typography>
-        </Paper>
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography component="h3" variant="h6" gutterBottom>
+          <Typography component="h3" variant="h5" gutterBottom>
             Mikä tämä on?
           </Typography>
           <Typography>
@@ -51,10 +49,7 @@ export default function KaijttoohjeetPage() {
             </Link>
             .
           </Typography>
-        </Paper>
-
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography component="h3" variant="h6" gutterBottom>
+          <Typography component="h3" variant="h5" gutterBottom>
             Näin pääset alkuun
           </Typography>
           <Typography>
@@ -73,7 +68,7 @@ export default function KaijttoohjeetPage() {
               </ListItemIcon>
               <ListItemText
                 primary="1. Valitse joukkue"
-                secondary="Etusivulla valitse joukkue, jonka ottelut haluat nähdä. Valittu joukkue tallentuu selaimen välimuistiin ja joukkueen nimi säilyy selaimen URL osoitteessa. Seuraavan kerran sivustolle palattuasi näet oman joukkueesi tiedot. Vaihda valittu joukkue yläpalkin hampurilaisvalikosta"
+                secondary="Valitse oma joukkueesi. Valinta tallentuu selaimesi välimuistiin ja joukkueen nimi säilyy selaimen URL osoitteessa joten voit jakaa linkin jolla pääsee suoraan oikean joukkueen peleihin."
                 className="steps-list-text"
               />
             </ListItem>
@@ -83,7 +78,7 @@ export default function KaijttoohjeetPage() {
               </ListItemIcon>
               <ListItemText
                 primary="2. Jaa toimitsijavuorot"
-                secondary="Valitse vastuut kotipelien eSCO- ja kellovuoroihin. Vanhemmat voivat tehdä tämän oma-aloitteisesti tai joukkueenjohtaja hoitaa nimeämisen peleihin mistä vastuun hoitaja puuttuu. Nimetyn pelaajan vanhemmat ovat vastuussa toimitsijavuoron hoitamisesta, tarvittaessa sovi toisen vanhemman kanssa mikäli haluat vaihtaa vuoroa. Mikäli et halua tai voi tehdä vuoroa, pyydä jokukkueenjohtajaa hoitamaan juniori poolista vuoron tekijäksi pientä korvausta vastaan."
+                secondary='Valitse pelin eSCO- ja kellovuoron vastuu painamalla "Valitse pelaaja...". Avautuvasta pudotusvalikosta valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
                 className="steps-list-text"
               />
             </ListItem>
@@ -93,7 +88,7 @@ export default function KaijttoohjeetPage() {
               </ListItemIcon>
               <ListItemText
                 primary="3. Vahvista vuoro"
-                secondary='Kun toimitsijavuoro on tilassa "Vahvista", paina toimitsijavuoron painiketta ja merkitse hoitaako vuoron huoltaja vai juniori poolista. Juniorille poolista maksetaan 20 € korvaus toimitsijavuoron tekemisestä. Pyydä joukkueenjohtajaa hankkimaan juniori toimitsijapoolista hyvissä ajoin mikäli haluat käyttää tätä vaihtoehtoa.'
+                secondary='Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista" painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai pyydetäänkö tehtävän tekijäksi juniori joukkueenjohtajan avustuksella.'
                 className="steps-list-text"
               />
             </ListItem>
@@ -108,35 +103,6 @@ export default function KaijttoohjeetPage() {
               />
             </ListItem>
           </List>
-        </Paper>
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography component="h3" variant="h6" gutterBottom>
-            Tietosuojaseloste
-          </Typography>
-          <Typography>
-            Pelajien nimet pyritään pitämään etu- tai lempiniminä jotta tietoja ei voi yhdistää
-            henkilöllisyyteen. Kirjautuneen käyttäjän sähköpostiosoite tallentuu tietokantaan.
-            Kirjautuminen on toteutettu Google autentikoinnin avulla, kirjautuminen vaatii
-            Google-tilin.
-          </Typography>
-          <Typography>
-            Applikaatioon tallennettuja tietoja ei luovuteta kolmansille osapuolille. Applikaation
-            hakukonenäkyvyys on estetty robots.txt tiedoston avulla.
-          </Typography>
-          <Typography>
-            Palvelimet sijaitsevat EU-alueella AWS Tukholman datakeskuksessa. Sivusto pyörii{" "}
-            <Link href="https://vercel.com/" target="_blank" rel="noopener">
-              Vercelin
-            </Link>{" "}
-            hostingissa.
-          </Typography>
-          <Typography>
-            Lisätietoja applikaation kehittäjältä saa sähköpostitse{" "}
-            <Link href="mailto:timo.kirkkala@gmail.com?subject=Kotipelin toimitsijat -applikaatio">
-              timo.kirkkala@gmail.com
-            </Link>
-            .
-          </Typography>
         </Paper>
       </Container>
       <Footer />

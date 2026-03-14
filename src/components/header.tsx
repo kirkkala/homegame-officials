@@ -32,7 +32,6 @@ import { useSession } from "next-auth/react"
 import { useState } from "react"
 import packageJson from "../../package.json"
 import { AuthActionButton } from "./auth-action-button"
-import { useTeam } from "./team-context"
 import { TeamSelector } from "./team-selector"
 
 type PageItem = {
@@ -51,7 +50,6 @@ const PAGES: PageItem[] = [
 export function MainHeader() {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { selectedTeam } = useTeam()
   const { data: session, status } = useSession()
   const user = session?.user
   const authLoading = status === "loading"
@@ -62,104 +60,107 @@ export function MainHeader() {
   return (
     <>
       <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0 }}>
-        <Toolbar sx={{ minHeight: { xs: 64, sm: 70 } }}>
-          {/* Mobile: hamburger menu */}
-          <IconButton edge="start" aria-label="menu" onClick={toggleDrawer(true)} sx={{ mr: 1 }}>
-            <MenuIcon />
-          </IconButton>
+        <Box sx={{ maxWidth: 1280, mx: "auto", width: "100%" }}>
+          <Toolbar sx={{ minHeight: { xs: 64, sm: 96 } }}>
+            {/* Mobile: hamburger menu */}
+            <IconButton edge="start" aria-label="menu" onClick={toggleDrawer(true)} sx={{ mr: 1 }}>
+              <MenuIcon />
+            </IconButton>
 
-          <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
-            <Box
-              component="img"
-              src="/logo.png"
-              alt="HMKY logo"
-              sx={{
-                mt: 1,
-                mr: 2,
-                mb: 0,
-                ml: 1,
-                width: { xs: 36, sm: 40 },
-                height: { xs: 36, sm: 40 },
-              }}
-            />
-          </MuiLink>
-          {/* Title */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flexGrow: 1,
-              minWidth: 0,
-              height: "100%",
-              justifyContent: "center",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", minWidth: 0, gap: 1 }}>
-              <Typography
-                variant="h6"
-                component="h1"
-                fontWeight="bold"
-                noWrap
-                sx={{ fontSize: { xs: "1rem", sm: "1.25rem" }, mt: 0, mb: 0 }}
-              >
-                <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
-                  Kotipelien toimitsijat
-                </MuiLink>
-              </Typography>
-              {/* Version chip */}
-              <Link
-                href="https://github.com/kirkkala/homegame-officials/releases"
-                target="_blank"
-                rel="noopener"
-              >
-                <Chip
-                  label={`v${packageJson.version}`}
-                  size="small"
-                  sx={{
-                    bgcolor: "background.paper",
-                    border: 1,
-                    borderColor: "divider",
-                    fontWeight: 500,
-                    fontSize: "0.7rem",
-                    "&:hover": {
-                      fontWeight: 700,
-                    },
-                  }}
-                />
-              </Link>
-            </Box>
-            {selectedTeam && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                noWrap
-                sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" }, mt: 0, mb: 0 }}
-              >
-                {selectedTeam.name}
-              </Typography>
-            )}
-          </Box>
-
-          {/* Desktop: tabs navigation */}
-          <Tabs
-            value={visiblePages.some((p) => p.path === pathname) ? pathname : false}
-            component="nav"
-            sx={{ display: { xs: "none", sm: "flex" } }}
-          >
-            {visiblePages.map((page) => (
-              <Tab
-                key={page.path}
-                label={page.label}
-                value={page.path}
-                href={page.path}
-                component={Link}
-                icon={<page.icon />}
-                iconPosition="start"
-                sx={{ fontWeight: pathname === page.path ? 700 : 400, px: 2 }}
+            <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="HMKY logo"
+                sx={{
+                  mt: 1,
+                  mr: 2,
+                  mb: 0,
+                  ml: 1,
+                  width: { xs: 36, sm: 40 },
+                  height: { xs: 36, sm: 40 },
+                }}
               />
-            ))}
-          </Tabs>
-        </Toolbar>
+            </MuiLink>
+            {/* Title */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                flexGrow: 1,
+                minWidth: 0,
+                height: "100%",
+                justifyContent: "center",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", minWidth: 0, gap: 1 }}>
+                <Typography
+                  variant="h6"
+                  component="h1"
+                  fontWeight="bold"
+                  noWrap
+                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" }, mt: 0, mb: 0 }}
+                >
+                  <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
+                    Kotipelien toimitsijat
+                  </MuiLink>
+                </Typography>
+                {/* Version chip */}
+                <Link
+                  href="https://github.com/kirkkala/homegame-officials/releases"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <Chip
+                    label={`v${packageJson.version}`}
+                    size="small"
+                    sx={{
+                      bgcolor: "background.paper",
+                      border: 1,
+                      borderColor: "divider",
+                      fontWeight: 500,
+                      fontSize: "0.7rem",
+                      "&:hover": {
+                        fontWeight: 700,
+                      },
+                    }}
+                  />
+                </Link>
+              </Box>
+              {/* Desktop: team selector below page name (hidden on mobile - use hamburger menu) */}
+              <Box
+                sx={{
+                  display: { xs: "none", sm: "block" },
+                  mt: 1,
+                  scale: 0.85,
+                  transformOrigin: "left center",
+                }}
+              >
+                <TeamSelector size="small" compact />
+              </Box>
+            </Box>
+
+            {/* Desktop: tabs navigation */}
+            <Tabs
+              value={visiblePages.some((p) => p.path === pathname) ? pathname : false}
+              component="nav"
+              sx={{ display: { xs: "none", sm: "flex" }, alignSelf: "flex-end" }}
+            >
+              {visiblePages.map((page) => (
+                <Tab
+                  key={page.path}
+                  label={page.label}
+                  value={page.path}
+                  href={page.path}
+                  component={Link}
+                  icon={<page.icon />}
+                  iconPosition="start"
+                  sx={{ fontWeight: pathname === page.path ? 700 : 400, px: 2 }}
+                />
+              ))}
+            </Tabs>
+          </Toolbar>
+        </Box>
       </AppBar>
 
       {/* Mobile drawer */}

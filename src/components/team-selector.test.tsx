@@ -41,7 +41,7 @@ const renderTeamSelector = (props?: React.ComponentProps<typeof TeamSelector>) =
   )
 }
 
-describe("team-selector", () => {
+describe("TeamSelector", () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue({ data: { user: { name: "Test User" } } })
     mockUseTeam.mockReturnValue(baseTeamContext)

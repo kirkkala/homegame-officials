@@ -20,7 +20,6 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 
 ```
 homegame-officials/
-├── __tests__/              # Project jest tests
 ├── app/                    # Next.js App Router
 │   ├── api/                # API routes (games, players)
 │   ├── hallinta/           # Admin page (import, manage)
@@ -99,8 +98,6 @@ pnpm dev             # Start dev server at http://localhost:3000
 ```bash
 pnpm run help       # List all scripts and what they do
 ```
-
-Key commands: `dev`, `build`, `start`, `lint`, `lint:fix`, `test`, `test:watch`
 
 ### Database Scripts
 

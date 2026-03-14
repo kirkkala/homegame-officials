@@ -1,5 +1,5 @@
 import { computePlayerStats, computePlayerStatsArray, formatDate, slugify } from "@/lib/utils"
-import { makeGame } from "./helpers"
+import { makeGame } from "@/test-utils"
 
 describe("utils", () => {
   it("slugify removes accents and normalizes whitespace", () => {

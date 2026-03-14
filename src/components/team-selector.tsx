@@ -30,6 +30,7 @@ type TeamSelectorProps = {
   size?: "small" | "medium"
   fullWidth?: boolean
   variant?: "standard" | "outlined" | "filled"
+  compact?: boolean
 }
 
 export function TeamSelector({
@@ -37,6 +38,7 @@ export function TeamSelector({
   size = "small",
   fullWidth = false,
   variant = "outlined",
+  compact = false,
 }: TeamSelectorProps) {
   const { teams, selectedTeam, selectTeam, createTeam, isLoading } = useTeam()
   const { data: session } = useSession()
@@ -56,6 +58,8 @@ export function TeamSelector({
     const value = event.target.value
     if (value === "__create__") {
       setDialogOpen(true)
+    } else if (value === "") {
+      selectTeam(null)
     } else {
       selectTeam(value)
     }
@@ -98,19 +102,29 @@ export function TeamSelector({
             fullWidth={fullWidth}
             variant={variant}
             sx={(theme) => ({
-              minWidth: 180,
+              minWidth: compact ? 160 : 200,
               bgcolor: alpha(theme.palette.background.paper, 0.7),
               borderRadius: 1,
             })}
           >
-            <InputLabel id="team-select-label">Joukkue</InputLabel>
+            <InputLabel id="team-select-label" shrink>
+              Joukkue
+            </InputLabel>
             <Select
               labelId="team-select-label"
               value={selectedTeam?.id ?? ""}
               label="Joukkue"
               onChange={handleChange}
               data-testid="team-select"
+              displayEmpty
+              renderValue={(value) => {
+                if (!value) return "Valitse joukkue"
+                return teams.find((t) => t.id === value)?.name ?? "Valitse joukkue"
+              }}
             >
+              <MenuItem value="" data-testid="team-option-empty">
+                Valitse joukkue
+              </MenuItem>
               {teams.map((team) => (
                 <MenuItem key={team.id} value={team.id} data-testid={`team-option-${team.id}`}>
                   {team.name}
