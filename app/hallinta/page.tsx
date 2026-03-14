@@ -225,6 +225,11 @@ export default function HallintaPage() {
     message: string
     onConfirm: () => void
   }>({ open: false, message: "", onConfirm: () => {} })
+  const [deleteTeamDialog, setDeleteTeamDialog] = useState<{
+    open: boolean
+    teamName: string
+    confirmInput: string
+  }>({ open: false, teamName: "", confirmInput: "" })
   const [editDialog, setEditDialog] = useState<{
     open: boolean
     mode: "edit" | "add"
@@ -681,12 +686,23 @@ export default function HallintaPage() {
 
   const handleDeleteTeam = useCallback(() => {
     if (!selectedTeam) return
-    openConfirmDialog(
-      `Haluatko varmasti poistaa joukkueen "${selectedTeam.name}"? Tämä poistaa myös kaikki joukkueen ottelut sekä pelaajat.`,
-      () => deleteTeamMutation.mutate(),
-      "Poista joukkue"
-    )
-  }, [selectedTeam, deleteTeamMutation, openConfirmDialog])
+    setDeleteTeamDialog({ open: true, teamName: selectedTeam.name, confirmInput: "" })
+  }, [selectedTeam])
+
+  const closeDeleteTeamDialog = useCallback(() => {
+    setDeleteTeamDialog((prev) => ({ ...prev, open: false, confirmInput: "" }))
+  }, [])
+
+  const handleConfirmDeleteTeam = useCallback(() => {
+    if (deleteTeamDialog.confirmInput !== deleteTeamDialog.teamName) return
+    deleteTeamMutation.mutate()
+    closeDeleteTeamDialog()
+  }, [
+    deleteTeamDialog.confirmInput,
+    deleteTeamDialog.teamName,
+    deleteTeamMutation,
+    closeDeleteTeamDialog,
+  ])
 
   const handleClearAll = useCallback(() => {
     openConfirmDialog("Haluatko varmasti poistaa kaikki ottelut?", () =>
@@ -751,22 +767,11 @@ export default function HallintaPage() {
     subtitle = selectedTeam.name
     content = (
       <Stack gap={3}>
-        {/* Team Management */}
-        <Box>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
-            {!authLoading && <AuthActionButton />}
-            <Button
-              color="error"
-              size="small"
-              startIcon={<DeleteForeverIcon />}
-              onClick={handleDeleteTeam}
-              disabled={deleteTeamMutation.isPending}
-            >
-              Poista joukkue
-            </Button>
-          </Stack>
-        </Box>
-        <TeamSelector showCreateButton />
+        {!authLoading && (
+          <Box sx={{ mb: 1 }}>
+            <AuthActionButton />
+          </Box>
+        )}
 
         <Tabs
           value={activeTab}
@@ -777,8 +782,8 @@ export default function HallintaPage() {
           sx={{ borderBottom: 1, borderColor: "divider" }}
         >
           <Tab label="Yleiset asetukset" data-testid="general-tab" />
-          <Tab label={`Joukkueen pelaajat (${players.length})`} data-testid="players-tab" />
-          <Tab label={`Joukkueen ottelut (${existingGames.length})`} data-testid="games-tab" />
+          <Tab label={`Pelaajat (${players.length})`} data-testid="players-tab" />
+          <Tab label={`Ottelut (${existingGames.length})`} data-testid="games-tab" />
         </Tabs>
 
         {activeTab === 0 && (
@@ -786,7 +791,7 @@ export default function HallintaPage() {
             <Stack gap={2}>
               <Box>
                 <Typography component="h2" variant="h5">
-                  Joukkueen {selectedTeam.name} Käyttöoikeudet
+                  Asetukset: {selectedTeam.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Käyttäjät, jotka voivat hallita tämän joukkueen otteluita ja pelaajia.
@@ -841,6 +846,9 @@ export default function HallintaPage() {
 
             {isAdmin && (
               <Stack gap={2}>
+                <Typography component="h2" variant="h5">
+                  Pääkäyttäjän toiminnot
+                </Typography>
                 <Box>
                   <Typography component="h3" variant="h6">
                     Rekisteröidyt käyttäjät ({users.length})
@@ -866,6 +874,20 @@ export default function HallintaPage() {
                 )}
               </Stack>
             )}
+            <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: "divider" }}>
+              <Typography component="h3" variant="h6" gutterBottom>
+                Danger zone
+              </Typography>
+              <Button
+                color="error"
+                variant="contained"
+                startIcon={<DeleteForeverIcon />}
+                onClick={handleDeleteTeam}
+                disabled={deleteTeamMutation.isPending}
+              >
+                Poista joukkue
+              </Button>
+            </Box>
           </Stack>
         )}
 
@@ -1269,6 +1291,46 @@ export default function HallintaPage() {
             data-testid="confirm-dialog-submit"
           >
             Poista
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Team Dialog - requires typing team name to confirm */}
+      <Dialog
+        open={deleteTeamDialog.open}
+        onClose={closeDeleteTeamDialog}
+        aria-labelledby="delete-team-dialog-title"
+      >
+        <DialogTitle id="delete-team-dialog-title">Poista joukkue</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Haluatko varmasti poistaa joukkueen &quot;{deleteTeamDialog.teamName}&quot;? Tämä
+            poistaa myös kaikki joukkueen ottelut sekä pelaajat. Toimintoa ei voi peruuttaa.
+          </DialogContentText>
+          <TextField
+            fullWidth
+            size="small"
+            label={`Kirjoita "${deleteTeamDialog.teamName}" vahvistaaksesi`}
+            value={deleteTeamDialog.confirmInput}
+            onChange={(e) =>
+              setDeleteTeamDialog((prev) => ({ ...prev, confirmInput: e.target.value }))
+            }
+            placeholder={deleteTeamDialog.teamName}
+            inputProps={{ "data-testid": "delete-team-confirm-input" }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteTeamDialog}>Peruuta</Button>
+          <Button
+            onClick={handleConfirmDeleteTeam}
+            color="error"
+            disabled={
+              deleteTeamDialog.confirmInput !== deleteTeamDialog.teamName ||
+              deleteTeamMutation.isPending
+            }
+            data-testid="delete-team-confirm-button"
+          >
+            Poista joukkue
           </Button>
         </DialogActions>
       </Dialog>

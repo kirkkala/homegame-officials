@@ -66,7 +66,7 @@ const renderHallintaPage = () => {
   )
 }
 
-describe("hallinta excel upload", () => {
+describe("hallinta", () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue({
       data: { user: { email: "test@example.com", isAdmin: true } },
@@ -305,5 +305,83 @@ describe("hallinta excel upload", () => {
     await user.click(confirmButton)
 
     expect(storage.deleteGame).toHaveBeenCalledWith("g2")
+  })
+})
+
+describe("delete team", () => {
+  const mockDeleteTeam = jest.fn()
+
+  beforeEach(() => {
+    mockUseSession.mockReturnValue({
+      data: { user: { email: "test@example.com", isAdmin: true } },
+      status: "authenticated",
+    })
+    mockUseTeam.mockReturnValue({
+      selectedTeam: { id: "team-1", name: "HNMKY T14 Stadi", createdAt: "2025-01-01" },
+      isLoading: false,
+      deleteTeam: mockDeleteTeam,
+    })
+    ;(storage.getGames as jest.Mock).mockResolvedValue([])
+    ;(storage.getPlayers as jest.Mock).mockResolvedValue([])
+    ;(storage.getTeamManagers as jest.Mock).mockResolvedValue([])
+    ;(storage.getUsers as jest.Mock).mockResolvedValue([])
+    mockDeleteTeam.mockReset()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("opens delete team dialog when clicking Poista joukkue", async () => {
+    const user = userEvent.setup()
+    renderHallintaPage()
+
+    await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
+
+    expect(screen.getByTestId("delete-team-confirm-input")).toBeInTheDocument()
+    expect(screen.getByTestId("delete-team-confirm-button")).toBeDisabled()
+  })
+
+  it("keeps confirm button disabled when team name does not match", async () => {
+    const user = userEvent.setup()
+    renderHallintaPage()
+
+    await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
+
+    const input = screen.getByTestId("delete-team-confirm-input")
+    await user.type(input, "wrong name")
+
+    expect(screen.getByTestId("delete-team-confirm-button")).toBeDisabled()
+  })
+
+  it("enables confirm button when team name matches exactly", async () => {
+    const user = userEvent.setup()
+    renderHallintaPage()
+
+    await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
+
+    const input = screen.getByTestId("delete-team-confirm-input")
+    fireEvent.change(input, { target: { value: "HNMKY T14 Stadi" } })
+
+    await waitFor(() => {
+      expect(screen.getByTestId("delete-team-confirm-button")).toBeEnabled()
+    })
+  })
+
+  it("calls deleteTeam when confirming with correct team name", async () => {
+    const user = userEvent.setup()
+    mockDeleteTeam.mockResolvedValue(undefined)
+    renderHallintaPage()
+
+    await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
+
+    const input = screen.getByTestId("delete-team-confirm-input")
+    fireEvent.change(input, { target: { value: "HNMKY T14 Stadi" } })
+
+    const confirmButton = await screen.findByTestId("delete-team-confirm-button")
+    await waitFor(() => expect(confirmButton).toBeEnabled())
+    await user.click(confirmButton)
+
+    expect(mockDeleteTeam).toHaveBeenCalledWith("team-1")
   })
 })
