@@ -2,7 +2,6 @@
 
 import {
   CalendarMonth as CalendarMonthIcon,
-  Groups as GroupsIcon,
   Leaderboard as LeaderboardIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
@@ -26,7 +25,6 @@ import { computePlayerStats } from "@/lib/utils"
 import { GameCard } from "./game-card"
 import { StatisticsDialog } from "./statistics-dialog"
 import { useTeam } from "./team-context"
-import { TeamSelector } from "./team-selector"
 
 export function GamesList() {
   const { selectedTeam, isLoading: teamLoading } = useTeam()
@@ -108,22 +106,12 @@ export function GamesList() {
   // Compute confirmed shift counts per player (for dropdown display)
   const playerStats = computePlayerStats(allGames)
 
+  if (!selectedTeam) return null
+
   if (teamLoading || gamesLoading) {
     return (
       <Stack alignItems="center" py={8}>
         <CircularProgress />
-      </Stack>
-    )
-  }
-
-  if (!selectedTeam) {
-    return (
-      <Stack alignItems="center" py={8}>
-        <GroupsIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
-        <Typography variant="h5" gutterBottom>
-          Valitse joukkue
-        </Typography>
-        <TeamSelector showCreateButton />
       </Stack>
     )
   }
