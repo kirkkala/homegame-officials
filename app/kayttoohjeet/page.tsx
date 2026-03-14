@@ -27,11 +27,9 @@ export default function KaijttoohjeetPage() {
       <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 }, flex: 1 }}>
         <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
           <Typography variant="h4" component="h2" gutterBottom>
-            Käyttöohjeet ja tietosuojaseloste
+            Tietoja ja käyttöohjeet
           </Typography>
-        </Paper>
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography component="h3" variant="h6" gutterBottom>
+          <Typography component="h3" variant="h5" gutterBottom>
             Mikä tämä on?
           </Typography>
           <Typography>
@@ -51,10 +49,7 @@ export default function KaijttoohjeetPage() {
             </Link>
             .
           </Typography>
-        </Paper>
-
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography component="h3" variant="h6" gutterBottom>
+          <Typography component="h3" variant="h5" gutterBottom>
             Näin pääset alkuun
           </Typography>
           <Typography>
@@ -108,35 +103,6 @@ export default function KaijttoohjeetPage() {
               />
             </ListItem>
           </List>
-        </Paper>
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-          <Typography component="h3" variant="h6" gutterBottom>
-            Tietosuojaseloste
-          </Typography>
-          <Typography>
-            Pelajien nimet pyritään pitämään etu- tai lempiniminä jotta tietoja ei voi yhdistää
-            henkilöllisyyteen. Kirjautuneen käyttäjän sähköpostiosoite tallentuu tietokantaan.
-            Kirjautuminen on toteutettu Google autentikoinnin avulla, kirjautuminen vaatii
-            Google-tilin.
-          </Typography>
-          <Typography>
-            Applikaatioon tallennettuja tietoja ei luovuteta kolmansille osapuolille. Applikaation
-            hakukonenäkyvyys on estetty robots.txt tiedoston avulla.
-          </Typography>
-          <Typography>
-            Palvelimet sijaitsevat EU-alueella AWS Tukholman datakeskuksessa. Sivusto pyörii{" "}
-            <Link href="https://vercel.com/" target="_blank" rel="noopener">
-              Vercelin
-            </Link>{" "}
-            hostingissa.
-          </Typography>
-          <Typography>
-            Lisätietoja applikaation kehittäjältä saa sähköpostitse{" "}
-            <Link href="mailto:timo.kirkkala@gmail.com?subject=Kotipelin toimitsijat -applikaatio">
-              timo.kirkkala@gmail.com
-            </Link>
-            .
-          </Typography>
         </Paper>
       </Container>
       <Footer />

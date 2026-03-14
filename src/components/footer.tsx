@@ -1,5 +1,6 @@
 import { Favorite as FavoriteIcon } from "@mui/icons-material"
 import { Box, Container, Link as MuiLink, Typography } from "@mui/material"
+import NextLink from "next/link"
 
 export function Footer() {
   return (
@@ -36,6 +37,16 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             GitHub
+          </MuiLink>
+        </Typography>
+        <Typography>
+          <MuiLink
+            component={NextLink}
+            href="/tietosuoja"
+            color="inherit"
+            sx={{ fontSize: "0.85rem" }}
+          >
+            Tietosuojaseloste
           </MuiLink>
         </Typography>
       </Container>
