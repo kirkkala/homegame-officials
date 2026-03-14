@@ -6,14 +6,14 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 
 - **Next.js 16** (App Router) + **React 19** + **TypeScript**
 - **Material UI 7** (MUI) for components and styling
-- **Drizzle ORM** + **Vercel Postgres** for database
+- **Drizzle ORM** + **Neon postgres** for database
 - **xlsx** (SheetJS) for Excel processing
 - **Jest** + **Testing Library** for tests
-- **ESLint** + **Prettier** for code quality
+- **Biome** for lint and format
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 24 (with nvm)
 - pnpm
 
 ## Project Structure
@@ -97,15 +97,10 @@ pnpm dev             # Start dev server at http://localhost:3000
 ### Available Scripts
 
 ```bash
-pnpm dev             # Development server
-pnpm build           # Production build
-pnpm start           # Production server
-pnpm lint            # Check linting
-pnpm test            # Run tests
-pnpm test:watch      # Run tests in watch mode
-pnpm format          # Format with Prettier
-pnpm format:check    # Check formatting
+pnpm run help       # List all scripts and what they do
 ```
+
+Key commands: `dev`, `build`, `start`, `lint`, `lint:fix`, `test`, `test:watch`
 
 ### Database Scripts
 
@@ -118,21 +113,19 @@ pnpm db:studio       # Open Drizzle Studio
 
 ### Copy Production Database to Local
 
-1. Get the database URL from Vercel Dashboard → Storage → your database → `.env.local` tab
-2. Remove `&supa=base-pooler.x` from the URL (pg_dump doesn't understand it)
+Get `DATABASE_URL` URL from Vercel Dashboard → Storage → Neon.
 
 ```bash
-# Set the production URL (remove &supa=...)
-export HOMEGAME_OFFICIALS_PROD_DB="postgres://user:pass@host:6543/postgres?sslmode=require"
+export HOMEGAME_OFFICIALS_PROD_DB="postgresql://user:pass@ep-xxx.pooler.c-2.eu-central-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
 
-# Dump production to file (use correct postgres:17 version)
+# Dump to a file (Docker ensure pg_dump is available, could also use pg_dump installed with e.g. homebrew)
 docker run --rm postgres:17 pg_dump "$HOMEGAME_OFFICIALS_PROD_DB" > prod-backup.sql
 
-# Import to local Docker
+# Import to local container
 docker exec -i homegame-postgres psql -U postgres < prod-backup.sql
 ```
 
-To clear local database first (fresh copy):
+To clear local database:
 
 ```bash
 docker exec -i homegame-postgres psql -U postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
@@ -140,19 +133,11 @@ docker exec -i homegame-postgres psql -U postgres -c "DROP SCHEMA public CASCADE
 
 ## Deployment
 
-Deploy to Vercel with Vercel Postgres:
+Github Actions and Vercel CI does all magic.
 
-```bash
-vercel --prod
-```
-
-## Code Quality
-
-```bash
-pnpm lint            # Check for issues
-pnpm format          # Format with Prettier
-pnpm format:check    # Check formatting
-```
+* Git push and create PR -> development environment.
+* Merge to main -> production deployment
+    * Create tag after deploy
 
 ## Credits
 

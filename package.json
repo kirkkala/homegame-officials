@@ -1,16 +1,30 @@
 {
   "name": "homegame-officials",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "private": true,
+  "scriptDescriptions": {
+    "help": "Lists available scripts, you probably just issues this command",
+    "dev": "Start development server",
+    "build": "Build for production",
+    "start": "Start production server",
+    "lint": "Check lint and format",
+    "lint:fix": "Fix linting and formatting issues",
+    "test": "Run tests",
+    "test:watch": "Run tests in watch mode",
+    "db:generate": "Generate migrations",
+    "db:migrate": "Run migrations",
+    "db:push": "Push schema to database",
+    "db:studio": "Open Drizzle Studio"
+  },
   "scripts": {
+    "help": "node scripts/pnpm-help.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -19,37 +33,45 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.3.8",
-    "@mui/material": "^7.3.8",
-    "@mui/material-nextjs": "^7.3.8",
+    "@mui/icons-material": "^7.3.9",
+    "@mui/material": "^7.3.9",
+    "@mui/material-nextjs": "^7.3.9",
+    "@neondatabase/serverless": "^1.0.2",
     "@tanstack/react-query": "^5.90.21",
     "@toolpad/core": "^0.16.0",
     "@vercel/analytics": "^1.6.1",
-    "@vercel/postgres": "^0.10.0",
     "drizzle-orm": "^0.45.1",
     "next": "^16.1.6",
     "next-auth": "^4.24.13",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^4.3.6"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": ">=0.25.0"
+    },
+    "ignoredBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.19.33",
-    "@types/pg": "^8.16.0",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.18.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@biomejs/biome": "^2.4.0",
     "drizzle-kit": "^0.31.9",
-    "eslint": "^9.39.3",
-    "eslint-config-next": "16.1.1",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
-    "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   }
 }

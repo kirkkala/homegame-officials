@@ -1,12 +1,12 @@
 "use client"
 
+import { Box, Container, Stack } from "@mui/material"
+import { AppProvider } from "@toolpad/core/AppProvider"
+import { type AuthProvider, type AuthResponse, SignInPage } from "@toolpad/core/SignInPage"
+import { signIn as nextAuthSignIn } from "next-auth/react"
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 import { theme } from "@/theme/theme"
-import { Box, Container, Stack } from "@mui/material"
-import { AppProvider } from "@toolpad/core/AppProvider"
-import { SignInPage, type AuthProvider, type AuthResponse } from "@toolpad/core/SignInPage"
-import { signIn as nextAuthSignIn } from "next-auth/react"
 
 const providers: AuthProvider[] = [{ id: "google", name: "Google" }]
 

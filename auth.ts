@@ -1,6 +1,6 @@
 import type { NextAuthOptions, Session } from "next-auth"
-import Google from "next-auth/providers/google"
 import type { JWT } from "next-auth/jwt"
+import Google from "next-auth/providers/google"
 
 export const authOptions: NextAuthOptions = {
   providers: [

@@ -1,6 +1,6 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { forbiddenResponse, requireAuthUser } from "@/lib/auth-api"
 import { getUsers } from "@/lib/db"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthUser(request)

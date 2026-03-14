@@ -1,5 +1,5 @@
+import { existsSync, readFileSync } from "node:fs"
 import { defineConfig } from "drizzle-kit"
-import { readFileSync, existsSync } from "fs"
 
 // Load environment variables from .env.local for local development
 if (existsSync(".env.local")) {
@@ -23,6 +23,6 @@ export default defineConfig({
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.POSTGRES_URL!,
+    url: process.env.POSTGRES_NEON_POSTGRES_URL ?? process.env.POSTGRES_URL!,
   },
 })

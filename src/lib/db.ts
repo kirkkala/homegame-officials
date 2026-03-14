@@ -1,40 +1,33 @@
-import * as schema from "@/db/schema"
-import { sql } from "@vercel/postgres"
+import { neon } from "@neondatabase/serverless"
 import { and, eq } from "drizzle-orm"
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-http"
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
-import { drizzle as drizzleVercel } from "drizzle-orm/vercel-postgres"
 import { Pool } from "pg"
+import * as schema from "@/db/schema"
 
-// Use @vercel/postgres on Vercel, pg locally
-const isVercel = process.env.VERCEL === "1"
-
-function createDb() {
-  if (isVercel) {
-    return drizzleVercel(sql, { schema })
-  } else {
-    const connectionString = process.env.POSTGRES_URL
-    if (!connectionString) {
-      throw new Error("POSTGRES_URL is not set")
-    }
-    const pool = new Pool({
-      connectionString: connectionString,
-      ssl: false,
-    })
-    return drizzlePg(pool, { schema })
-  }
+// @todo: change variable names in vercel, POSTGRES_NEON_POSTGRES_URL was semi accidental.
+const connectionString = process.env.POSTGRES_NEON_POSTGRES_URL ?? process.env.POSTGRES_URL ?? ""
+if (!connectionString) {
+  throw new Error("POSTGRES_NEON_POSTGRES_URL or POSTGRES_URL is not set")
 }
 
-export const db = createDb()
+const isVercel = process.env.VERCEL === "1"
+
+const db = isVercel
+  ? drizzleNeon({ client: neon(connectionString), schema })
+  : drizzlePg(new Pool({ connectionString, ssl: false }), { schema })
+
+export { db }
 
 // Re-export types from schema
 export type {
-  Team,
   Game,
-  Player,
   OfficialAssignment,
   Officials,
-  User,
+  Player,
+  Team,
   TeamManager,
+  User,
 } from "@/db/schema"
 
 // ============ TEAMS ============

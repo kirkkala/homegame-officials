@@ -1,4 +1,4 @@
-import { formatDate, slugify, computePlayerStats, computePlayerStatsArray } from "@/lib/utils"
+import { computePlayerStats, computePlayerStatsArray, formatDate, slugify } from "@/lib/utils"
 import { makeGame } from "./helpers"
 
 describe("utils", () => {

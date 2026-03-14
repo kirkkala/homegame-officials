@@ -1,10 +1,10 @@
 import {
-  pgTable,
-  text,
-  timestamp,
   boolean,
   jsonb,
+  pgTable,
   primaryKey,
+  text,
+  timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core"
 
