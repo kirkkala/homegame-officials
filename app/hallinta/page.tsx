@@ -652,7 +652,7 @@ export default function HallintaPage() {
   }, [editDialog, updateGameDetailsMutation])
 
   const handleAddPlayers = useCallback(
-    (e: React.FormEvent) => {
+    (e: React.SubmitEvent) => {
       e.preventDefault()
       const names = playerNames
         .split("\n")
@@ -665,7 +665,7 @@ export default function HallintaPage() {
   )
 
   const handleAddManager = useCallback(
-    (event: React.FormEvent) => {
+    (event: React.SubmitEvent) => {
       event.preventDefault()
       if (!managerEmail.trim()) return
       addManagerMutation.mutate(managerEmail.trim())
