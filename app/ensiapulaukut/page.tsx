@@ -2,6 +2,7 @@
 
 import {
   Clear as ClearIcon,
+  HomeOutlined as HomeOutlinedIcon,
   MedicalServicesOutlined as MedicalServicesIcon,
   PersonAdd as PersonAddIcon,
   Person as PersonIcon,
@@ -252,11 +253,6 @@ export default function EnsiapulaukutPage() {
             <Typography variant="body2" color="text.secondary">
               Ensiapulaukkujen seuranta ei ole käytössä joukkueella {selectedTeam.name}.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              <Link href="/" style={{ color: "inherit", textDecoration: "underline" }}>
-                Siirry etusivulle.
-              </Link>
-            </Typography>
           </Paper>
         ) : (
           <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
@@ -285,6 +281,16 @@ export default function EnsiapulaukutPage() {
             </Grid>
           </Paper>
         )}
+        <Paper sx={{ mt: 2, p: 2 }}>
+          <Button
+            component={Link}
+            href="/"
+            startIcon={<HomeOutlinedIcon />}
+            fullWidth
+          >
+            Etusivulle
+          </Button>
+        </Paper>
       </Container>
       <Footer />
     </Box>
