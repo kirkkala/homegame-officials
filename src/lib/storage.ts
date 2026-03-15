@@ -1,5 +1,7 @@
 // API-based storage - data is stored in Postgres via API routes
 
+import { parseJsonResponse } from "@/lib/api"
+
 export type OfficialAssignment = {
   playerName: string // Player whose turn it is
   handledBy: "guardian" | "pool" | null // Who handles the shift
@@ -9,6 +11,8 @@ export type OfficialAssignment = {
 export type Team = {
   id: string
   name: string
+  firstAidBagsEnabled?: boolean
+  firstAidBagCount?: string
   createdAt: string
 }
 
@@ -41,22 +45,6 @@ export type User = {
   email: string
 }
 
-// Helper to safely parse JSON response
-async function parseJsonResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const text = await res.text()
-    let error = "Pyyntö epäonnistui"
-    try {
-      const data = JSON.parse(text)
-      error = data.error || error
-    } catch {
-      // Couldn't parse error message
-    }
-    throw new Error(error)
-  }
-  return res.json()
-}
-
 // Teams
 export async function getTeams(): Promise<Team[]> {
   const res = await fetch("/api/teams")
@@ -82,6 +70,22 @@ export async function deleteTeam(id: string): Promise<void> {
   if (!res.ok) {
     throw new Error("Joukkueen poisto epäonnistui")
   }
+}
+
+export async function updateTeamFirstAidSettings(
+  teamId: string,
+  settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }
+): Promise<Team> {
+  const res = await fetch(`/api/teams/${teamId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settings),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    throw new Error(data?.error || "Joukkueen päivitys epäonnistui")
+  }
+  return parseJsonResponse<Team>(res)
 }
 
 // Team managers

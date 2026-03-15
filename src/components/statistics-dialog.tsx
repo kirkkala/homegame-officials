@@ -33,16 +33,16 @@ function getMedalColor(stats: { count: number }[], index: number): string | unde
   if (currentCount === undefined) return undefined
 
   // No medals if everyone has the same count (no clear winner)
-  const uniqueCounts = new Set(stats.map((s) => s.count))
+  const uniqueCounts = new Set(stats.map((stat) => stat.count))
   if (uniqueCounts.size === 1) return undefined
 
   // Rank is 1 + count of players with higher scores
-  const rank = stats.filter((s) => s.count > currentCount).length + 1
+  const rank = stats.filter((stat) => stat.count > currentCount).length + 1
 
   if (rank > 3) return undefined
 
   // Count how many players share this rank
-  const playersAtThisRank = stats.filter((s) => s.count === currentCount).length
+  const playersAtThisRank = stats.filter((stat) => stat.count === currentCount).length
 
   // No medal if more than 2 players share the position
   if (playersAtThisRank > 2) return undefined
@@ -84,7 +84,7 @@ export function StatisticsDialog({ open, onClose, games }: StatisticsDialogProps
         </Stack>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 2 }}>
+        <Typography variant="caption" color="text.secondary" component="div" sx={{ mb: 2 }}>
           Tilastossa näkyy kuinka monta toimitsijavuoroa (pöytäkirja tai kello) kullakin pelaajalla
           on vahvistettuna.
         </Typography>

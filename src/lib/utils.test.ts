@@ -6,9 +6,21 @@ describe("utils", () => {
     expect(slugify("  AaBbCc & # ÅåÄäÖö (20€)")).toBe("aabbcc-aaaaoo-20")
   })
 
-  it("formatDate returns Finnish weekday when requested", () => {
-    expect(formatDate("2026-01-30T23:59:00", { includeWeekday: true })).toBe("Perjantai 30.1.2026")
-    expect(formatDate("1980-04-12T08:36:25", { includeWeekday: true })).toBe("Lauantai 12.4.1980")
+  describe("formatDate", () => {
+    it("returns full format (day.month.year) by default", () => {
+      expect(formatDate("2026-01-30T23:59:00")).toBe("30.1.2026")
+      expect(formatDate("1980-04-12T08:36:25")).toBe("12.4.1980")
+    })
+
+    it("returns short format (day.month.) when format: 'short'", () => {
+      expect(formatDate("2026-01-30T23:59:00", { format: "short" })).toBe("30.1.")
+      expect(formatDate("1980-04-12T08:36:25", { format: "short" })).toBe("12.4.")
+    })
+
+    it("returns weekday format when format: 'weekday'", () => {
+      expect(formatDate("2026-01-30T23:59:00", { format: "weekday" })).toBe("Perjantai 30.1.2026")
+      expect(formatDate("1980-04-12T08:36:25", { format: "weekday" })).toBe("Lauantai 12.4.1980")
+    })
   })
 })
 

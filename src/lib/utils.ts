@@ -14,23 +14,37 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "")
 }
 
-export function formatDate(dateStr: string, options: { includeWeekday?: boolean } = {}): string {
+/** Format variants for Finnish date display. */
+export type DateFormat = "full" | "short" | "weekday"
+
+/**
+ * Formats a date string in Finnish locale.
+ *
+ * @param dateStr - ISO date string (e.g. "2026-01-30T23:59:00")
+ * @param options.format - `"full"` = day.month.year, `"short"` = day.month., `"weekday"` = weekday day.month.year
+ * @returns Formatted date string
+ */
+export function formatDate(dateStr: string, options: { format?: DateFormat } = {}): string {
+  const { format = "full" } = options
   const date = new Date(dateStr)
   const day = date.getDate()
   const month = date.getMonth() + 1
   const year = date.getFullYear()
-  if (!options.includeWeekday) return `${day}.${month}.${year}`
 
-  const weekdays = [
-    "Sunnuntai",
-    "Maanantai",
-    "Tiistai",
-    "Keskiviikko",
-    "Torstai",
-    "Perjantai",
-    "Lauantai",
-  ]
-  return `${weekdays[date.getDay()]} ${day}.${month}.${year}`
+  if (format === "short") return `${day}.${month}.`
+  if (format === "weekday") {
+    const weekdays = [
+      "Sunnuntai",
+      "Maanantai",
+      "Tiistai",
+      "Keskiviikko",
+      "Torstai",
+      "Perjantai",
+      "Lauantai",
+    ]
+    return `${weekdays[date.getDay()]} ${day}.${month}.${year}`
+  }
+  return `${day}.${month}.${year}`
 }
 
 /**
@@ -62,5 +76,8 @@ export function computePlayerStatsArray(games: Game[]): { name: string; count: n
   const counts = computePlayerStats(games)
   return Array.from(counts.entries())
     .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "fi"))
+    .sort(
+      (playerA, playerB) =>
+        playerB.count - playerA.count || playerA.name.localeCompare(playerB.name, "fi")
+    )
 }

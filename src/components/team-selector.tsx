@@ -119,7 +119,7 @@ export function TeamSelector({
               displayEmpty
               renderValue={(value) => {
                 if (!value) return "Valitse joukkue"
-                return teams.find((t) => t.id === value)?.name ?? "Valitse joukkue"
+                return teams.find((team) => team.id === value)?.name ?? "Valitse joukkue"
               }}
             >
               <MenuItem value="" data-testid="team-option-empty">

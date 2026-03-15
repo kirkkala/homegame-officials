@@ -27,11 +27,18 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  FormControl,
+  FormControlLabel,
   IconButton,
+  InputLabel,
   Link,
+  MenuItem,
   Paper,
+  Select,
   Snackbar,
   Stack,
+  Switch,
   Tab,
   Table,
   TableBody,
@@ -67,6 +74,7 @@ import {
   savePlayer,
   updateGameDetails,
   updateGameHomeStatus,
+  updateTeamFirstAidSettings,
 } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
@@ -201,7 +209,7 @@ function GamesTable({
 
 export default function HallintaPage() {
   const queryClient = useQueryClient()
-  const { selectedTeam, isLoading: teamLoading, deleteTeam } = useTeam()
+  const { selectedTeam, isLoading: teamLoading, deleteTeam, refreshTeams } = useTeam()
   const { data: session, status } = useSession()
   const user = session?.user
   const authLoading = status === "loading"
@@ -488,6 +496,18 @@ export default function HallintaPage() {
     },
   })
 
+  const updateFirstAidMutation = useMutation({
+    mutationFn: (settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }) =>
+      updateTeamFirstAidSettings(selectedTeam!.id, settings),
+    onSuccess: () => {
+      refreshTeams()
+      setSnackbar({ type: "success", message: "Ensiapulaukut-asetukset päivitetty" })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Asetusten päivitys epäonnistui" })
+    },
+  })
+
   const addManualGameMutation = useMutation({
     mutationFn: () =>
       saveGames(
@@ -652,7 +672,7 @@ export default function HallintaPage() {
   }, [editDialog, updateGameDetailsMutation])
 
   const handleAddPlayers = useCallback(
-    (e: React.FormEvent) => {
+    (e: React.SubmitEvent) => {
       e.preventDefault()
       const names = playerNames
         .split("\n")
@@ -665,7 +685,7 @@ export default function HallintaPage() {
   )
 
   const handleAddManager = useCallback(
-    (event: React.FormEvent) => {
+    (event: React.SubmitEvent) => {
       event.preventDefault()
       if (!managerEmail.trim()) return
       addManagerMutation.mutate(managerEmail.trim())
@@ -773,396 +793,471 @@ export default function HallintaPage() {
           </Box>
         )}
 
-        <Tabs
-          value={activeTab}
-          onChange={(_, value) => setActiveTab(value)}
-          variant="scrollable"
-          allowScrollButtonsMobile
-          aria-label="Hallinnan välilehdet"
-          sx={{ borderBottom: 1, borderColor: "divider" }}
-        >
-          <Tab label="Yleiset asetukset" data-testid="general-tab" />
-          <Tab label={`Pelaajat (${players.length})`} data-testid="players-tab" />
-          <Tab label={`Ottelut (${existingGames.length})`} data-testid="games-tab" />
-        </Tabs>
+        {(() => {
+          const tabKeys = isAdmin
+            ? ["admin", "general", "players", "games"]
+            : ["general", "players", "games"]
+          const currentKey = tabKeys[activeTab] ?? "general"
+          return (
+            <>
+              <Tabs
+                value={activeTab}
+                onChange={(_, value) => setActiveTab(value)}
+                variant="scrollable"
+                allowScrollButtonsMobile
+                aria-label="Hallinnan välilehdet"
+                sx={{ borderBottom: 1, borderColor: "divider" }}
+              >
+                {isAdmin && <Tab label="Admin zone" data-testid="admin-tab" />}
+                <Tab label="Joukkueen asetukset" data-testid="general-tab" />
+                <Tab label={`Pelaajat (${players.length})`} data-testid="players-tab" />
+                <Tab label={`Ottelut (${existingGames.length})`} data-testid="games-tab" />
+              </Tabs>
 
-        {activeTab === 0 && (
-          <Stack gap={3}>
-            <Stack gap={2}>
-              <Box>
-                <Typography component="h2" variant="h5">
-                  Asetukset: {selectedTeam.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Käyttäjät, jotka voivat hallita tämän joukkueen otteluita ja pelaajia.
-                  {adminEmail
-                    ? ` Järjestelmän pääkäyttäjä ${adminEmail} voi hallita kaikkia joukkueita.`
-                    : " Järjestelmän pääkäyttäjä voi hallita kaikkia joukkueita."}
-                </Typography>
-              </Box>
-              {managersLoading ? (
-                <Stack alignItems="center" py={2}>
-                  <CircularProgress size={24} />
-                </Stack>
-              ) : (
-                <Stack direction="row" flexWrap="wrap" gap={1}>
-                  {managers.map((manager) => {
-                    const isSelf = manager.email === userEmail
-                    const canRemove = !isSelf
-                    return (
-                      <Chip
-                        key={manager.id}
-                        label={manager.email}
-                        onDelete={
-                          canRemove ? () => removeManagerMutation.mutate(manager.email) : undefined
-                        }
-                        deleteIcon={canRemove ? <CloseIcon /> : undefined}
-                      />
-                    )
-                  })}
+              {currentKey === "admin" && (
+                <Stack gap={2}>
+                  <Box>
+                    <Typography component="h3" variant="h6">
+                      Rekisteröityneet käyttäjät ({users.length})
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Näkyy vain järjestelmän pääkäyttäjälle.
+                    </Typography>
+                  </Box>
+                  {usersLoading ? (
+                    <Stack alignItems="center" py={2}>
+                      <CircularProgress size={24} />
+                    </Stack>
+                  ) : users.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      Ei rekisteröityneitä käyttäjiä.
+                    </Typography>
+                  ) : (
+                    <Stack direction="row" flexWrap="wrap" gap={1}>
+                      {users.map((u) => (
+                        <Chip key={u.id} label={u.email} />
+                      ))}
+                    </Stack>
+                  )}
                 </Stack>
               )}
-              <Box component="form" onSubmit={handleAddManager}>
-                <Stack direction={{ xs: "column", sm: "row" }} gap={2} alignItems="center">
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Lisää käyttäjä sähköpostilla"
-                    type="email"
-                    value={managerEmail}
-                    onChange={(e) => setManagerEmail(e.target.value)}
-                  />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    size="small"
-                    disabled={addManagerMutation.isPending}
-                  >
-                    Lisää
-                  </Button>
-                </Stack>
-              </Box>
-            </Stack>
 
-            {isAdmin && (
-              <Stack gap={2}>
-                <Typography component="h2" variant="h5">
-                  Pääkäyttäjän toiminnot
-                </Typography>
-                <Box>
-                  <Typography component="h3" variant="h6">
-                    Rekisteröidyt käyttäjät ({users.length})
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Näkyy vain järjestelmän pääkäyttäjälle.
-                  </Typography>
-                </Box>
-                {usersLoading ? (
-                  <Stack alignItems="center" py={2}>
-                    <CircularProgress size={24} />
-                  </Stack>
-                ) : users.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
-                    Ei rekisteröityneitä käyttäjiä.
-                  </Typography>
-                ) : (
-                  <Stack direction="row" flexWrap="wrap" gap={1}>
-                    {users.map((user) => (
-                      <Chip key={user.id} label={user.email} />
-                    ))}
-                  </Stack>
-                )}
-              </Stack>
-            )}
-            <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: "divider" }}>
-              <Typography component="h3" variant="h6" gutterBottom>
-                Danger zone
-              </Typography>
-              <Button
-                color="error"
-                variant="contained"
-                startIcon={<DeleteForeverIcon />}
-                onClick={handleDeleteTeam}
-                disabled={deleteTeamMutation.isPending}
-              >
-                Poista joukkue
-              </Button>
-            </Box>
-          </Stack>
-        )}
-
-        {activeTab === 1 && (
-          <Stack gap={2}>
-            <Box>
-              <Typography component="h2" variant="h5">
-                Joukkueen {selectedTeam.name} pelaajat ({players.length})
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Joukkueen pelaajat toimitsijavuorovastuun valintalistaan.
-              </Typography>
-            </Box>
-            {playersLoading ? (
-              <Stack alignItems="center" py={2}>
-                <CircularProgress size={24} />
-              </Stack>
-            ) : (
-              players.length > 0 && (
-                <Stack direction="row" flexWrap="wrap" gap={1} my={2}>
-                  {[...players]
-                    .sort((a, b) => a.name.localeCompare(b.name, "fi"))
-                    .map((player) => (
-                      <Chip
-                        key={player.id}
-                        label={player.name}
-                        onDelete={() => handleDeletePlayer(player.id)}
-                        deleteIcon={<CloseIcon data-testid={`player-delete-${player.id}`} />}
-                        data-testid={`player-chip-${player.id}`}
+              {currentKey === "general" && (
+                <Stack gap={3}>
+                  <Stack gap={2}>
+                    <Typography component="h2" variant="h5">
+                      Asetukset: {selectedTeam.name}
+                    </Typography>
+                    <Box>
+                      <Typography component="h3" variant="h6" gutterBottom>
+                        Ensiapulaukut
+                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={!!selectedTeam.firstAidBagsEnabled}
+                            onChange={(_, checked) =>
+                              updateFirstAidMutation.mutate({
+                                firstAidBagsEnabled: checked,
+                                firstAidBagCount: Math.min(
+                                  6,
+                                  Math.max(
+                                    1,
+                                    parseInt(selectedTeam.firstAidBagCount ?? "3", 10) || 3
+                                  )
+                                ),
+                              })
+                            }
+                            disabled={updateFirstAidMutation.isPending}
+                          />
+                        }
+                        label="Ensiapulaukkujen seuranta käytössä"
                       />
-                    ))}
-                </Stack>
-              )
-            )}
-            <form onSubmit={handleAddPlayers}>
-              <TextField
-                multiline
-                minRows={4}
-                fullWidth
-                value={playerNames}
-                onChange={(e) => setPlayerNames(e.target.value)}
-                placeholder="Lisää pelaajia (yksi per rivi)"
-                inputProps={{ "data-testid": "players-textarea" }}
-                sx={{ mb: 2 }}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                size="small"
-                data-testid="players-add-submit"
-                disabled={addPlayersMutation.isPending}
-                startIcon={
-                  addPlayersMutation.isPending ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : null
-                }
-              >
-                {addPlayersMutation.isPending ? "Lisätään..." : "Lisää pelaajat"}
-              </Button>
-            </form>
-          </Stack>
-        )}
+                      {selectedTeam.firstAidBagsEnabled && (
+                        <Box sx={{ mt: 2 }}>
+                          <FormControl
+                            size="small"
+                            sx={{ minWidth: 120 }}
+                            data-testid="firstaid-bag-count"
+                          >
+                            <InputLabel id="firstaid-bag-count-label">Laukkujen määrä</InputLabel>
+                            <Select
+                              sx={{ maxWidth: 120 }}
+                              labelId="firstaid-bag-count-label"
+                              label="Laukkujen määrä"
+                              value={selectedTeam.firstAidBagCount ?? "3"}
+                              onChange={(e) => {
+                                const n = parseInt(e.target.value as string, 10)
+                                if (Number.isInteger(n) && n >= 1 && n <= 6) {
+                                  updateFirstAidMutation.mutate({
+                                    firstAidBagsEnabled: true,
+                                    firstAidBagCount: n,
+                                  })
+                                }
+                              }}
+                            >
+                              {[1, 2, 3, 4, 5, 6].map((n) => (
+                                <MenuItem key={n} value={String(n)}>
+                                  {n}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      )}
+                    </Box>
 
-        {activeTab === 2 && (
-          <Stack gap={3}>
-            <Typography component="h2" variant="h5">
-              Joukkueen {selectedTeam.name} ottelut ({existingGames.length})
-            </Typography>
-            <Accordion
-              expanded={shouldExpandImport || importExpanded}
-              onChange={(_, isExpanded) => {
-                if (parsedGames.length > 0) return
-                setImportExpanded(isExpanded)
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{ "&:hover": { backgroundColor: "action.hover" } }}
-              >
-                <Typography component="h2" variant="h5">
-                  Tuo otteluita
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack gap={2}>
-                  {parsedGames.length === 0 && (
+                    <Divider sx={{ my: 2 }} />
+
                     <Box>
                       <Typography variant="body2" color="text.secondary">
-                        Tuo ottelut joko{" "}
-                        <Link
-                          href="https://elsa-myclub.hnmky.fi"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          elsa-myclub muuntimella
-                        </Link>{" "}
-                        tehdyistä excel-tiedostosta tai MyClubin tapahtumalistauksesta ladatusta
-                        excel-tiedostosta.
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Voit myös lisätä otteluita yksitellen painamalla &quot;Lisää
-                        manuaalisesti&quot; painiketta.
+                        Käyttäjät, jotka voivat hallita tämän joukkueen otteluita ja pelaajia.
+                        {adminEmail
+                          ? ` Järjestelmän pääkäyttäjä ${adminEmail} voi hallita kaikkia joukkueita.`
+                          : " Järjestelmän pääkäyttäjä voi hallita kaikkia joukkueita."}
                       </Typography>
                     </Box>
-                  )}
-                  {parsedGames.length === 0 && (
-                    <>
-                      <Box
-                        onDragOver={(e) => {
-                          e.preventDefault()
-                          setIsDragging(true)
-                        }}
-                        onDragLeave={() => setIsDragging(false)}
-                        onDrop={handleDrop}
-                        sx={{
-                          border: 2,
-                          borderStyle: "dashed",
-                          borderColor: isDragging ? "primary.main" : "grey.300",
-                          borderRadius: 2,
-                          p: 3,
-                          textAlign: "center",
-                          bgcolor: isDragging ? "primary.50" : "transparent",
-                        }}
-                      >
-                        <Typography color="text.secondary" gutterBottom>
-                          Vedä Excel-tiedosto tähän tai
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          component="label"
-                          startIcon={<UploadFileIcon />}
-                          data-testid="excel-upload-button"
-                        >
-                          Valitse tiedosto
-                          <input
-                            type="file"
-                            hidden
-                            accept=".xlsx,.xls"
-                            data-testid="excel-upload-input"
-                            ref={fileInputRef}
-                            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-                          />
-                        </Button>
-                      </Box>
-                      <Box sx={{ mt: 2 }}>
-                        <Button
-                          size="small"
-                          startIcon={<AddIcon />}
-                          onClick={handleOpenAddGame}
-                          variant="outlined"
-                          data-testid="manual-game-toggle"
-                        >
-                          Lisää manuaalisesti
-                        </Button>
-                      </Box>
-                    </>
-                  )}
-                  {parsedGames.length > 0 && (
-                    <>
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        mb={2}
-                      >
-                        <Stack>
-                          <Typography
-                            component="h3"
-                            variant="h6"
-                            data-testid="import-preview-title"
-                          >
-                            Esikatselu: {parsedGames.length} ottelua
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Tarkista tuotavien otteluiden oikeellisuus, merkitse kotipelit rastilla
-                            ja paina &quot;Tuo ottelut&quot; painiketta tallentaaksesi ottelut.
-                          </Typography>
-                        </Stack>
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          alignItems="center"
-                          flexWrap="nowrap"
-                          sx={{ ml: 4 }}
-                        >
-                          <Button
-                            variant="outlined"
-                            color="inherit"
-                            onClick={handleCancelImport}
-                            disabled={importMutation.isPending}
-                            data-testid="import-cancel"
-                          >
-                            Peruuta
-                          </Button>
-                          <Button
-                            variant="contained"
-                            color="success"
-                            onClick={() => importMutation.mutate()}
-                            disabled={importMutation.isPending}
-                            data-testid="import-submit"
-                            sx={{ textWrap: "nowrap" }}
-                          >
-                            Tuo ottelut
-                          </Button>
-                        </Stack>
+                    {managersLoading ? (
+                      <Stack alignItems="center" py={2}>
+                        <CircularProgress size={24} />
                       </Stack>
+                    ) : (
+                      <Stack direction="row" flexWrap="wrap" gap={1}>
+                        {managers.map((manager) => {
+                          const isSelf = manager.email === userEmail
+                          const canRemove = !isSelf
+                          return (
+                            <Chip
+                              key={manager.id}
+                              label={manager.email}
+                              onDelete={
+                                canRemove
+                                  ? () => removeManagerMutation.mutate(manager.email)
+                                  : undefined
+                              }
+                              deleteIcon={canRemove ? <CloseIcon /> : undefined}
+                            />
+                          )
+                        })}
+                      </Stack>
+                    )}
+                    <Box component="form" onSubmit={handleAddManager}>
+                      <Stack direction={{ xs: "column", sm: "row" }} gap={2} alignItems="center">
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Lisää käyttäjä sähköpostilla"
+                          type="email"
+                          value={managerEmail}
+                          onChange={(e) => setManagerEmail(e.target.value)}
+                        />
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          size="small"
+                          disabled={addManagerMutation.isPending}
+                        >
+                          Lisää
+                        </Button>
+                      </Stack>
+                    </Box>
+                  </Stack>
+
+                  <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: "divider" }}>
+                    <Typography component="h3" variant="h6" gutterBottom>
+                      Danger zone
+                    </Typography>
+                    <Button
+                      color="error"
+                      variant="contained"
+                      startIcon={<DeleteForeverIcon />}
+                      onClick={handleDeleteTeam}
+                      disabled={deleteTeamMutation.isPending}
+                    >
+                      Poista joukkue
+                    </Button>
+                  </Box>
+                </Stack>
+              )}
+
+              {currentKey === "players" && (
+                <Stack gap={2}>
+                  <Box>
+                    <Typography component="h2" variant="h5">
+                      Joukkueen {selectedTeam.name} pelaajat ({players.length})
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Joukkueen pelaajat toimitsijavuorovastuun valintalistaan.
+                    </Typography>
+                  </Box>
+                  {playersLoading ? (
+                    <Stack alignItems="center" py={2}>
+                      <CircularProgress size={24} />
+                    </Stack>
+                  ) : (
+                    players.length > 0 && (
+                      <Stack direction="row" flexWrap="wrap" gap={1} my={2}>
+                        {[...players]
+                          .sort((a, b) => a.name.localeCompare(b.name, "fi"))
+                          .map((player) => (
+                            <Chip
+                              key={player.id}
+                              label={player.name}
+                              onDelete={() => handleDeletePlayer(player.id)}
+                              deleteIcon={<CloseIcon data-testid={`player-delete-${player.id}`} />}
+                              data-testid={`player-chip-${player.id}`}
+                            />
+                          ))}
+                      </Stack>
+                    )
+                  )}
+                  <form onSubmit={handleAddPlayers}>
+                    <TextField
+                      multiline
+                      minRows={4}
+                      fullWidth
+                      value={playerNames}
+                      onChange={(e) => setPlayerNames(e.target.value)}
+                      placeholder="Lisää pelaajia (yksi per rivi)"
+                      inputProps={{ "data-testid": "players-textarea" }}
+                      sx={{ mb: 2 }}
+                    />
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      size="small"
+                      data-testid="players-add-submit"
+                      disabled={addPlayersMutation.isPending}
+                      startIcon={
+                        addPlayersMutation.isPending ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : null
+                      }
+                    >
+                      {addPlayersMutation.isPending ? "Lisätään..." : "Lisää pelaajat"}
+                    </Button>
+                  </form>
+                </Stack>
+              )}
+
+              {currentKey === "games" && (
+                <Stack gap={3}>
+                  <Typography component="h2" variant="h5">
+                    Joukkueen {selectedTeam.name} ottelut ({existingGames.length})
+                  </Typography>
+                  <Accordion
+                    expanded={shouldExpandImport || importExpanded}
+                    onChange={(_, isExpanded) => {
+                      if (parsedGames.length > 0) return
+                      setImportExpanded(isExpanded)
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      sx={{ "&:hover": { backgroundColor: "action.hover" } }}
+                    >
+                      <Typography component="h2" variant="h5">
+                        Tuo otteluita
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack gap={2}>
+                        {parsedGames.length === 0 && (
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              Tuo ottelut joko{" "}
+                              <Link
+                                href="https://elsa-myclub.hnmky.fi"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                elsa-myclub muuntimella
+                              </Link>{" "}
+                              tehdyistä excel-tiedostosta tai MyClubin tapahtumalistauksesta
+                              ladatusta excel-tiedostosta.
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Voit myös lisätä otteluita yksitellen painamalla &quot;Lisää
+                              manuaalisesti&quot; painiketta.
+                            </Typography>
+                          </Box>
+                        )}
+                        {parsedGames.length === 0 && (
+                          <>
+                            <Box
+                              onDragOver={(e) => {
+                                e.preventDefault()
+                                setIsDragging(true)
+                              }}
+                              onDragLeave={() => setIsDragging(false)}
+                              onDrop={handleDrop}
+                              sx={{
+                                border: 2,
+                                borderStyle: "dashed",
+                                borderColor: isDragging ? "primary.main" : "grey.300",
+                                borderRadius: 2,
+                                p: 3,
+                                textAlign: "center",
+                                bgcolor: isDragging ? "primary.50" : "transparent",
+                              }}
+                            >
+                              <Typography color="text.secondary" gutterBottom>
+                                Vedä Excel-tiedosto tähän tai
+                              </Typography>
+                              <Button
+                                variant="contained"
+                                component="label"
+                                startIcon={<UploadFileIcon />}
+                                data-testid="excel-upload-button"
+                              >
+                                Valitse tiedosto
+                                <input
+                                  type="file"
+                                  hidden
+                                  accept=".xlsx,.xls"
+                                  data-testid="excel-upload-input"
+                                  ref={fileInputRef}
+                                  onChange={(e) =>
+                                    e.target.files?.[0] && handleFile(e.target.files[0])
+                                  }
+                                />
+                              </Button>
+                            </Box>
+                            <Box sx={{ mt: 2 }}>
+                              <Button
+                                size="small"
+                                startIcon={<AddIcon />}
+                                onClick={handleOpenAddGame}
+                                variant="outlined"
+                                data-testid="manual-game-toggle"
+                              >
+                                Lisää manuaalisesti
+                              </Button>
+                            </Box>
+                          </>
+                        )}
+                        {parsedGames.length > 0 && (
+                          <>
+                            <Stack
+                              direction="row"
+                              alignItems="center"
+                              justifyContent="space-between"
+                              mb={2}
+                            >
+                              <Stack>
+                                <Typography
+                                  component="h3"
+                                  variant="h6"
+                                  data-testid="import-preview-title"
+                                >
+                                  Esikatselu: {parsedGames.length} ottelua
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  Tarkista tuotavien otteluiden oikeellisuus, merkitse kotipelit
+                                  rastilla ja paina &quot;Tuo ottelut&quot; painiketta
+                                  tallentaaksesi ottelut.
+                                </Typography>
+                              </Stack>
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                alignItems="center"
+                                flexWrap="nowrap"
+                                sx={{ ml: 4 }}
+                              >
+                                <Button
+                                  variant="outlined"
+                                  color="inherit"
+                                  onClick={handleCancelImport}
+                                  disabled={importMutation.isPending}
+                                  data-testid="import-cancel"
+                                >
+                                  Peruuta
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="success"
+                                  onClick={() => importMutation.mutate()}
+                                  disabled={importMutation.isPending}
+                                  data-testid="import-submit"
+                                  sx={{ textWrap: "nowrap" }}
+                                >
+                                  Tuo ottelut
+                                </Button>
+                              </Stack>
+                            </Stack>
+
+                            <GamesTable
+                              games={parsedGames.map((g, i) => ({
+                                key: String(i),
+                                division: g.division,
+                                homeTeam: g.homeTeam,
+                                awayTeam: g.awayTeam,
+                                date: formatDate(g.date),
+                                time: g.time,
+                                location: g.location,
+                                isHomeGame: g.isHomeGame,
+                              }))}
+                              onToggleHomeGame={(key) => handleToggleHomeGame(Number(key))}
+                              testIdPrefix="import-preview"
+                            />
+                          </>
+                        )}
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  {/* Existing Games */}
+                  {existingGames.length > 0 && (
+                    <>
+                      <Typography variant="body2" color="text.secondary" mb={2}>
+                        Merkitse kotipelit rastilla jotta niihin voi lisätä toimitsijoita. Voit myös
+                        poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa valinnan
+                        automaattisesti.
+                      </Typography>
 
                       <GamesTable
-                        games={parsedGames.map((g, i) => ({
-                          key: String(i),
-                          division: g.division,
-                          homeTeam: g.homeTeam,
-                          awayTeam: g.awayTeam,
-                          date: formatDate(g.date),
-                          time: g.time,
-                          location: g.location,
-                          isHomeGame: g.isHomeGame,
-                        }))}
-                        onToggleHomeGame={(key) => handleToggleHomeGame(Number(key))}
-                        testIdPrefix="import-preview"
+                        games={[...existingGames]
+                          .sort((a, b) => {
+                            const dateCompare = a.date.localeCompare(b.date)
+                            if (dateCompare !== 0) return dateCompare
+                            return a.time.localeCompare(b.time)
+                          })
+                          .map((g) => ({
+                            key: g.id,
+                            division: g.divisionId,
+                            homeTeam: g.homeTeam,
+                            awayTeam: g.awayTeam,
+                            date: formatDate(g.date),
+                            time: g.time,
+                            location: g.location,
+                            isHomeGame: g.isHomeGame,
+                          }))}
+                        onToggleHomeGame={(gameId, isHomeGame) =>
+                          toggleHomeGameMutation.mutate({ gameId, isHomeGame })
+                        }
+                        onEdit={isAdmin ? handleOpenEditGame : undefined}
+                        onDelete={handleDeleteGame}
+                        testIdPrefix="existing-games"
                       />
+                      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                        <Button
+                          color="error"
+                          size="small"
+                          startIcon={<DeleteForeverIcon />}
+                          onClick={handleClearAll}
+                          disabled={clearGamesMutation.isPending}
+                        >
+                          Poista kaikki ottelut
+                        </Button>
+                      </Box>
                     </>
                   )}
                 </Stack>
-              </AccordionDetails>
-            </Accordion>
-
-            {/* Existing Games */}
-            {existingGames.length > 0 && (
-              <>
-                <Typography variant="body2" color="text.secondary" mb={2}>
-                  Merkitse kotipelit rastilla jotta niihin voi lisätä toimitsijoita. Voit myös
-                  poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa valinnan
-                  automaattisesti.
-                </Typography>
-
-                <GamesTable
-                  games={[...existingGames]
-                    .sort((a, b) => {
-                      const dateCompare = a.date.localeCompare(b.date)
-                      if (dateCompare !== 0) return dateCompare
-                      return a.time.localeCompare(b.time)
-                    })
-                    .map((g) => ({
-                      key: g.id,
-                      division: g.divisionId,
-                      homeTeam: g.homeTeam,
-                      awayTeam: g.awayTeam,
-                      date: formatDate(g.date),
-                      time: g.time,
-                      location: g.location,
-                      isHomeGame: g.isHomeGame,
-                    }))}
-                  onToggleHomeGame={(gameId, isHomeGame) =>
-                    toggleHomeGameMutation.mutate({ gameId, isHomeGame })
-                  }
-                  onEdit={isAdmin ? handleOpenEditGame : undefined}
-                  onDelete={handleDeleteGame}
-                  testIdPrefix="existing-games"
-                />
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-                  <Button
-                    color="error"
-                    size="small"
-                    startIcon={<DeleteForeverIcon />}
-                    onClick={handleClearAll}
-                    disabled={clearGamesMutation.isPending}
-                  >
-                    Poista kaikki ottelut
-                  </Button>
-                </Box>
-              </>
-            )}
-          </Stack>
-        )}
+              )}
+            </>
+          )
+        })()}
       </Stack>
     )
   }

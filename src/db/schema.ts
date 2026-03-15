@@ -24,6 +24,8 @@ export type Officials = {
 export const teams = pgTable("teams", {
   id: text("id").primaryKey(), // slug-based ID
   name: text("name").notNull(),
+  firstAidBagsEnabled: boolean("first_aid_bags_enabled").notNull().default(false),
+  firstAidBagCount: text("first_aid_bag_count").notNull().default("3"), // 1-10
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
@@ -73,6 +75,18 @@ export const games = pgTable("games", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
+// First aid bag holders (per team, jsonb for bag1..bagN)
+export type BagHolder = { name: string; lastSeenAt: string }
+export type FirstAidBagsData = Record<string, BagHolder | null>
+
+export const firstAidBags = pgTable("first_aid_bags", {
+  teamId: text("team_id")
+    .references(() => teams.id, { onDelete: "cascade" })
+    .primaryKey(),
+  data: jsonb("data").$type<FirstAidBagsData>().notNull().default({}),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
 // Players
 export const players = pgTable("players", {
   id: text("id").primaryKey(), // UUID
@@ -93,3 +107,4 @@ export type NewPlayer = typeof players.$inferInsert
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type TeamManager = typeof teamManagers.$inferSelect
+export type FirstAidBags = typeof firstAidBags.$inferSelect

@@ -551,7 +551,7 @@ export function GameCard({
               <Chip label="Pelattu" size="small" sx={{ fontSize: "0.7rem", lineHeight: 1.4 }} />
             )}
             <Typography>
-              {formatDate(game.date, { includeWeekday: true })} klo {game.time}
+              {formatDate(game.date, { format: "weekday" })} klo {game.time}
             </Typography>
           </Stack>
 
@@ -576,7 +576,7 @@ export function GameCard({
           <Typography
             variant="body1"
             fontWeight={game.isHomeGame ? "bold" : "normal"}
-            sx={{ gridArea: "teams", lineHeight: 1.3, textAlign: { xs: "left", sm: "left" } }}
+            sx={{ gridArea: "teams", lineHeight: 1.3 }}
           >
             {game.homeTeam}
             <Typography component="span" color="text.secondary" sx={{ mx: 0.5 }}>

@@ -89,7 +89,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
       const storedTeamId = getSelectedTeamId()
 
       // Priority: URL > localStorage (validate team exists)
-      const findTeam = (id: string | null) => loadedTeams.find((t) => t.id === id)?.id
+      const findTeam = (id: string | null) => loadedTeams.find((team) => team.id === id)?.id
       const teamId = findTeam(urlTeamId) ?? findTeam(storedTeamId) ?? null
 
       if (teamId) {
@@ -130,7 +130,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
     async (id: string) => {
       await apiDeleteTeam(id)
       setTeams((prev) => {
-        const remaining = prev.filter((t) => t.id !== id)
+        const remaining = prev.filter((team) => team.id !== id)
         // If deleted team was selected, select another one
         if (selectedTeamId === id) {
           const newSelection = remaining.length > 0 ? remaining[0].id : null
@@ -142,7 +142,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
     [selectedTeamId, selectTeam]
   )
 
-  const selectedTeam = teams.find((t) => t.id === selectedTeamId) ?? null
+  const selectedTeam = teams.find((team) => team.id === selectedTeamId) ?? null
 
   return (
     <TeamContext.Provider

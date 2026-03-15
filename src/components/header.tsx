@@ -4,6 +4,7 @@ import {
   Close as CloseIcon,
   HelpOutline as HelpOutlineIcon,
   Home as HomeIcon,
+  MedicalServicesOutlined as MedicalServicesIcon,
   Menu as MenuIcon,
   Settings as SettingsIcon,
 } from "@mui/icons-material"
@@ -43,6 +44,7 @@ type PageItem = {
 
 const PAGES: PageItem[] = [
   { path: "/", label: "Etusivu", icon: HomeIcon },
+  { path: "/ensiapulaukut", label: "Ensiapulaukut", icon: MedicalServicesIcon },
   { path: "/kayttoohjeet", label: "Käyttöohjeet", icon: HelpOutlineIcon },
   { path: "/hallinta", label: "Hallinta", icon: SettingsIcon, requiresAuth: true },
 ]
@@ -142,7 +144,7 @@ export function MainHeader() {
 
             {/* Desktop: tabs navigation */}
             <Tabs
-              value={visiblePages.some((p) => p.path === pathname) ? pathname : false}
+              value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
               component="nav"
               sx={{ display: { xs: "none", sm: "flex" }, alignSelf: "flex-end" }}
             >
@@ -159,6 +161,7 @@ export function MainHeader() {
                 />
               ))}
             </Tabs>
+            <AuthActionButton logoutOnly />
           </Toolbar>
         </Box>
       </AppBar>
