@@ -11,6 +11,7 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Divider,
   FormControlLabel,
   IconButton,
   Snackbar,
@@ -118,6 +119,41 @@ export function GamesList() {
     )
   }
 
+  const filterCheckboxes = (
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      alignItems={{ xs: "flex-start", sm: "center" }}
+      spacing={{ xs: 0, sm: 2 }}
+      useFlexGap
+      sx={{ "& .MuiFormControlLabel-root": { marginBottom: 0 } }}
+    >
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={!showAwayGames}
+            onChange={(e) => setShowAwayGames(!e.target.checked)}
+            size="small"
+          />
+        }
+        label="Näytä vain kotipelit"
+        slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
+      />
+      {pastGamesCount > 0 && (
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showPastGames}
+              onChange={(e) => setShowPastGames(e.target.checked)}
+              size="small"
+            />
+          }
+          label="Näytä pelatut pelit"
+          slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
+        />
+      )}
+    </Stack>
+  )
+
   if (allGames.length === 0) {
     return (
       <>
@@ -196,7 +232,7 @@ export function GamesList() {
             py: 1.5,
           }}
         >
-          <Stack gap={1} minWidth={0}>
+          <Stack gap={1} minWidth={0} sx={{ order: { xs: 0, sm: 0 } }}>
             <Stack direction="row" alignItems="center" gap={1}>
               <Typography
                 variant="h2"
@@ -216,39 +252,20 @@ export function GamesList() {
                 </IconButton>
               </Tooltip>
             </Stack>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              alignItems={{ xs: "flex-start", sm: "center" }}
-              gap={{ xs: 0.5, sm: 2 }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={!showAwayGames}
-                    onChange={(e) => setShowAwayGames(!e.target.checked)}
-                    size="small"
-                  />
-                }
-                label="Näytä vain kotipelit"
-                slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
-              />
-              {pastGamesCount > 0 && (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={showPastGames}
-                      onChange={(e) => setShowPastGames(e.target.checked)}
-                      size="small"
-                    />
-                  }
-                  label="Näytä pelatut pelit"
-                  slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
-                />
-              )}
-            </Stack>
+            <Box sx={{ display: { xs: "none", sm: "block" } }}>{filterCheckboxes}</Box>
           </Stack>
-          <Box sx={{ alignSelf: { xs: "stretch", sm: "center" } }}>
+          <Box sx={{ order: { xs: 1, sm: 2 }, alignSelf: { xs: "stretch", sm: "center" } }}>
             <FirstAidBagsSummary />
+          </Box>
+          <Box
+            sx={{
+              display: { xs: "block", sm: "none" },
+              order: { xs: 2, sm: 0 },
+              my: { xs: -0.5, sm: 0 },
+            }}
+          >
+            <Divider sx={{ my: 1 }} />
+            {filterCheckboxes}
           </Box>
         </Stack>
         {games.length === 0 ? (
