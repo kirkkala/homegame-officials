@@ -189,9 +189,11 @@ export function GamesList() {
                 </IconButton>
               </Tooltip>
             </Stack>
-            <Box sx={{ alignSelf: { xs: "stretch", sm: "center" } }}>
-              <FirstAidBagsSummary />
-            </Box>
+            {selectedTeam.firstAidBagsEnabled && (
+              <Box sx={{ alignSelf: { xs: "stretch", sm: "center" } }}>
+                <FirstAidBagsSummary />
+              </Box>
+            )}
           </Stack>
           <Stack alignItems="center" py={6}>
             <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
@@ -254,9 +256,11 @@ export function GamesList() {
             </Stack>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>{filterCheckboxes}</Box>
           </Stack>
-          <Box sx={{ order: { xs: 1, sm: 2 }, alignSelf: { xs: "stretch", sm: "center" } }}>
-            <FirstAidBagsSummary />
-          </Box>
+          {selectedTeam.firstAidBagsEnabled && (
+            <Box sx={{ order: { xs: 1, sm: 2 }, alignSelf: { xs: "stretch", sm: "center" } }}>
+              <FirstAidBagsSummary />
+            </Box>
+          )}
           <Box
             sx={{
               display: { xs: "block", sm: "none" },

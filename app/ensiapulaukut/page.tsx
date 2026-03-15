@@ -19,6 +19,7 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  Link,
   Paper,
   Stack,
   TextField,
@@ -250,6 +251,11 @@ export default function EnsiapulaukutPage() {
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Ensiapulaukkujen seuranta ei ole käytössä joukkueella {selectedTeam.name}.
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <Link href="/" style={{ color: "inherit", textDecoration: "underline" }}>
+                Siirry etusivulle.
+              </Link>
             </Typography>
           </Paper>
         ) : (
