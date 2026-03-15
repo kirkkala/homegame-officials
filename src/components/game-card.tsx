@@ -551,7 +551,7 @@ export function GameCard({
               <Chip label="Pelattu" size="small" sx={{ fontSize: "0.7rem", lineHeight: 1.4 }} />
             )}
             <Typography>
-              {formatDate(game.date, { includeWeekday: true })} klo {game.time}
+              {formatDate(game.date, { format: "weekday" })} klo {game.time}
             </Typography>
           </Stack>
 
