@@ -1,6 +1,6 @@
 {
   "name": "homegame-officials",
-  "version": "2.0.1,
+  "version": "2.0.1",
   "private": true,
   "scriptDescriptions": {
     "help": "Lists available scripts, you probably just issues this command",
