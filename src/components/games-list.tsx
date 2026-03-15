@@ -7,6 +7,7 @@ import {
 } from "@mui/icons-material"
 import {
   Alert,
+  Box,
   Button,
   Checkbox,
   CircularProgress,
@@ -22,6 +23,7 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { getGames } from "@/lib/storage"
 import { computePlayerStats } from "@/lib/utils"
+import { FirstAidBagsSummary } from "./first-aid-bags-summary"
 import { GameCard } from "./game-card"
 import { StatisticsDialog } from "./statistics-dialog"
 import { useTeam } from "./team-context"
@@ -118,40 +120,19 @@ export function GamesList() {
 
   if (allGames.length === 0) {
     return (
-      <Stack alignItems="center" py={8}>
-        <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
-        <Typography variant="h5" gutterBottom>
-          Ei otteluita joukkueella {selectedTeam.name}
-        </Typography>
-        <Button
-          component={Link}
-          href="/hallinta"
-          variant="contained"
-          startIcon={<UploadFileIcon />}
-        >
-          Siirry hallintaan
-        </Button>
-      </Stack>
-    )
-  }
-
-  return (
-    <>
-      <Stack gap={{ xs: 2, sm: 3 }}>
-        <Stack
-          gap={1}
-          sx={{
-            bgcolor: "background.paper",
-            borderRadius: 1,
-            px: 2,
-            py: 1.5,
-          }}
-        >
+      <>
+        <Stack gap={{ xs: 2, sm: 3 }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
-            alignItems={{ xs: "flex-start", sm: "center" }}
-            gap={1}
+            alignItems={{ xs: "stretch", sm: "center" }}
+            gap={2}
+            sx={{
+              bgcolor: "background.paper",
+              borderRadius: 1,
+              px: 2,
+              py: 1.5,
+            }}
           >
             <Stack direction="row" alignItems="center" gap={1}>
               <Typography
@@ -172,37 +153,103 @@ export function GamesList() {
                 </IconButton>
               </Tooltip>
             </Stack>
+            <Box sx={{ alignSelf: { xs: "stretch", sm: "center" } }}>
+              <FirstAidBagsSummary />
+            </Box>
           </Stack>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            alignItems={{ xs: "flex-start", sm: "center" }}
-            gap={{ xs: 0.5, sm: 2 }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={!showAwayGames}
-                  onChange={(e) => setShowAwayGames(!e.target.checked)}
+          <Stack alignItems="center" py={6}>
+            <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+            <Typography variant="h5" gutterBottom>
+              Ei otteluita joukkueella {selectedTeam.name}
+            </Typography>
+            <Button
+              component={Link}
+              href="/hallinta"
+              variant="contained"
+              startIcon={<UploadFileIcon />}
+            >
+              Siirry hallintaan
+            </Button>
+          </Stack>
+        </Stack>
+        <StatisticsDialog
+          open={statsDialogOpen}
+          onClose={() => setStatsDialogOpen(false)}
+          games={[]}
+        />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Stack gap={{ xs: 2, sm: 3 }}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "stretch", sm: "center" }}
+          gap={2}
+          sx={{
+            bgcolor: "background.paper",
+            borderRadius: 1,
+            px: 2,
+            py: 1.5,
+          }}
+        >
+          <Stack gap={1} minWidth={0}>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <Typography
+                variant="h2"
+                fontWeight="bold"
+                sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+              >
+                {selectedTeam.name}
+              </Typography>
+              <Tooltip title="Toimitsijavuorotilasto">
+                <IconButton
                   size="small"
-                />
-              }
-              label="Näytä vain kotipelit"
-              slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
-            />
-            {pastGamesCount > 0 && (
+                  onClick={() => setStatsDialogOpen(true)}
+                  color="primary"
+                  aria-label="Näytä tilasto"
+                >
+                  <LeaderboardIcon />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              gap={{ xs: 0.5, sm: 2 }}
+            >
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={showPastGames}
-                    onChange={(e) => setShowPastGames(e.target.checked)}
+                    checked={!showAwayGames}
+                    onChange={(e) => setShowAwayGames(!e.target.checked)}
                     size="small"
                   />
                 }
-                label="Näytä pelatut pelit"
+                label="Näytä vain kotipelit"
                 slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
               />
-            )}
+              {pastGamesCount > 0 && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showPastGames}
+                      onChange={(e) => setShowPastGames(e.target.checked)}
+                      size="small"
+                    />
+                  }
+                  label="Näytä pelatut pelit"
+                  slotProps={{ typography: { variant: "body2", color: "text.secondary" } }}
+                />
+              )}
+            </Stack>
           </Stack>
+          <Box sx={{ alignSelf: { xs: "stretch", sm: "center" } }}>
+            <FirstAidBagsSummary />
+          </Box>
         </Stack>
         {games.length === 0 ? (
           <Stack
