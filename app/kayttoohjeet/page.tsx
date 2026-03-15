@@ -103,6 +103,16 @@ export default function KayttoohjeetPage() {
               />
             </ListItem>
           </List>
+          <Typography component="h3" variant="h5" gutterBottom sx={{ mt: 3 }}>
+            Ensiapulaukut
+          </Typography>
+          <Typography>
+            Jos joukkueenjohtaja on ottanut ensiapulaukkujen seurannan käyttöön, näet{" "}
+            <Link href="/ensiapulaukut">Ensiapulaukut</Link>-sivulla kenellä ensiapulaukut
+            parhaillaan ovat. Eli ota laukku haltuun lisäämällä nimesi tänne jos laukku on tullut
+            mukaasi pelistä! Näin kaikki tietävät missä laukut ovat ja vähennetään WhatsApp-viestien
+            määrää 🩹
+          </Typography>
         </Paper>
       </Container>
       <Footer />
