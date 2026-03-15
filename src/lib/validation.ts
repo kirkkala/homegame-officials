@@ -68,6 +68,12 @@ export const teamManagerSchema = z.object({
   email: emailString,
 })
 
+export const updateBagHolderSchema = z.object({
+  teamId: idString,
+  bagNumber: z.number().int().min(1).max(10),
+  holder: z.object({ name: nameString }).nullable(),
+})
+
 // Helper to validate and return parsed data or error response
 export function validate<T>(
   schema: z.ZodSchema<T>,

@@ -1,6 +1,6 @@
 /// <reference types="@testing-library/jest-dom" />
 
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import * as firstAidBags from "@/lib/first-aid-bags"
 import { formatDate } from "@/lib/utils"
@@ -34,13 +34,13 @@ describe("EnsiapulaukutPage", () => {
       isLoading: false,
     })
     ;(firstAidBags.getBagCountForTeam as jest.Mock).mockReturnValue(3)
-    ;(firstAidBags.getFirstAidBags as jest.Mock).mockReturnValue({
+    ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
       bag1: null,
       bag2: null,
       bag3: null,
     })
-    ;(firstAidBags.setBagHolder as jest.Mock).mockReturnValue({})
-    ;(firstAidBags.clearBagHolder as jest.Mock).mockReturnValue({})
+    ;(firstAidBags.setBagHolder as jest.Mock).mockResolvedValue({})
+    ;(firstAidBags.clearBagHolder as jest.Mock).mockResolvedValue({})
   })
 
   afterEach(() => {
@@ -64,13 +64,16 @@ describe("EnsiapulaukutPage", () => {
     expect(screen.getByText("Valitse joukkue nähdäksesi ensiapulaukut.")).toBeInTheDocument()
   })
 
-  it("shows team name and bag cards when team selected", () => {
+  it("shows team name and bag cards when team selected", async () => {
     mockUseTeam.mockReturnValue({
       selectedTeam: { id: "team-1", name: "HNMKY T14" },
       isLoading: false,
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     expect(screen.getByRole("heading", { name: /HNMKY T14 ensiapulaukut/i })).toBeInTheDocument()
     expect(screen.getByTestId("bag-card-1")).toBeInTheDocument()
@@ -79,13 +82,16 @@ describe("EnsiapulaukutPage", () => {
     expect(firstAidBags.getFirstAidBags).toHaveBeenCalledWith("team-1")
   })
 
-  it("shows empty state when bag has no holder", () => {
+  it("shows empty state when bag has no holder", async () => {
     mockUseTeam.mockReturnValue({
       selectedTeam: { id: "team-1", name: "Test" },
       isLoading: false,
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     const card1 = screen.getByTestId("bag-card-1")
     expect(
@@ -94,21 +100,26 @@ describe("EnsiapulaukutPage", () => {
     expect(screen.getAllByRole("button", { name: /ota haltuun/i })).toHaveLength(3)
   })
 
-  it("shows holder name and date when bag has holder", () => {
+  it("shows holder name and date when bag has holder", async () => {
     const lastSeenAt = "2025-01-15T10:00:00Z"
     mockUseTeam.mockReturnValue({
       selectedTeam: { id: "team-1", name: "Test" },
       isLoading: false,
     })
-    ;(firstAidBags.getFirstAidBags as jest.Mock).mockReturnValue({
+    ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
       bag1: { name: "Matti Meikäläinen", lastSeenAt },
       bag2: null,
       bag3: null,
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
-    expect(screen.getByText("Matti Meikäläinen")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText("Matti Meikäläinen")).toBeInTheDocument()
+    })
     expect(screen.getByText(formatDate(lastSeenAt))).toBeInTheDocument()
   })
 
@@ -120,6 +131,9 @@ describe("EnsiapulaukutPage", () => {
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
 
@@ -138,6 +152,9 @@ describe("EnsiapulaukutPage", () => {
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
 
@@ -159,6 +176,9 @@ describe("EnsiapulaukutPage", () => {
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
 
@@ -181,6 +201,9 @@ describe("EnsiapulaukutPage", () => {
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
     expect(screen.getByRole("dialog")).toBeInTheDocument()
@@ -198,13 +221,20 @@ describe("EnsiapulaukutPage", () => {
       selectedTeam: { id: "team-1", name: "Test" },
       isLoading: false,
     })
-    ;(firstAidBags.getFirstAidBags as jest.Mock).mockReturnValue({
+    ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
       bag1: { name: "Matti", lastSeenAt: "2025-01-15T10:00:00Z" },
       bag2: null,
       bag3: null,
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText("Matti")).toBeInTheDocument()
+    })
 
     const card1 = screen.getByTestId("bag-card-1")
     await user.click(within(card1).getByRole("button", { name: "Tyhjennä" }))
@@ -220,6 +250,9 @@ describe("EnsiapulaukutPage", () => {
     })
 
     render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
 

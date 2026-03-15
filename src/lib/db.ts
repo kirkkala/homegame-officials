@@ -5,7 +5,7 @@ import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 import * as schema from "@/db/schema"
 
-// @todo: change variable names in vercel, POSTGRES_NEON_POSTGRES_URL was semi accidental.
+// @todo: change variable names in vercel to look less ugly, the POSTGRES_NEON_POSTGRES_URL was semi accident.
 const connectionString = process.env.POSTGRES_NEON_POSTGRES_URL ?? process.env.POSTGRES_URL ?? ""
 if (!connectionString) {
   throw new Error("POSTGRES_NEON_POSTGRES_URL or POSTGRES_URL is not set")
@@ -21,6 +21,9 @@ export { db }
 
 // Re-export types from schema
 export type {
+  BagHolder,
+  FirstAidBags,
+  FirstAidBagsData,
   Game,
   OfficialAssignment,
   Officials,
@@ -268,4 +271,36 @@ export async function createPlayer(id: string, name: string, teamId: string) {
 
 export async function deletePlayer(id: string) {
   await db.delete(schema.players).where(eq(schema.players.id, id))
+}
+
+// ============ FIRST AID BAGS ============
+
+export async function getFirstAidBagsData(teamId: string): Promise<schema.FirstAidBagsData> {
+  const row = await db
+    .select()
+    .from(schema.firstAidBags)
+    .where(eq(schema.firstAidBags.teamId, teamId))
+  const r = row[0]
+  if (!r) return {}
+  return r.data as schema.FirstAidBagsData
+}
+
+export async function updateBagHolder(
+  teamId: string,
+  bagNumber: number,
+  holder: schema.BagHolder | null
+): Promise<schema.FirstAidBagsData> {
+  const current = await getFirstAidBagsData(teamId)
+  const key = `bag${bagNumber}`
+  const updated: schema.FirstAidBagsData = { ...current, [key]: holder }
+
+  await db
+    .insert(schema.firstAidBags)
+    .values({ teamId, data: updated, updatedAt: new Date() })
+    .onConflictDoUpdate({
+      target: schema.firstAidBags.teamId,
+      set: { data: updated, updatedAt: new Date() },
+    })
+
+  return updated
 }

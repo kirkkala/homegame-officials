@@ -15,8 +15,8 @@ export function FirstAidBagsSummary() {
   const { selectedTeam } = useTeam()
   const [bags, setBags] = useState<FirstAidBagsData>({})
 
-  const refresh = useCallback(() => {
-    if (selectedTeam) setBags(getFirstAidBags(selectedTeam.id))
+  const refresh = useCallback(async () => {
+    if (selectedTeam) setBags(await getFirstAidBags(selectedTeam.id))
   }, [selectedTeam])
 
   useEffect(() => {

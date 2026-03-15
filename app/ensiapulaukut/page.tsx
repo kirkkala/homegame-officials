@@ -53,6 +53,7 @@ function BagCard({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [name, setName] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [clearError, setClearError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -66,22 +67,32 @@ function BagCard({
     setDialogOpen(false)
     setName("")
     setError(null)
+    setClearError(null)
   }, [])
 
-  const handleClear = useCallback(() => {
-    clearBagHolder(teamId, bagNumber)
-    onUpdate()
+  const handleClear = useCallback(async () => {
+    setClearError(null)
+    try {
+      await clearBagHolder(teamId, bagNumber)
+      onUpdate()
+    } catch (e) {
+      setClearError(e instanceof Error ? e.message : "Tyhjennys epäonnistui")
+    }
   }, [teamId, bagNumber, onUpdate])
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     const trimmed = name.trim()
     if (!trimmed) {
       setError("Syötä nimesi")
       return
     }
-    setBagHolder(teamId, bagNumber, trimmed)
-    closeDialog()
-    onUpdate()
+    try {
+      await setBagHolder(teamId, bagNumber, trimmed)
+      closeDialog()
+      onUpdate()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Tallennus epäonnistui")
+    }
   }, [name, teamId, bagNumber, onUpdate, closeDialog])
 
   return (
@@ -120,6 +131,11 @@ function BagCard({
                   <ClearIcon fontSize="small" />
                 </IconButton>
               </Stack>
+              {clearError && (
+                <Typography variant="caption" color="error">
+                  {clearError}
+                </Typography>
+              )}
             </Stack>
           </Box>
         ) : (
@@ -137,6 +153,7 @@ function BagCard({
           onClick={() => {
             setName("")
             setError(null)
+            setClearError(null)
             setDialogOpen(true)
           }}
           fullWidth
@@ -199,8 +216,8 @@ export default function EnsiapulaukutPage() {
   const { selectedTeam, isLoading } = useTeam()
   const [bags, setBags] = useState<FirstAidBagsData>({})
 
-  const refreshBags = useCallback(() => {
-    if (selectedTeam) setBags(getFirstAidBags(selectedTeam.id))
+  const refreshBags = useCallback(async () => {
+    if (selectedTeam) setBags(await getFirstAidBags(selectedTeam.id))
   }, [selectedTeam])
 
   useEffect(() => {
