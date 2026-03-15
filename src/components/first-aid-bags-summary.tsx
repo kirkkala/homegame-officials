@@ -21,9 +21,9 @@ export function FirstAidBagsSummary() {
   const hasAnyHolder = Object.values(bags).some(Boolean)
 
   return (
-    <Card variant="outlined">
+    <Card variant="elevation" sx={{ boxShadow: 'none' }}>
       <CardActionArea component={NextLink} href="/ensiapulaukut">
-        <CardContent>
+        <CardContent sx={{ p: { xs: 0, sm: 2 } }}>
           <Stack spacing={0.5}>
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
               <Stack direction="row" alignItems="center" spacing={0.5}>
