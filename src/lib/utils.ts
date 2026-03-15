@@ -76,5 +76,8 @@ export function computePlayerStatsArray(games: Game[]): { name: string; count: n
   const counts = computePlayerStats(games)
   return Array.from(counts.entries())
     .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "fi"))
+    .sort(
+      (playerA, playerB) =>
+        playerB.count - playerA.count || playerA.name.localeCompare(playerB.name, "fi")
+    )
 }

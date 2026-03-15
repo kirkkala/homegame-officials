@@ -144,7 +144,7 @@ export function MainHeader() {
 
             {/* Desktop: tabs navigation */}
             <Tabs
-              value={visiblePages.some((p) => p.path === pathname) ? pathname : false}
+              value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
               component="nav"
               sx={{ display: { xs: "none", sm: "flex" }, alignSelf: "flex-end" }}
             >

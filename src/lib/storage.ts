@@ -1,5 +1,7 @@
 // API-based storage - data is stored in Postgres via API routes
 
+import { parseJsonResponse } from "@/lib/api"
+
 export type OfficialAssignment = {
   playerName: string // Player whose turn it is
   handledBy: "guardian" | "pool" | null // Who handles the shift
@@ -39,22 +41,6 @@ export type Player = {
 export type User = {
   id: string
   email: string
-}
-
-// Helper to safely parse JSON response
-async function parseJsonResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const text = await res.text()
-    let error = "Pyyntö epäonnistui"
-    try {
-      const data = JSON.parse(text)
-      error = data.error || error
-    } catch {
-      // Couldn't parse error message
-    }
-    throw new Error(error)
-  }
-  return res.json()
 }
 
 // Teams

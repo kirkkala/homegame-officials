@@ -3,7 +3,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import * as firstAidBags from "@/lib/first-aid-bags"
-import { formatDate } from "@/lib/utils"
 import EnsiapulaukutPage from "./page"
 
 const mockUseTeam = jest.fn()
@@ -75,7 +74,9 @@ describe("EnsiapulaukutPage", () => {
       await Promise.resolve()
     })
 
-    expect(screen.getByRole("heading", { name: /HNMKY T14 ensiapulaukut/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole("heading", { name: /HNMKY T14 ensiapulaukkujen haltijat/i })
+    ).toBeInTheDocument()
     expect(screen.getByTestId("bag-card-1")).toBeInTheDocument()
     expect(screen.getByTestId("bag-card-2")).toBeInTheDocument()
     expect(screen.getByTestId("bag-card-3")).toBeInTheDocument()
@@ -95,9 +96,9 @@ describe("EnsiapulaukutPage", () => {
 
     const card1 = screen.getByTestId("bag-card-1")
     expect(
-      within(card1).getByText(/oivoi! toivottavasti tämä laukku ei ole hukassa/i)
+      within(card1).getByText(/oivoi, ei nimeä! toivottavasti laukku on tallessa/i)
     ).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /ota haltuun/i })).toHaveLength(3)
+    expect(screen.getAllByRole("button", { name: /ota laukku haltuun/i })).toHaveLength(3)
   })
 
   it("shows holder name and date when bag has holder", async () => {
@@ -120,10 +121,10 @@ describe("EnsiapulaukutPage", () => {
     await waitFor(() => {
       expect(screen.getByText("Matti Meikäläinen")).toBeInTheDocument()
     })
-    expect(screen.getByText(formatDate(lastSeenAt))).toBeInTheDocument()
+    expect(screen.getByText(/15\.1\.2025/)).toBeInTheDocument()
   })
 
-  it("opens dialog when clicking Ota haltuun", async () => {
+  it("opens dialog when clicking Ota laukku haltuun", async () => {
     const user = userEvent.setup()
     mockUseTeam.mockReturnValue({
       selectedTeam: { id: "team-1", name: "Test" },
@@ -135,7 +136,7 @@ describe("EnsiapulaukutPage", () => {
       await Promise.resolve()
     })
 
-    await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
+    await user.click(screen.getAllByRole("button", { name: /ota laukku haltuun/i })[0])
 
     expect(screen.getByRole("dialog")).toBeInTheDocument()
     expect(screen.getByText("Ota haltuun laukku #1")).toBeInTheDocument()
@@ -156,7 +157,7 @@ describe("EnsiapulaukutPage", () => {
       await Promise.resolve()
     })
 
-    await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
+    await user.click(screen.getAllByRole("button", { name: /ota laukku haltuun/i })[0])
 
     const nameInput = screen.getByTestId("claim-bag-name")
     await user.type(nameInput, "Matti Meikäläinen")
@@ -180,7 +181,7 @@ describe("EnsiapulaukutPage", () => {
       await Promise.resolve()
     })
 
-    await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
+    await user.click(screen.getAllByRole("button", { name: /ota laukku haltuun/i })[0])
 
     const submitButton = screen.getByTestId("claim-bag-submit")
     expect(submitButton).toBeDisabled()
@@ -205,7 +206,7 @@ describe("EnsiapulaukutPage", () => {
       await Promise.resolve()
     })
 
-    await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
+    await user.click(screen.getAllByRole("button", { name: /ota laukku haltuun/i })[0])
     expect(screen.getByRole("dialog")).toBeInTheDocument()
 
     await user.click(screen.getByTestId("claim-bag-cancel"))
@@ -254,7 +255,7 @@ describe("EnsiapulaukutPage", () => {
       await Promise.resolve()
     })
 
-    await user.click(screen.getAllByRole("button", { name: /ota haltuun/i })[0])
+    await user.click(screen.getAllByRole("button", { name: /ota laukku haltuun/i })[0])
 
     expect(screen.getByTestId("claim-bag-submit")).toBeDisabled()
   })

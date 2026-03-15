@@ -145,11 +145,11 @@ export async function createGames(games: Omit<schema.NewGame, "createdAt">[], te
   const newGames = games.filter(
     (game) =>
       !existingGames.some(
-        (g) =>
-          g.date === game.date &&
-          g.time === game.time &&
-          g.homeTeam === game.homeTeam &&
-          g.awayTeam === game.awayTeam
+        (existing) =>
+          existing.date === game.date &&
+          existing.time === game.time &&
+          existing.homeTeam === game.homeTeam &&
+          existing.awayTeam === game.awayTeam
       )
   )
 
@@ -276,13 +276,12 @@ export async function deletePlayer(id: string) {
 // ============ FIRST AID BAGS ============
 
 export async function getFirstAidBagsData(teamId: string): Promise<schema.FirstAidBagsData> {
-  const row = await db
+  const [row] = await db
     .select()
     .from(schema.firstAidBags)
     .where(eq(schema.firstAidBags.teamId, teamId))
-  const r = row[0]
-  if (!r) return {}
-  return r.data as schema.FirstAidBagsData
+  if (!row) return {}
+  return row.data as schema.FirstAidBagsData
 }
 
 export async function updateBagHolder(

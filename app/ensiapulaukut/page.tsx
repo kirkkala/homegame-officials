@@ -29,12 +29,11 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 import { useTeam } from "@/components/team-context"
+import { useFirstAidBags } from "@/hooks/use-first-aid-bags"
 import {
   type BagHolder,
   clearBagHolder,
-  type FirstAidBagsData,
   getBagCountForTeam,
-  getFirstAidBags,
   setBagHolder,
 } from "@/lib/first-aid-bags"
 import { formatDate } from "@/lib/utils"
@@ -98,28 +97,27 @@ function BagCard({
   return (
     <Card
       variant="outlined"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+      sx={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
       data-testid={`bag-card-${bagNumber}`}
     >
-      <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-        <Typography variant="h6" component="h3" color="primary" fontWeight="bold">
+      <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <Typography variant="h6" component="h3" fontWeight="bold">
           Laukku #{bagNumber}
         </Typography>
 
-        {holder ? (
-          <Box>
-            <Stack direction="row" spacing={0.5} alignItems="center">
-              <Typography variant="caption" color="text.secondary">
-                {formatDate(holder.lastSeenAt)}
+        <Box sx={{ mt: 1, minHeight: 72 }}>
+          {holder ? (
+            <>
+              <Typography variant="body2" color="text.secondary">
+                Päivitetty {formatDate(holder.lastSeenAt)}
               </Typography>
-            </Stack>
-            <Stack spacing={1}>
               <Stack
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
                 flexWrap="wrap"
                 gap={0.5}
+                sx={{ mt: 0.5 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center" minWidth={0}>
                   <PersonIcon sx={{ fontSize: 22, color: "primary.main", flexShrink: 0 }} />
@@ -136,16 +134,16 @@ function BagCard({
                   {clearError}
                 </Typography>
               )}
-            </Stack>
-          </Box>
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            Oivoi! Toivottavasti tämä laukku ei ole hukassa! 🥺
-          </Typography>
-        )}
+            </>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Oivoi, ei nimeä! Toivottavasti laukku on tallessa! 🥺
+            </Typography>
+          )}
+        </Box>
 
-        <Divider />
-
+        <Divider sx={{ my: 2 }} />
+        <Box sx={{ flex: 1 }} />
         <Button
           variant="outlined"
           color="primary"
@@ -157,9 +155,8 @@ function BagCard({
             setDialogOpen(true)
           }}
           fullWidth
-          sx={{ mt: "auto" }}
         >
-          Ota haltuun
+          {holder ? "Vaihda haltija" : "Ota laukku haltuun"}
         </Button>
 
         <Dialog open={dialogOpen} onClose={closeDialog} maxWidth="xs" fullWidth>
@@ -214,15 +211,7 @@ function BagCard({
 
 export default function EnsiapulaukutPage() {
   const { selectedTeam, isLoading } = useTeam()
-  const [bags, setBags] = useState<FirstAidBagsData>({})
-
-  const refreshBags = useCallback(async () => {
-    if (selectedTeam) setBags(await getFirstAidBags(selectedTeam.id))
-  }, [selectedTeam])
-
-  useEffect(() => {
-    refreshBags()
-  }, [refreshBags])
+  const { bags, refresh } = useFirstAidBags(selectedTeam?.id ?? null)
 
   const bagCount = selectedTeam ? getBagCountForTeam(selectedTeam.id) : 0
 
@@ -251,17 +240,21 @@ export default function EnsiapulaukutPage() {
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
               <MedicalServicesIcon color="primary" sx={{ fontSize: 32 }} />
               <Typography variant="h5" component="h2" fontWeight="bold">
-                {selectedTeam.name} ensiapulaukut
+                {selectedTeam.name} ensiapulaukkujen haltijat
               </Typography>
             </Stack>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="stretch">
               {Array.from({ length: bagCount }, (_, i) => i + 1).map((bagNum) => (
-                <Grid key={bagNum} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid
+                  key={bagNum}
+                  size={{ xs: 12, sm: 6, md: 4 }}
+                  sx={{ display: "flex", flexDirection: "column" }}
+                >
                   <BagCard
                     bagNumber={bagNum}
                     holder={bags[`bag${bagNum}`] ?? null}
                     teamId={selectedTeam.id}
-                    onUpdate={refreshBags}
+                    onUpdate={refresh}
                   />
                 </Grid>
               ))}

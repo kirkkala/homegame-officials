@@ -21,13 +21,18 @@ A web application to manage game officials (toimitsijat) for basketball home gam
 ```
 homegame-officials/
 ├── app/                    # Next.js App Router
-│   ├── api/                # API routes (games, players)
+│   ├── api/                # API routes (games, players, first-aid-bags, auth, etc.)
+│   ├── ensiapulaukut/      # First aid bags page
 │   ├── hallinta/           # Admin page (import, manage)
+│   ├── kayttoohjeet/       # Usage instructions
+│   ├── kirjaudu/           # Login page
+│   ├── tietosuoja/         # Privacy policy
 │   └── page.tsx            # Main games list page
 ├── src/
 │   ├── components/         # React components
 │   ├── db/                 # Drizzle schema & config
-│   ├── lib/                # Utilities (Excel parser, storage)
+│   ├── hooks/              # Custom hooks (e.g. useFirstAidBags)
+│   ├── lib/                # Utilities (Excel parser, storage, API client)
 │   └── theme/              # MUI theme configuration
 └── public/                 # Static assets
 ```

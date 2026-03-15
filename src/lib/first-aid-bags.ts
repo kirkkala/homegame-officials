@@ -1,27 +1,13 @@
 // Client API for first aid bag tracking (fetches from DB via API)
 
 import type { BagHolder, FirstAidBagsData } from "@/db/schema"
+import { parseJsonResponse } from "@/lib/api"
 
 export type { BagHolder, FirstAidBagsData }
 
 /** @TODO: Replace with admin configuration */
 export function getBagCountForTeam(_teamId: string): number {
   return 3
-}
-
-async function parseJsonResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const text = await res.text()
-    let error = "Pyyntö epäonnistui"
-    try {
-      const data = JSON.parse(text)
-      error = data.error ?? error
-    } catch {
-      // ignore
-    }
-    throw new Error(error)
-  }
-  return res.json()
 }
 
 export async function getFirstAidBags(teamId: string): Promise<FirstAidBagsData> {

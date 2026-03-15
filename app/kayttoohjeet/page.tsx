@@ -20,7 +20,7 @@ import {
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 
-export default function KaijttoohjeetPage() {
+export default function KayttoohjeetPage() {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <MainHeader />

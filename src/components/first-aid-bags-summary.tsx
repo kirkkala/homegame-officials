@@ -6,30 +6,14 @@ import {
 } from "@mui/icons-material"
 import { Box, Card, CardActionArea, CardContent, Stack, Typography } from "@mui/material"
 import NextLink from "next/link"
-import { useCallback, useEffect, useState } from "react"
-import { type FirstAidBagsData, getBagCountForTeam, getFirstAidBags } from "@/lib/first-aid-bags"
+import { useFirstAidBags } from "@/hooks/use-first-aid-bags"
+import { getBagCountForTeam } from "@/lib/first-aid-bags"
 import { formatDate } from "@/lib/utils"
 import { useTeam } from "./team-context"
 
 export function FirstAidBagsSummary() {
   const { selectedTeam } = useTeam()
-  const [bags, setBags] = useState<FirstAidBagsData>({})
-
-  const refresh = useCallback(async () => {
-    if (selectedTeam) setBags(await getFirstAidBags(selectedTeam.id))
-  }, [selectedTeam])
-
-  useEffect(() => {
-    refresh()
-  }, [refresh])
-
-  useEffect(() => {
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") refresh()
-    }
-    document.addEventListener("visibilitychange", onVisibilityChange)
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange)
-  }, [refresh])
+  const { bags } = useFirstAidBags(selectedTeam?.id ?? null)
 
   if (!selectedTeam) return null
 
@@ -63,12 +47,12 @@ export function FirstAidBagsSummary() {
                   color: "text.secondary",
                 }}
               >
-                {Array.from({ length: bagCount }, (_, i) => i + 1).map((n) => {
-                  const h = bags[`bag${n}`]
-                  const label = h
-                    ? `#${n}: ${h.name} (${formatDate(h.lastSeenAt, { format: "short" })})`
-                    : `#${n}: ???`
-                  return <li key={n}>{label}</li>
+                {Array.from({ length: bagCount }, (_, i) => i + 1).map((bagNumber) => {
+                  const holder = bags[`bag${bagNumber}`]
+                  const label = holder
+                    ? `#${bagNumber}: ${holder.name} (${formatDate(holder.lastSeenAt, { format: "short" })})`
+                    : `#${bagNumber}: ???`
+                  return <li key={bagNumber}>{label}</li>
                 })}
               </Box>
             ) : (
