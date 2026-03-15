@@ -25,6 +25,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
+import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
@@ -42,11 +43,13 @@ function BagCard({
   bagNumber,
   holder,
   teamId,
+  team,
   onUpdate,
 }: {
   bagNumber: number
   holder: BagHolder | null
   teamId: string
+  team?: { firstAidBagCount?: string } | null
   onUpdate: () => void
 }) {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -72,12 +75,12 @@ function BagCard({
   const handleClear = useCallback(async () => {
     setClearError(null)
     try {
-      await clearBagHolder(teamId, bagNumber)
+      await clearBagHolder(teamId, bagNumber, team)
       onUpdate()
     } catch (e) {
       setClearError(e instanceof Error ? e.message : "Tyhjennys epäonnistui")
     }
-  }, [teamId, bagNumber, onUpdate])
+  }, [teamId, bagNumber, team, onUpdate])
 
   const handleSubmit = useCallback(async () => {
     const trimmed = name.trim()
@@ -86,13 +89,13 @@ function BagCard({
       return
     }
     try {
-      await setBagHolder(teamId, bagNumber, trimmed)
+      await setBagHolder(teamId, bagNumber, trimmed, team)
       closeDialog()
       onUpdate()
     } catch (e) {
       setError(e instanceof Error ? e.message : "Tallennus epäonnistui")
     }
-  }, [name, teamId, bagNumber, onUpdate, closeDialog])
+  }, [name, teamId, bagNumber, team, onUpdate, closeDialog])
 
   return (
     <Card
@@ -211,9 +214,9 @@ function BagCard({
 
 export default function EnsiapulaukutPage() {
   const { selectedTeam, isLoading } = useTeam()
-  const { bags, refresh } = useFirstAidBags(selectedTeam?.id ?? null)
+  const { bags, refresh } = useFirstAidBags(selectedTeam?.id ?? null, selectedTeam ?? undefined)
 
-  const bagCount = selectedTeam ? getBagCountForTeam(selectedTeam.id) : 0
+  const bagCount = selectedTeam ? getBagCountForTeam(selectedTeam) : 0
 
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -235,6 +238,22 @@ export default function EnsiapulaukutPage() {
               Valitse joukkue nähdäksesi ensiapulaukut.
             </Typography>
           </Paper>
+        ) : !selectedTeam?.firstAidBagsEnabled ? (
+          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+              <MedicalServicesIcon color="primary" sx={{ fontSize: 32 }} />
+              <Typography variant="h5" component="h2" fontWeight="bold">
+                Ensiapulaukut
+              </Typography>
+            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Ensiapulaukkujen seuranta ei ole käytössä tälle joukkueelle. Ota se käyttöön{" "}
+              <Link href="/hallinta" style={{ fontWeight: 600 }}>
+                hallinnassa
+              </Link>
+              .
+            </Typography>
+          </Paper>
         ) : (
           <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
@@ -254,6 +273,7 @@ export default function EnsiapulaukutPage() {
                     bagNumber={bagNum}
                     holder={bags[`bag${bagNum}`] ?? null}
                     teamId={selectedTeam.id}
+                    team={selectedTeam}
                     onUpdate={refresh}
                   />
                 </Grid>

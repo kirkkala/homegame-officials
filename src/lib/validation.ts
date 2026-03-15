@@ -70,7 +70,7 @@ export const teamManagerSchema = z.object({
 
 export const updateBagHolderSchema = z.object({
   teamId: idString,
-  bagNumber: z.number().int().min(1).max(10),
+  bagNumber: z.number().int().min(1).max(6),
   holder: z.object({ name: nameString }).nullable(),
 })
 

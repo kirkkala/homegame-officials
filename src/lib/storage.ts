@@ -11,6 +11,8 @@ export type OfficialAssignment = {
 export type Team = {
   id: string
   name: string
+  firstAidBagsEnabled?: boolean
+  firstAidBagCount?: string
   createdAt: string
 }
 
@@ -68,6 +70,22 @@ export async function deleteTeam(id: string): Promise<void> {
   if (!res.ok) {
     throw new Error("Joukkueen poisto epäonnistui")
   }
+}
+
+export async function updateTeamFirstAidSettings(
+  teamId: string,
+  settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }
+): Promise<Team> {
+  const res = await fetch(`/api/teams/${teamId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settings),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    throw new Error(data?.error || "Joukkueen päivitys epäonnistui")
+  }
+  return parseJsonResponse<Team>(res)
 }
 
 // Team managers

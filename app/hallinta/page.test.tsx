@@ -336,6 +336,7 @@ describe("HallintaPage delete team", () => {
     const user = userEvent.setup()
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("general-tab"))
     await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
 
     expect(screen.getByTestId("delete-team-confirm-input")).toBeInTheDocument()
@@ -346,6 +347,7 @@ describe("HallintaPage delete team", () => {
     const user = userEvent.setup()
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("general-tab"))
     await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
 
     const input = screen.getByTestId("delete-team-confirm-input")
@@ -358,6 +360,7 @@ describe("HallintaPage delete team", () => {
     const user = userEvent.setup()
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("general-tab"))
     await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
 
     const input = screen.getByTestId("delete-team-confirm-input")
@@ -373,6 +376,7 @@ describe("HallintaPage delete team", () => {
     mockDeleteTeam.mockResolvedValue(undefined)
     renderHallintaPage()
 
+    await user.click(screen.getByTestId("general-tab"))
     await user.click(screen.getByRole("button", { name: /poista joukkue/i }))
 
     const input = screen.getByTestId("delete-team-confirm-input")

@@ -24,6 +24,8 @@ export type Officials = {
 export const teams = pgTable("teams", {
   id: text("id").primaryKey(), // slug-based ID
   name: text("name").notNull(),
+  firstAidBagsEnabled: boolean("first_aid_bags_enabled").notNull().default(false),
+  firstAidBagCount: text("first_aid_bag_count").notNull().default("3"), // 1-10
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 

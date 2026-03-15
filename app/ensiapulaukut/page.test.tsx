@@ -63,9 +63,27 @@ describe("EnsiapulaukutPage", () => {
     expect(screen.getByText("Valitse joukkue nähdäksesi ensiapulaukut.")).toBeInTheDocument()
   })
 
+  it("shows enable-in-hallinta message when team has firstAidBagsEnabled false", async () => {
+    mockUseTeam.mockReturnValue({
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: false },
+      isLoading: false,
+    })
+
+    render(<EnsiapulaukutPage />)
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    expect(screen.getByRole("heading", { name: /ensiapulaukut/i })).toBeInTheDocument()
+    expect(
+      screen.getByText(/ensiapulaukkujen seuranta ei ole käytössä tälle joukkueelle/i)
+    ).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: /hallinnassa/i })).toHaveAttribute("href", "/hallinta")
+  })
+
   it("shows team name and bag cards when team selected", async () => {
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "HNMKY T14" },
+      selectedTeam: { id: "team-1", name: "HNMKY T14", firstAidBagsEnabled: true },
       isLoading: false,
     })
 
@@ -80,12 +98,15 @@ describe("EnsiapulaukutPage", () => {
     expect(screen.getByTestId("bag-card-1")).toBeInTheDocument()
     expect(screen.getByTestId("bag-card-2")).toBeInTheDocument()
     expect(screen.getByTestId("bag-card-3")).toBeInTheDocument()
-    expect(firstAidBags.getFirstAidBags).toHaveBeenCalledWith("team-1")
+    expect(firstAidBags.getFirstAidBags).toHaveBeenCalledWith(
+      "team-1",
+      expect.objectContaining({ id: "team-1", name: "HNMKY T14", firstAidBagsEnabled: true })
+    )
   })
 
   it("shows empty state when bag has no holder", async () => {
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
 
@@ -104,7 +125,7 @@ describe("EnsiapulaukutPage", () => {
   it("shows holder name and date when bag has holder", async () => {
     const lastSeenAt = "2025-01-15T10:00:00Z"
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
     ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
@@ -127,7 +148,7 @@ describe("EnsiapulaukutPage", () => {
   it("opens dialog when clicking Ota laukku haltuun", async () => {
     const user = userEvent.setup()
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
 
@@ -148,7 +169,7 @@ describe("EnsiapulaukutPage", () => {
   it("calls setBagHolder when submitting name in dialog", async () => {
     const user = userEvent.setup()
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
 
@@ -165,14 +186,19 @@ describe("EnsiapulaukutPage", () => {
     await user.click(screen.getByTestId("claim-bag-submit"))
 
     await waitFor(() => {
-      expect(firstAidBags.setBagHolder).toHaveBeenCalledWith("team-1", 1, "Matti Meikäläinen")
+      expect(firstAidBags.setBagHolder).toHaveBeenCalledWith(
+        "team-1",
+        1,
+        "Matti Meikäläinen",
+        expect.objectContaining({ id: "team-1", name: "Test", firstAidBagsEnabled: true })
+      )
     })
   })
 
   it("shows error when submitting empty name", async () => {
     const user = userEvent.setup()
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
 
@@ -197,7 +223,7 @@ describe("EnsiapulaukutPage", () => {
   it("closes dialog when clicking Peruuta", async () => {
     const user = userEvent.setup()
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
 
@@ -219,7 +245,7 @@ describe("EnsiapulaukutPage", () => {
   it("calls clearBagHolder when clicking Tyhjennä on bag with holder", async () => {
     const user = userEvent.setup()
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
     ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
@@ -240,13 +266,17 @@ describe("EnsiapulaukutPage", () => {
     const card1 = screen.getByTestId("bag-card-1")
     await user.click(within(card1).getByRole("button", { name: "Tyhjennä" }))
 
-    expect(firstAidBags.clearBagHolder).toHaveBeenCalledWith("team-1", 1)
+    expect(firstAidBags.clearBagHolder).toHaveBeenCalledWith(
+      "team-1",
+      1,
+      expect.objectContaining({ id: "team-1", name: "Test", firstAidBagsEnabled: true })
+    )
   })
 
   it("disables Tallenna when name input is empty", async () => {
     const user = userEvent.setup()
     mockUseTeam.mockReturnValue({
-      selectedTeam: { id: "team-1", name: "Test" },
+      selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
 

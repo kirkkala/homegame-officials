@@ -54,6 +54,21 @@ export async function deleteTeam(id: string) {
   await db.delete(schema.teams).where(eq(schema.teams.id, id))
 }
 
+export async function updateTeamFirstAidSettings(
+  id: string,
+  settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }
+) {
+  const result = await db
+    .update(schema.teams)
+    .set({
+      firstAidBagsEnabled: settings.firstAidBagsEnabled,
+      firstAidBagCount: String(Math.min(6, Math.max(1, settings.firstAidBagCount))),
+    })
+    .where(eq(schema.teams.id, id))
+    .returning()
+  return result[0]
+}
+
 // ============ USERS ============
 
 export async function getUserByEmail(email: string) {

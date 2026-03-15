@@ -4,12 +4,15 @@ import { useCallback, useEffect, useState } from "react"
 import type { FirstAidBagsData } from "@/db/schema"
 import { getFirstAidBags } from "@/lib/first-aid-bags"
 
-export function useFirstAidBags(teamId: string | null) {
+export function useFirstAidBags(
+  teamId: string | null,
+  team?: { firstAidBagCount?: string } | null
+) {
   const [bags, setBags] = useState<FirstAidBagsData>({})
 
   const refresh = useCallback(async () => {
-    if (teamId) setBags(await getFirstAidBags(teamId))
-  }, [teamId])
+    if (teamId) setBags(await getFirstAidBags(teamId, team))
+  }, [teamId, team])
 
   useEffect(() => {
     refresh()
