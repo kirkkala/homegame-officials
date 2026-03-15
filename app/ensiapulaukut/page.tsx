@@ -17,9 +17,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   IconButton,
+  Link,
   Paper,
   Stack,
   TextField,
@@ -103,16 +103,20 @@ function BagCard({
       data-testid={`bag-card-${bagNumber}`}
     >
       <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <Typography variant="h6" component="h3" fontWeight="bold">
-          Laukku #{bagNumber}
-        </Typography>
+        <Stack direction="row" alignItems="baseline" justifyContent="space-between" gap={1}>
+          <Typography variant="h6" component="h3" fontWeight="bold">
+            Laukku #{bagNumber}
+          </Typography>
+          {holder && (
+            <Typography variant="body2" color="text.secondary">
+              {formatDate(holder.lastSeenAt)}
+            </Typography>
+          )}
+        </Stack>
 
-        <Box sx={{ mt: 1, minHeight: 72 }}>
+        <Box>
           {holder ? (
             <>
-              <Typography variant="body2" color="text.secondary">
-                Päivitetty {formatDate(holder.lastSeenAt)}
-              </Typography>
               <Stack
                 direction="row"
                 alignItems="center"
@@ -144,7 +148,6 @@ function BagCard({
           )}
         </Box>
 
-        <Divider sx={{ my: 2 }} />
         <Box sx={{ flex: 1 }} />
         <Button
           variant="outlined"
@@ -157,6 +160,7 @@ function BagCard({
             setDialogOpen(true)
           }}
           fullWidth
+          sx={{ mt: 1 }}
         >
           {holder ? "Vaihda haltija" : "Ota laukku haltuun"}
         </Button>
@@ -247,6 +251,11 @@ export default function EnsiapulaukutPage() {
             </Stack>
             <Typography variant="body2" color="text.secondary">
               Ensiapulaukkujen seuranta ei ole käytössä joukkueella {selectedTeam.name}.
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              <Link href="/" style={{ color: "inherit", textDecoration: "underline" }}>
+                Siirry etusivulle.
+              </Link>
             </Typography>
           </Paper>
         ) : (
