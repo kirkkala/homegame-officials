@@ -76,9 +76,8 @@ describe("EnsiapulaukutPage", () => {
 
     expect(screen.getByRole("heading", { name: /ensiapulaukut/i })).toBeInTheDocument()
     expect(
-      screen.getByText(/ensiapulaukkujen seuranta ei ole käytössä tälle joukkueelle/i)
+      screen.getByText(/ensiapulaukkujen seuranta ei ole käytössä joukkueella/i)
     ).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /hallinnassa/i })).toHaveAttribute("href", "/hallinta")
   })
 
   it("shows team name and bag cards when team selected", async () => {

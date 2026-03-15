@@ -808,7 +808,7 @@ export default function HallintaPage() {
                 aria-label="Hallinnan välilehdet"
                 sx={{ borderBottom: 1, borderColor: "divider" }}
               >
-                {isAdmin && <Tab label="Pääkäyttäjän toiminnot" data-testid="admin-tab" />}
+                {isAdmin && <Tab label="Admin zone" data-testid="admin-tab" />}
                 <Tab label="Joukkueen asetukset" data-testid="general-tab" />
                 <Tab label={`Pelaajat (${players.length})`} data-testid="players-tab" />
                 <Tab label={`Ottelut (${existingGames.length})`} data-testid="games-tab" />
@@ -816,9 +816,6 @@ export default function HallintaPage() {
 
               {currentKey === "admin" && (
                 <Stack gap={2}>
-                  <Typography component="h2" variant="h5">
-                    Pääkäyttäjän toiminnot
-                  </Typography>
                   <Box>
                     <Typography component="h3" variant="h6">
                       Rekisteröityneet käyttäjät ({users.length})

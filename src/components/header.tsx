@@ -161,6 +161,7 @@ export function MainHeader() {
                 />
               ))}
             </Tabs>
+            <AuthActionButton logoutOnly />
           </Toolbar>
         </Box>
       </AppBar>

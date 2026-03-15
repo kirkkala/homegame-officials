@@ -13,11 +13,11 @@ import { useTeam } from "./team-context"
 
 export function FirstAidBagsSummary() {
   const { selectedTeam } = useTeam()
-  const { bags } = useFirstAidBags(selectedTeam?.id ?? null)
+  const { bags } = useFirstAidBags(selectedTeam?.id ?? null, selectedTeam ?? undefined)
 
   if (!selectedTeam) return null
 
-  const bagCount = getBagCountForTeam(selectedTeam.id)
+  const bagCount = getBagCountForTeam(selectedTeam)
   const hasAnyHolder = Object.values(bags).some(Boolean)
 
   return (

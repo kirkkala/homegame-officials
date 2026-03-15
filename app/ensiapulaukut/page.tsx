@@ -25,7 +25,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
-import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
@@ -247,11 +246,7 @@ export default function EnsiapulaukutPage() {
               </Typography>
             </Stack>
             <Typography variant="body2" color="text.secondary">
-              Ensiapulaukkujen seuranta ei ole käytössä tälle joukkueelle. Ota se käyttöön{" "}
-              <Link href="/hallinta" style={{ fontWeight: 600 }}>
-                hallinnassa
-              </Link>
-              .
+              Ensiapulaukkujen seuranta ei ole käytössä joukkueella {selectedTeam.name}.
             </Typography>
           </Paper>
         ) : (
