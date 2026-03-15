@@ -282,12 +282,7 @@ export default function EnsiapulaukutPage() {
           </Paper>
         )}
         <Paper sx={{ mt: 2, p: 2 }}>
-          <Button
-            component={Link}
-            href="/"
-            startIcon={<HomeOutlinedIcon />}
-            fullWidth
-          >
+          <Button component={Link} href="/" startIcon={<HomeOutlinedIcon />} fullWidth>
             Etusivulle
           </Button>
         </Paper>
