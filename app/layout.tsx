@@ -9,7 +9,7 @@ import { ThemeRegistry } from "@/theme/ThemeRegistry"
 
 export const metadata: Metadata = {
   title: "Kotipelien toimitsijat",
-  description: "Hallitse kotipelien toimitsijat helposti",
+  description: "Toimitsijat ja ensiapulaukut 🩹",
   robots: {
     index: false,
     follow: false,
