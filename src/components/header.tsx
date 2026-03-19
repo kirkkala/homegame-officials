@@ -27,6 +27,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSession } from "next-auth/react"
@@ -69,19 +70,20 @@ export function MainHeader() {
               <MenuIcon />
             </IconButton>
 
-            <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
-              <Box
-                component="img"
+            <MuiLink
+              component={Link}
+              href="/"
+              color="inherit"
+              sx={{ textDecoration: "none", display: "inline-flex", mt: 1, mr: 2, mb: 0, ml: 1 }}
+            >
+              <Image
                 src="/logo.png"
                 alt="HMKY logo"
-                sx={{
-                  mt: 1,
-                  mr: 2,
-                  mb: 0,
-                  ml: 1,
-                  width: { xs: 36, sm: 40 },
-                  height: { xs: 36, sm: 40 },
-                }}
+                width={40}
+                height={40}
+                priority
+                sizes="40px"
+                className="header-logo"
               />
             </MuiLink>
             {/* Title */}

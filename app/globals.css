@@ -1,4 +1,16 @@
 /* MUI handles most styling, minimal custom CSS here */
+.header-logo {
+  width: 36px;
+  height: 36px;
+}
+
+@media (min-width: 600px) {
+  .header-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
 html {
   /* Prevent scrollbar from disappearing when opening dialogs */
   overflow-y: scroll !important;
@@ -19,7 +31,10 @@ body::before {
   z-index: -1;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),
-    url("/basketball-sport-environment-filed.jpg");
+    image-set(
+      url("/basketball-sport-environment-filed.webp") type("image/webp") 1x,
+      url("/basketball-sport-environment-filed.jpg") type("image/jpeg") 1x
+    );
   background-size: cover;
   background-position: center;
   filter: blur(4px);
