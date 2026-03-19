@@ -5,8 +5,11 @@ import { createPlayerSchema, validate } from "@/lib/validation"
 
 export async function GET(request: NextRequest) {
   try {
-    const teamId = request.nextUrl.searchParams.get("teamId")
-    const players = await getPlayers(teamId || undefined)
+    const teamId = request.nextUrl.searchParams.get("teamId")?.trim()
+    if (!teamId) {
+      return NextResponse.json({ error: "teamId is required" }, { status: 400 })
+    }
+    const players = await getPlayers(teamId)
     return NextResponse.json(players)
   } catch (error) {
     console.error("Failed to get players:", error)

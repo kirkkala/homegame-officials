@@ -141,10 +141,9 @@ export function setSelectedTeamId(teamId: string | null): void {
   }
 }
 
-// Games
-export async function getGames(teamId?: string): Promise<Game[]> {
-  const url = teamId ? `/api/games?teamId=${teamId}` : "/api/games"
-  const res = await fetch(url)
+// Games (teamId required — API does not return all teams' games)
+export async function getGames(teamId: string): Promise<Game[]> {
+  const res = await fetch(`/api/games?teamId=${encodeURIComponent(teamId)}`)
   return parseJsonResponse<Game[]>(res)
 }
 
@@ -210,10 +209,9 @@ export async function deleteGame(gameId: string): Promise<void> {
   }
 }
 
-// Players
-export async function getPlayers(teamId?: string): Promise<Player[]> {
-  const url = teamId ? `/api/players?teamId=${teamId}` : "/api/players"
-  const res = await fetch(url)
+// Players (teamId required — API does not return all teams' players)
+export async function getPlayers(teamId: string): Promise<Player[]> {
+  const res = await fetch(`/api/players?teamId=${encodeURIComponent(teamId)}`)
   return parseJsonResponse<Player[]>(res)
 }
 
