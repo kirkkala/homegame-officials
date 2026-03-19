@@ -2,12 +2,16 @@
 
 import { Box, Container, Link, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
+import dynamic from "next/dynamic"
 import NextLink from "next/link"
 import { Footer } from "@/components/footer"
-import { GamesList } from "@/components/games-list"
 import { MainHeader } from "@/components/header"
 import { useTeam } from "@/components/team-context"
 import { TeamSelector } from "@/components/team-selector"
+
+const GamesList = dynamic(() => import("@/components/games-list").then((m) => m.GamesList), {
+  loading: () => null,
+})
 
 export default function Home() {
   const { selectedTeam } = useTeam()
