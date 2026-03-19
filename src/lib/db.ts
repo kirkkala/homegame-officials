@@ -17,8 +17,6 @@ const db = isVercel
   ? drizzleNeon({ client: neon(connectionString), schema })
   : drizzlePg(new Pool({ connectionString, ssl: false }), { schema })
 
-export { db }
-
 // Re-export types from schema
 export type {
   BagHolder,
@@ -32,6 +30,7 @@ export type {
   TeamManager,
   User,
 } from "@/db/schema"
+export { db }
 
 // ============ TEAMS ============
 
