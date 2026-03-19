@@ -71,9 +71,20 @@ export function computePlayerStats(games: Game[]): Map<string, number> {
 
 /**
  * Returns player stats as a sorted array for display (highest count first).
+ * When `rosterNames` is set, every roster name is included with count 0 if they have no confirmed shifts yet.
  */
-export function computePlayerStatsArray(games: Game[]): { name: string; count: number }[] {
+export function computePlayerStatsArray(
+  games: Game[],
+  rosterNames?: string[]
+): { name: string; count: number }[] {
   const counts = computePlayerStats(games)
+  if (rosterNames?.length) {
+    for (const raw of rosterNames) {
+      const name = raw.trim()
+      if (!name || counts.has(name)) continue
+      counts.set(name, 0)
+    }
+  }
   return Array.from(counts.entries())
     .map(([name, count]) => ({ name, count }))
     .sort(

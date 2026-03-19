@@ -63,10 +63,17 @@ type StatisticsDialogProps = {
   open: boolean
   onClose: () => void
   games: Game[]
+  /** Roster names from hallinta; players with no confirmed shifts appear with count 0 */
+  rosterPlayerNames?: string[]
 }
 
-export function StatisticsDialog({ open, onClose, games }: StatisticsDialogProps) {
-  const stats = computePlayerStatsArray(games)
+export function StatisticsDialog({
+  open,
+  onClose,
+  games,
+  rosterPlayerNames,
+}: StatisticsDialogProps) {
+  const stats = computePlayerStatsArray(games, rosterPlayerNames)
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -85,7 +92,7 @@ export function StatisticsDialog({ open, onClose, games }: StatisticsDialogProps
       </DialogTitle>
       <DialogContent>
         <Typography variant="caption" color="text.secondary" component="div" sx={{ mb: 2 }}>
-          Tilastossa näkyy kuinka monta toimitsijavuoroa (pöytäkirja tai kello) kullakin pelaajalla
+          Tilasto näyttää kuinka monta toimitsijavuoroa (pöytäkirja tai kello) kullakin pelaajalla
           on vahvistettuna.
         </Typography>
         {stats.length === 0 ? (

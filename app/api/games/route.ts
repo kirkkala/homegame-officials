@@ -5,8 +5,11 @@ import { createGamesSchema, validate } from "@/lib/validation"
 
 export async function GET(request: NextRequest) {
   try {
-    const teamId = request.nextUrl.searchParams.get("teamId")
-    const games = await getGames(teamId || undefined)
+    const teamId = request.nextUrl.searchParams.get("teamId")?.trim()
+    if (!teamId) {
+      return NextResponse.json({ error: "teamId is required" }, { status: 400 })
+    }
+    const games = await getGames(teamId)
     return NextResponse.json(games)
   } catch (error) {
     console.error("Failed to get games:", error)

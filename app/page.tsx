@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer"
 import { GamesList } from "@/components/games-list"
 import { MainHeader } from "@/components/header"
 import { useTeam } from "@/components/team-context"
+import { TeamSelector } from "@/components/team-selector"
 
 export default function Home() {
   const { selectedTeam } = useTeam()
@@ -22,17 +23,24 @@ export default function Home() {
             </Typography>
 
             <Typography>
-              Kotipelien toimitsijat -appi on työkalu, jolla Namikan joukkueenjohtaja voi jakaa ja
-              hallinnoida kotipelien toimitsijavuorot yhdessä joukkueen vanhempien kanssa.
+              Namikan juniorijoukkueen jojo voi tämän sovelluksen avulla jakaa ja hallinnoida
+              kotipelien toimitsijavuorot yhdessä pelaajien vanhempien kanssa. Sovelluksesta löytyy
+              myös ratkaisu ensiapulaukkujen seurannalle.
             </Typography>
             <Typography>
-              Pelaajien vanhemmat voivat käyttää sovellusta ilman kirjautumista. Valitse joukkueesi
-              yläpalkista tai lue lisää{" "}
+              Sovelluksen käyttö ei vaadi kirjautumista muilta kuin joukkueenjohtajalta pelien
+              hallinnoimisen osalta.
+            </Typography>
+            <Typography>
+              Valitse joukkue tai lue lisää{" "}
               <Link component={NextLink} href="/kayttoohjeet">
                 käyttöohjeet
               </Link>{" "}
-              -sivulta.
+              -sivulta. Mikäli joukkueesi ei ole listalla, ota yhteyttä joukkueenjohtajaan.
             </Typography>
+            <Box sx={{ mt: 4 }}>
+              <TeamSelector />
+            </Box>
           </Paper>
         )}
         <GamesList />
