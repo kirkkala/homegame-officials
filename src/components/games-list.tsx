@@ -22,6 +22,7 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { liveTeamListQueryOptions } from "@/lib/live-poll-query-options"
 import { getGames, getPlayers } from "@/lib/storage"
 import { computePlayerStats } from "@/lib/utils"
 import { FirstAidBagsSummary } from "./first-aid-bags-summary"
@@ -62,8 +63,7 @@ export function GamesList() {
     queryKey: ["games", selectedTeam?.id],
     queryFn: () => getGames(selectedTeam!.id),
     enabled: !!selectedTeam,
-    refetchInterval: 10000,
-    refetchIntervalInBackground: false,
+    ...liveTeamListQueryOptions,
     select: (data) =>
       data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
   })
@@ -72,8 +72,7 @@ export function GamesList() {
     queryKey: ["players", selectedTeam?.id],
     queryFn: () => getPlayers(selectedTeam!.id),
     enabled: !!selectedTeam,
-    refetchInterval: 10000,
-    refetchIntervalInBackground: false,
+    ...liveTeamListQueryOptions,
   })
 
   const rosterPlayerNames = rosterPlayers?.map((p) => p.name)
