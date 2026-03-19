@@ -564,7 +564,7 @@ export default function HallintaPage() {
       return
     }
     const arrayBuffer = await file.arrayBuffer()
-    const parsed = parseExcelFile(arrayBuffer)
+    const parsed = await parseExcelFile(arrayBuffer)
     setParsedGames(parsed)
     if (parsed.length === 0) {
       setSnackbar({ type: "info", message: "Excel-tiedostosta ei löytynyt otteluita" })

@@ -1,5 +1,3 @@
-import * as XLSX from "xlsx"
-
 export type ParsedGame = {
   division: string
   homeTeam: string
@@ -11,47 +9,51 @@ export type ParsedGame = {
   isHomeGame: boolean // User will mark this in the UI
 }
 
-/**
- * Parse Excel file and extract all games
- * Games are expected to have format like "I div. Team A - Team B"
- */
 function pad2(value: number): string {
   return value.toString().padStart(2, "0")
 }
 
-function parseExcelDateTime(value: unknown): { date: string; time: string } | null {
-  if (typeof value === "string") {
-    const match = value.match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/)
-    if (match) {
-      const [, day, month, year, hour, minute] = match
-      return {
-        date: `${year}-${month}-${day}`,
-        time: `${hour}:${minute}`,
+/**
+ * Parse Excel file and extract all games
+ * Games are expected to have format like "I div. Team A - Team B"
+ *
+ * Loads the `xlsx` library only when called (keeps hallinta JS smaller until import).
+ */
+export async function parseExcelFile(file: ArrayBuffer): Promise<ParsedGame[]> {
+  const XLSX = await import("xlsx")
+
+  function parseExcelDateTime(value: unknown): { date: string; time: string } | null {
+    if (typeof value === "string") {
+      const match = value.match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/)
+      if (match) {
+        const [, day, month, year, hour, minute] = match
+        return {
+          date: `${year}-${month}-${day}`,
+          time: `${hour}:${minute}`,
+        }
       }
     }
-  }
 
-  if (value instanceof Date) {
-    return {
-      date: `${value.getFullYear()}-${pad2(value.getMonth() + 1)}-${pad2(value.getDate())}`,
-      time: `${pad2(value.getHours())}:${pad2(value.getMinutes())}`,
-    }
-  }
-
-  if (typeof value === "number") {
-    const parsed = XLSX.SSF.parse_date_code(value)
-    if (parsed && parsed.y && parsed.m && parsed.d) {
+    if (value instanceof Date) {
       return {
-        date: `${parsed.y}-${pad2(parsed.m)}-${pad2(parsed.d)}`,
-        time: `${pad2(parsed.H || 0)}:${pad2(parsed.M || 0)}`,
+        date: `${value.getFullYear()}-${pad2(value.getMonth() + 1)}-${pad2(value.getDate())}`,
+        time: `${pad2(value.getHours())}:${pad2(value.getMinutes())}`,
       }
     }
+
+    if (typeof value === "number") {
+      const parsed = XLSX.SSF.parse_date_code(value)
+      if (parsed && parsed.y && parsed.m && parsed.d) {
+        return {
+          date: `${parsed.y}-${pad2(parsed.m)}-${pad2(parsed.d)}`,
+          time: `${pad2(parsed.H || 0)}:${pad2(parsed.M || 0)}`,
+        }
+      }
+    }
+
+    return null
   }
 
-  return null
-}
-
-export function parseExcelFile(file: ArrayBuffer): ParsedGame[] {
   const workbook = XLSX.read(file, { type: "array" })
   const sheetName = workbook.SheetNames[0]
   const sheet = workbook.Sheets[sheetName]

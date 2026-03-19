@@ -13,7 +13,7 @@ describe("excel-parser", () => {
   it("parses elsa-myclub-import.xlsx into games", async () => {
     const filePath = path.join(process.cwd(), "excel-test-sheets", "elsa-myclub-import.xlsx")
     const fileBuffer = await readFile(filePath)
-    const games = parseExcelFile(toArrayBuffer(fileBuffer))
+    const games = await parseExcelFile(toArrayBuffer(fileBuffer))
 
     expect(games.length).toBeGreaterThan(0)
     expect(games.some((game) => game.homeTeam && game.awayTeam)).toBe(true)
