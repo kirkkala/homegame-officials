@@ -27,6 +27,7 @@ jest.mock("@/components/first-aid-bags-summary", () => ({
 
 jest.mock("@/lib/storage", () => ({
   getGames: jest.fn(),
+  getPlayers: jest.fn(),
 }))
 
 const futureGame = {
@@ -63,6 +64,7 @@ describe("GamesList", () => {
   beforeEach(() => {
     mockUseTeam.mockReturnValue(baseTeamContext)
     ;(storage.getGames as jest.Mock).mockResolvedValue([futureGame])
+    ;(storage.getPlayers as jest.Mock).mockResolvedValue([])
   })
 
   afterEach(() => {

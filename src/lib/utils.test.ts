@@ -156,4 +156,20 @@ describe("computePlayerStatsArray", () => {
     expect(result[0].name).toBe("Aino")
     expect(result[1].name).toBe("Zorro")
   })
+
+  it("includes roster players with zero confirmed shifts", () => {
+    const games = [
+      makeGame({
+        officials: {
+          poytakirja: { playerName: "Matti", handledBy: "guardian", confirmedBy: "E" },
+          kello: null,
+        },
+      }),
+    ]
+    const result = computePlayerStatsArray(games, ["Matti", "Teppo", "  "])
+    expect(result).toEqual([
+      { name: "Matti", count: 1 },
+      { name: "Teppo", count: 0 },
+    ])
+  })
 })

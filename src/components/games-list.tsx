@@ -22,7 +22,7 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { getGames } from "@/lib/storage"
+import { getGames, getPlayers } from "@/lib/storage"
 import { computePlayerStats } from "@/lib/utils"
 import { FirstAidBagsSummary } from "./first-aid-bags-summary"
 import { GameCard } from "./game-card"
@@ -67,6 +67,16 @@ export function GamesList() {
     select: (data) =>
       data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)),
   })
+
+  const { data: rosterPlayers } = useQuery({
+    queryKey: ["players", selectedTeam?.id],
+    queryFn: () => getPlayers(selectedTeam!.id),
+    enabled: !!selectedTeam,
+    refetchInterval: 10000,
+    refetchIntervalInBackground: false,
+  })
+
+  const rosterPlayerNames = rosterPlayers?.map((p) => p.name)
 
   useEffect(() => {
     try {
@@ -214,6 +224,7 @@ export function GamesList() {
           open={statsDialogOpen}
           onClose={() => setStatsDialogOpen(false)}
           games={[]}
+          rosterPlayerNames={rosterPlayerNames}
         />
       </>
     )
@@ -320,6 +331,7 @@ export function GamesList() {
         open={statsDialogOpen}
         onClose={() => setStatsDialogOpen(false)}
         games={allGames}
+        rosterPlayerNames={rosterPlayerNames}
       />
     </>
   )

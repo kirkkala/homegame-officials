@@ -6,10 +6,25 @@ import { StatisticsDialog } from "@/components/statistics-dialog"
 import { makeGame } from "@/test-utils"
 
 describe("StatisticsDialog", () => {
-  it("shows empty state when no confirmed shifts", () => {
+  it("shows empty state when no confirmed shifts and no roster", () => {
     render(<StatisticsDialog open={true} onClose={() => {}} games={[]} />)
 
     expect(screen.getByText("Ei vielä vahvistettuja toimitsijavuoroja.")).toBeInTheDocument()
+  })
+
+  it("shows roster players with zero when none confirmed", () => {
+    render(
+      <StatisticsDialog
+        open={true}
+        onClose={() => {}}
+        games={[]}
+        rosterPlayerNames={["Liisa", "Matti"]}
+      />
+    )
+
+    expect(screen.getByText("Liisa")).toBeInTheDocument()
+    expect(screen.getByText("Matti")).toBeInTheDocument()
+    expect(screen.getAllByText("0")).toHaveLength(2)
   })
 
   it("shows player names with counts", () => {
