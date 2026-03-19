@@ -1,6 +1,6 @@
 "use client"
 
-import { Add as AddIcon } from "@mui/icons-material"
+import { Add as AddIcon, Clear as RemoveIcon } from "@mui/icons-material"
 import {
   Alert,
   Box,
@@ -122,9 +122,11 @@ export function TeamSelector({
                 return teams.find((team) => team.id === value)?.name ?? "Valitse joukkue"
               }}
             >
-              <MenuItem value="" data-testid="team-option-empty">
-                Valitse joukkue
-              </MenuItem>
+              {selectedTeam && (
+                <MenuItem value="" data-testid="team-option-empty">
+                  <RemoveIcon sx={{ mr: 1, fontSize: 16 }} /> Poista valinta
+                </MenuItem>
+              )}
               {teams.map((team) => (
                 <MenuItem key={team.id} value={team.id} data-testid={`team-option-${team.id}`}>
                   {team.name}
