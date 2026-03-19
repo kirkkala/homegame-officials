@@ -5,9 +5,11 @@ import {
   CheckCircle as CheckCircleIcon,
   PersonAdd as PersonAddIcon,
   UploadFile as UploadFileIcon,
+  HomeOutlined as HomeOutlinedIcon,
 } from "@mui/icons-material"
 import {
   Box,
+  Button,
   Container,
   Link,
   List,
@@ -113,6 +115,11 @@ export default function KayttoohjeetPage() {
             mukaasi pelistä! Näin kaikki tietävät missä laukut ovat ja vähennetään WhatsApp-viestien
             määrää 🩹
           </Typography>
+        </Paper>
+        <Paper sx={{ mt: 2, p: 2 }}>
+          <Button component={Link} href="/" startIcon={<HomeOutlinedIcon />} fullWidth>
+            Etusivulle
+          </Button>
         </Paper>
       </Container>
       <Footer />
