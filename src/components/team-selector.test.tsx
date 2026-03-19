@@ -113,4 +113,34 @@ describe("TeamSelector", () => {
 
     expect(screen.getByTestId("team-create-button")).toBeDisabled()
   })
+
+  it("does not show clear option when no team is selected", async () => {
+    mockUseTeam.mockReturnValue({
+      ...baseTeamContext,
+      selectedTeam: null,
+    })
+    renderTeamSelector()
+
+    const select = screen.getByTestId("team-select")
+    const combobox = within(select).getByRole("combobox")
+    fireEvent.mouseDown(combobox)
+
+    expect(await screen.findByTestId("team-option-team-1")).toBeInTheDocument()
+    expect(screen.queryByTestId("team-option-empty")).not.toBeInTheDocument()
+  })
+
+  it("shows clear option when a team is selected and clears on choose", async () => {
+    const user = userEvent.setup()
+    renderTeamSelector()
+
+    const select = screen.getByTestId("team-select")
+    const combobox = within(select).getByRole("combobox")
+    fireEvent.mouseDown(combobox)
+
+    const clearOption = await screen.findByTestId("team-option-empty")
+    expect(clearOption).toBeInTheDocument()
+    await user.click(clearOption)
+
+    expect(baseTeamContext.selectTeam).toHaveBeenCalledWith(null)
+  })
 })
