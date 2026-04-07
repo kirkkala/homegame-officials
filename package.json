@@ -1,6 +1,6 @@
 {
   "name": "homegame-officials",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "private": true,
   "scriptDescriptions": {
     "help": "Lists available scripts, you probably just issues this command",
@@ -37,11 +37,11 @@
     "@mui/material": "^7.3.9",
     "@mui/material-nextjs": "^7.3.9",
     "@neondatabase/serverless": "^1.0.2",
-    "@tanstack/react-query": "^5.91.2",
+    "@tanstack/react-query": "^5.96.2",
     "@toolpad/core": "^0.16.0",
     "@vercel/analytics": "^1.6.1",
-    "drizzle-orm": "^0.45.1",
-    "next": "^16.2.0",
+    "drizzle-orm": "^0.45.2",
+    "next": "^16.2.2",
     "next-auth": "^4.24.13",
     "pg": "^8.20.0",
     "react": "^19.2.4",
@@ -50,6 +50,11 @@
     "zod": "^4.3.6"
   },
   "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "next": "16"
+      }
+    },
     "overrides": {
       "esbuild": ">=0.25.0"
     },
@@ -60,13 +65,13 @@
     ]
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.8",
+    "@biomejs/biome": "^2.4.10",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.12.0",
-    "@types/pg": "^8.18.0",
+    "@types/node": "^24.12.2",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "drizzle-kit": "^0.31.10",
