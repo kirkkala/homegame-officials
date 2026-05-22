@@ -5,10 +5,9 @@ import { drizzle as drizzlePg } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 import * as schema from "@/db/schema"
 
-// @todo: change variable names in vercel to look less ugly, the POSTGRES_NEON_POSTGRES_URL was semi accident.
-const connectionString = process.env.POSTGRES_NEON_POSTGRES_URL ?? process.env.POSTGRES_URL ?? ""
+const connectionString = process.env.POSTGRES_URL ?? ""
 if (!connectionString) {
-  throw new Error("POSTGRES_NEON_POSTGRES_URL or POSTGRES_URL is not set")
+  throw new Error("POSTGRES_URL is not set")
 }
 
 const isVercel = process.env.VERCEL === "1"
