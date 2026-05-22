@@ -39,28 +39,33 @@ homegame-officials/
 
 ## How It Works
 
-The application helps basketball team managers assign officials to home games:
-
-1. **Import Games**: Upload eLSA Excel export to import home games
-2. **Manage Players**: Add players who can serve as officials
-3. **Assign Officials**: Assign players to games as "pöytäkirja" (scorekeeper) or "kello" (clock operator)
-
-**Input**: eLSA Excel export with game schedule (date, time, venue, teams, division)
-
-**Output**: Organized list of home games with assigned officials
+1. **Log in and create team**
+    * Log in with Gmail address and create your team
+    * You will be the administrator, you can add other Gmail users as team admins too
+2. **Import Games**
+    * Import games from an eLSA Excel export file
+    * The file can be created with https://elsa-myclub.hnmky.fi
+2. **Manage Players**
+    * Add players to your team.
+3. **Assign Officials**
+    * Assign players to games as "pöytäkirja" (scorekeeper) or "kello" (clock operator)
+    * The parent of named player is responsible for the officials shift
+    * The app can be used by team manager or members of the team
+4. **Track First aid kit bags**
+    * Manager add the number of First aid kits in the team
+    * Team members can mark who currently has each Fist aid kit    
 
 ## Development
 
 ### Local Database Setup
 
-Start a local Postgres database with Docker:
+Start local Postgres:
 
 ```bash
-# Note the correct postrgres version, match with one at Vercel
 docker run --name homegame-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:17
 ```
 
-Create a `.env.local` file:
+Create `.env.local`
 
 ```bash
 POSTGRES_URL="postgresql://postgres:postgres@localhost:5432/postgres"
@@ -73,7 +78,7 @@ ADMIN_EMAIL=
 Auth notes:
 
 - `AUTH_SECRET` is required by Auth.js. Generate it with `npx auth secret`.
-- `ADMIN_EMAIL` grants admin privileges to the matching user email.
+- `ADMIN_EMAIL` grants full admin privileges to the matching user email.
 
 Push the database schema:
 
@@ -81,21 +86,23 @@ Push the database schema:
 pnpm db:push
 ```
 
-To push schema changes to **Vercel**, set `POSTGRES_URL` to your Vercel database URL (from Vercel Dashboard → Storage → your database → `.env.local`) and then run `pnpm db:push`. The command targets whatever database `POSTGRES_URL` points to.
-Might need to `NODE_TLS_REJECT_UNAUTHORIZED=0 pnpm db:push`
+**To push schema to preview or production**
+* Set `POSTGRES_URL` to that database URL (Neon or Vercel Dashboard → Storage → `.env.local`)
+* Run `pnpm db:push`.
+* Might need to `NODE_TLS_REJECT_UNAUTHORIZED=0 pnpm db:push`
 
-To stop/start the database later:
 
+**Stop/start local db later**
 ```bash
-docker stop homegame-postgres   # Stop
-docker start homegame-postgres  # Start again
+docker stop homegame-postgres
+docker start homegame-postgres
 ```
 
 ### Install & Run
 
 ```bash
-pnpm install         # Install dependencies
-pnpm dev             # Start dev server at http://localhost:3000
+pnpm i
+pnpm dev
 ```
 
 ### Available Scripts
@@ -113,19 +120,50 @@ pnpm db:push         # Push schema to database
 pnpm db:studio       # Open Drizzle Studio
 ```
 
-### Copy Production Database to Local
+## Environments
 
-Get `DATABASE_URL` URL from Vercel Dashboard → Storage → Neon.
+Preview deployments should not use the production database.
+
+| | Runs on | Database |
+| --- | --- | --- |
+| Local | `pnpm dev` | Docker Postgres |
+| Preview | Vercel PR | Neon branch `preview` (shared by all previews) |
+| Production | Vercel `main` | Neon branch `main` |
+
+* **Neon**
+    * Branches → create `preview` from `main`
+    * Copy connection string
+    * Refresh data: Branches → `preview` → **Reset from parent**.
+
+* **Vercel**
+    * Settings → Environment Variables: `POSTGRES_URL`
+    * Scope prod URL to **Production**, preview branch URL to **Preview** only.
+    * Redeploy after changes.
+    * Google login on previews needs that deployment's callback URL in Google Cloud Console.
+
+* **Schema**
+    * `pnpm db:push` on local, then preview URL, then production after merge.
+
+### Copy production database
 
 ```bash
-export HOMEGAME_OFFICIALS_PROD_DB="postgresql://user:pass@ep-xxx.pooler.c-2.eu-central-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+export HOMEGAME_OFFICIALS_PROD_DB="postgresql://user:pass@ep-xxx-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+export HOMEGAME_OFFICIALS_PREVIEW_DB="postgresql://user:pass@ep-yyy-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
 
-# Dump to a file (Docker ensure pg_dump is available, could also use pg_dump installed with e.g. homebrew)
+# Dump (Docker ensures pg_dump is available)
 docker run --rm postgres:17 pg_dump "$HOMEGAME_OFFICIALS_PROD_DB" > prod-backup.sql
 
-# Import to local container
+# Restore to preview
+docker run --rm -i postgres:17 psql "$HOMEGAME_OFFICIALS_PREVIEW_DB" \
+  -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+docker run --rm -i postgres:17 psql "$HOMEGAME_OFFICIALS_PREVIEW_DB" < prod-backup.sql
+
+# Restore to local
+docker exec -i homegame-postgres psql -U postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 docker exec -i homegame-postgres psql -U postgres < prod-backup.sql
 ```
+
+Or Neon → `preview` → Reset from parent. Run `pnpm db:push` after restore if your branch has newer schema.
 
 To clear local database:
 
@@ -137,7 +175,7 @@ docker exec -i homegame-postgres psql -U postgres -c "DROP SCHEMA public CASCADE
 
 Github Actions and Vercel CI does all magic.
 
-* Git push and create PR -> development environment.
+* Git push and create PR -> preview deployment (preview database).
 * Merge to main -> production deployment
     * Create tag after deploy
 
