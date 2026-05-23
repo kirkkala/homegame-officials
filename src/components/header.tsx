@@ -123,7 +123,7 @@ export function MainHeader() {
   return (
     <>
       <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0 }}>
-        <Box sx={{ maxWidth: 1280, mx: "auto", width: "100%" }}>
+        <Box sx={{ maxWidth: 1105, mx: "auto", width: "100%" }}>
           <Toolbar sx={{ minHeight: { xs: 64, sm: 96 } }}>
             {/* Mobile: hamburger menu */}
             <IconButton edge="start" aria-label="menu" onClick={toggleDrawer(true)} sx={{ mr: 1 }}>
