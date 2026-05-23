@@ -28,7 +28,10 @@ import {
   Tabs,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from "@mui/material"
+import type { Theme } from "@mui/material/styles"
+import { useTheme } from "@mui/material/styles"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -44,15 +47,66 @@ type PageItem = {
   requiresAuth?: boolean
 }
 
+const navTabSx = {
+  position: "relative",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: 0,
+    left: 12,
+    right: 12,
+    height: 2,
+    bgcolor: "text.secondary",
+    borderRadius: 1,
+    transform: "scaleX(0)",
+    transition: "transform 0.2s ease",
+    transformOrigin: "center",
+  },
+  "&:hover:not(.Mui-selected)::after": {
+    transform: "scaleX(1)",
+  },
+}
+
+const navListItemSx = (theme: Theme) => {
+  const selectedBg = theme.alpha(theme.palette.primary.main, 0.2)
+
+  return {
+    borderRadius: 1,
+    "&:hover:not(.Mui-selected)": {
+      bgcolor: "grey.100",
+    },
+    "&.Mui-selected": {
+      bgcolor: selectedBg,
+      color: "primary.main",
+      "& .MuiListItemIcon-root": {
+        color: "primary.main",
+      },
+    },
+    "&.Mui-selected:hover": {
+      bgcolor: selectedBg,
+    },
+  }
+}
+
+const navTabsSx = {
+  "& .MuiTab-root": {
+    ...navTabSx,
+    minWidth: { sm: 48, md: 90 },
+    px: { sm: 1, md: 2 },
+  },
+}
+
 const PAGES: PageItem[] = [
   { path: "/", label: "Etusivu", icon: HomeIcon },
-  { path: "/ensiapulaukut", label: "Ensiapulaukut", icon: MedicalServicesIcon },
-  { path: "/kayttoohjeet", label: "Käyttöohjeet", icon: HelpOutlineIcon },
+  { path: "/ensiapulaukut", label: "EA", icon: MedicalServicesIcon },
+  { path: "/kayttoohjeet", label: "Ohjeet", icon: HelpOutlineIcon },
   { path: "/hallinta", label: "Hallinta", icon: SettingsIcon, requiresAuth: true },
 ]
 
 export function MainHeader() {
   const pathname = usePathname()
+  const theme = useTheme()
+  const showTabLabels = useMediaQuery(theme.breakpoints.up("md"))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { data: session, status } = useSession()
   const user = session?.user
@@ -150,46 +204,61 @@ export function MainHeader() {
               </Box>
             </Box>
 
-            {/* Desktop: tabs navigation + auth */}
-            <Tabs
-              value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
-              component="nav"
-              sx={{ display: { xs: "none", sm: "flex" }, alignSelf: "flex-end" }}
+            <Box
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                alignSelf: "flex-end",
+                alignItems: "center",
+              }}
             >
-              {visiblePages.map((page) => (
-                <Tab
-                  key={page.path}
-                  label={page.label}
-                  value={page.path}
-                  href={page.path}
-                  component={Link}
-                  icon={<page.icon />}
-                  iconPosition="start"
-                  sx={{ fontWeight: pathname === page.path ? 700 : 400, px: 2 }}
-                />
-              ))}
-              {!authLoading &&
-                (user ? (
+              <Tabs
+                value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
+                component="nav"
+                sx={navTabsSx}
+              >
+                {visiblePages.map((page) => (
                   <Tab
-                    label="Kirjaudu ulos"
-                    icon={<LogoutIcon />}
-                    iconPosition="start"
-                    onClick={handleLogout}
-                    sx={{ fontWeight: 400, px: 2 }}
-                  />
-                ) : (
-                  <Tab
-                    icon={<LoginIcon />}
-                    href="/kirjaudu"
+                    key={page.path}
+                    label={showTabLabels ? page.label : undefined}
+                    value={page.path}
+                    href={page.path}
                     component={Link}
-                    aria-label="Kirjaudu"
-                    sx={{ minWidth: 48, px: 2 }}
+                    icon={<page.icon />}
+                    iconPosition={showTabLabels ? "start" : undefined}
+                    aria-label={page.label}
+                    sx={{ fontWeight: pathname === page.path ? 700 : 400 }}
                   />
                 ))}
-            </Tabs>
+                {!authLoading && user && (
+                  <Tab
+                    label={showTabLabels ? "Logout" : undefined}
+                    icon={<LogoutIcon />}
+                    iconPosition={showTabLabels ? "start" : undefined}
+                    onClick={handleLogout}
+                    aria-label="Logout"
+                    sx={{ fontWeight: 400 }}
+                  />
+                )}
+              </Tabs>
+              {!authLoading && !user && (
+                <IconButton component={Link} href="/kirjaudu" aria-label="Kirjaudu" sx={{ ml: 1 }}>
+                  <LoginIcon />
+                </IconButton>
+              )}
+            </Box>
+            {!authLoading && !user && (
+              <IconButton
+                component={Link}
+                href="/kirjaudu"
+                aria-label="Kirjaudu"
+                sx={{ display: { xs: "inline-flex", sm: "none" }, ml: 1 }}
+              >
+                <LoginIcon />
+              </IconButton>
+            )}
             {!authLoading && user && (
               <IconButton
-                aria-label="Kirjaudu ulos"
+                aria-label="Logout"
                 onClick={handleLogout}
                 sx={{ display: { xs: "inline-flex", sm: "none" }, ml: 1 }}
               >
@@ -229,7 +298,7 @@ export function MainHeader() {
 
           <Divider />
 
-          <List sx={{ pt: 1 }}>
+          <List sx={{ pt: 1, "& .MuiListItemButton-root": navListItemSx }}>
             {visiblePages.map((page) => {
               const Icon = page.icon
               const isActive = pathname === page.path
@@ -261,7 +330,7 @@ export function MainHeader() {
                       <ListItemIcon>
                         <LogoutIcon />
                       </ListItemIcon>
-                      <ListItemText primary="Kirjaudu ulos" />
+                      <ListItemText primary="Logout" />
                     </ListItemButton>
                   ) : (
                     <ListItemButton component={Link} href="/kirjaudu" onClick={toggleDrawer(false)}>

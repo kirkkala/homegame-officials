@@ -64,13 +64,6 @@ export const theme = createTheme({
         root: {
           paddingTop: 12,
           paddingBottom: 12,
-          "&.Mui-selected": {
-            backgroundColor: "rgba(255, 66, 56, 0.2)", // primary.light equivalent
-            color: "#ff4238",
-            "& .MuiListItemIcon-root": {
-              color: "#ff4238",
-            },
-          },
         },
       },
     },
