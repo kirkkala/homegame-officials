@@ -234,7 +234,8 @@ function OfficialButton({
           flex: 1,
           justifyContent: "flex-start",
           textAlign: "left",
-          pt: 2,
+          pl: 2,
+          py: 2,
           ...(isUnassigned && {
             color: "text.secondary",
             borderColor: "text.secondary",
@@ -250,7 +251,7 @@ function OfficialButton({
             <Icon sx={{ verticalAlign: "middle" }} />
             <Typography>{label}</Typography>
           </Stack>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ pt: 1 }}>
             <Typography sx={{ fontWeight: "bold" }} noWrap>
               {isBusy ? "Tallennetaan..." : displayAssignment?.playerName || "Valitse pelaaja..."}
             </Typography>
@@ -575,7 +576,7 @@ export function GameCard({
           <Typography
             variant="body1"
             fontWeight={game.isHomeGame ? "bold" : "normal"}
-            sx={{ gridArea: "teams", lineHeight: 1.3 }}
+            sx={{ gridArea: "teams", lineHeight: 1.3, mt: 1 }}
           >
             {game.homeTeam}
             <Typography component="span" color="text.secondary" sx={{ mx: 0.5 }}>
