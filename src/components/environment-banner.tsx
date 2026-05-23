@@ -15,8 +15,8 @@ export function EnvironmentBanner() {
       sx={{
         borderRadius: 0,
         justifyContent: "center",
-        py: 0.5,
-        "& .MuiAlert-message": { py: 0.75 },
+        py: 0.75,
+        boxShadow: 1,
       }}
     >
       {environment.label}

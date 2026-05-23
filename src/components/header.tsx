@@ -103,7 +103,7 @@ export function MainHeader() {
                   component="h1"
                   fontWeight="bold"
                   noWrap
-                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" }, mt: 0, mb: 0 }}
+                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
                 >
                   <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
                     Kotipelien toimitsijat
@@ -182,7 +182,7 @@ export function MainHeader() {
             }}
           >
             <Stack direction="row" alignItems="center" gap={1}>
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 0, mb: 0 }}>
+              <Typography variant="h6" fontWeight="bold">
                 Menu
               </Typography>
             </Stack>
