@@ -15,9 +15,9 @@ export default function TietosuojaPage() {
               Tietosuojaseloste
             </Typography>
             <Typography>
-              Joukkueenjohtaja huolehtii, että pelaajien nimet ovat etu- tai lempinimiä. Näin tietoja
-              ei voi helposti yhdistää henkilöllisyyteen. Kirjautuneen käyttäjän (joukkueenjohtaja)
-              sähköpostiosoite tallennetaan tietokantaan.
+              Joukkueenjohtaja huolehtii, että pelaajien nimet ovat etu- tai lempinimiä. Näin
+              tietoja ei voi helposti yhdistää henkilöllisyyteen. Kirjautuneen käyttäjän
+              (joukkueenjohtaja) sähköpostiosoite tallennetaan tietokantaan.
             </Typography>
             <Typography>
               Kirjautuminen on toteutettu Google autentikoinnin avulla, kirjautuminen vaatii

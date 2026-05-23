@@ -64,48 +64,50 @@ export default function KayttoohjeetPage() {
               appilla tehdystä excel-tiedostosta sekä lisää pelaajat ja merkitsee kotiottelut
               hallintapaneelin kautta.
             </Typography>
-            <Typography>Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista.</Typography>
+            <Typography>
+              Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista.
+            </Typography>
             <List className="steps-list">
-            <ListItem className="steps-list-item">
-              <ListItemIcon className="steps-list-icon">
-                <PersonAddIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="1. Valitse joukkue"
-                secondary="Valitse oma joukkueesi. Valinta tallentuu selaimesi välimuistiin ja joukkueen nimi säilyy selaimen URL osoitteessa joten voit jakaa linkin jolla pääsee suoraan oikean joukkueen peleihin."
-                className="steps-list-text"
-              />
-            </ListItem>
-            <ListItem className="steps-list-item">
-              <ListItemIcon className="steps-list-icon">
-                <UploadFileIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="2. Jaa toimitsijavuorot"
-                secondary='Valitse pelin eSCO- ja kellovuoron vastuu painamalla "Valitse pelaaja...". Avautuvasta pudotusvalikosta valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
-                className="steps-list-text"
-              />
-            </ListItem>
-            <ListItem className="steps-list-item">
-              <ListItemIcon className="steps-list-icon">
-                <AssignmentAddIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="3. Vahvista vuoro"
-                secondary='Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista" painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai pyydetäänkö tehtävän tekijäksi juniori joukkueenjohtajan avustuksella.'
-                className="steps-list-text"
-              />
-            </ListItem>
-            <ListItem className="steps-list-item">
-              <ListItemIcon className="steps-list-icon">
-                <CheckCircleIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="4. Seuraa tilannetta"
-                secondary="Vahvistetut vuorot näkyvät vihreänä, odottavat oranssina. Mikäli vaihdat nimeämisiä sovi siitä toisen vanhemman/huoltajan tai joukkueenjohtajan kanssa."
-                className="steps-list-text"
-              />
-            </ListItem>
+              <ListItem className="steps-list-item">
+                <ListItemIcon className="steps-list-icon">
+                  <PersonAddIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="1. Valitse joukkue"
+                  secondary="Valitse oma joukkueesi. Valinta tallentuu selaimesi välimuistiin ja joukkueen nimi säilyy selaimen URL osoitteessa joten voit jakaa linkin jolla pääsee suoraan oikean joukkueen peleihin."
+                  className="steps-list-text"
+                />
+              </ListItem>
+              <ListItem className="steps-list-item">
+                <ListItemIcon className="steps-list-icon">
+                  <UploadFileIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="2. Jaa toimitsijavuorot"
+                  secondary='Valitse pelin eSCO- ja kellovuoron vastuu painamalla "Valitse pelaaja...". Avautuvasta pudotusvalikosta valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
+                  className="steps-list-text"
+                />
+              </ListItem>
+              <ListItem className="steps-list-item">
+                <ListItemIcon className="steps-list-icon">
+                  <AssignmentAddIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="3. Vahvista vuoro"
+                  secondary='Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista" painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai pyydetäänkö tehtävän tekijäksi juniori joukkueenjohtajan avustuksella.'
+                  className="steps-list-text"
+                />
+              </ListItem>
+              <ListItem className="steps-list-item">
+                <ListItemIcon className="steps-list-icon">
+                  <CheckCircleIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="4. Seuraa tilannetta"
+                  secondary="Vahvistetut vuorot näkyvät vihreänä, odottavat oranssina. Mikäli vaihdat nimeämisiä sovi siitä toisen vanhemman/huoltajan tai joukkueenjohtajan kanssa."
+                  className="steps-list-text"
+                />
+              </ListItem>
             </List>
             <Typography component="h3" variant="h5">
               Ensiapulaukut
@@ -114,8 +116,8 @@ export default function KayttoohjeetPage() {
               Jos joukkueenjohtaja on ottanut ensiapulaukkujen seurannan käyttöön, näet{" "}
               <Link href="/ensiapulaukut">Ensiapulaukut</Link>-sivulla kenellä ensiapulaukut
               parhaillaan ovat. Eli ota laukku haltuun lisäämällä nimesi tänne jos laukku on tullut
-              mukaasi pelistä! Näin kaikki tietävät missä laukut ovat ja vähennetään WhatsApp-viestien
-              määrää 🩹
+              mukaasi pelistä! Näin kaikki tietävät missä laukut ovat ja vähennetään
+              WhatsApp-viestien määrää 🩹
             </Typography>
           </Stack>
         </Paper>
