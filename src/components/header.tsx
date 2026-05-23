@@ -150,15 +150,9 @@ export function MainHeader() {
               </Box>
             </Box>
 
-            {/* Desktop: tabs navigation */}
+            {/* Desktop: tabs navigation + auth */}
             <Tabs
-              value={
-                visiblePages.some((page) => page.path === pathname)
-                  ? pathname
-                  : pathname === "/kirjaudu"
-                    ? "/kirjaudu"
-                    : false
-              }
+              value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
               component="nav"
               sx={{ display: { xs: "none", sm: "flex" }, alignSelf: "flex-end" }}
             >
@@ -185,13 +179,11 @@ export function MainHeader() {
                   />
                 ) : (
                   <Tab
-                    label="Kirjaudu"
-                    value="/kirjaudu"
+                    icon={<LoginIcon />}
                     href="/kirjaudu"
                     component={Link}
-                    icon={<LoginIcon />}
-                    iconPosition="start"
-                    sx={{ fontWeight: pathname === "/kirjaudu" ? 700 : 400, px: 2 }}
+                    aria-label="Kirjaudu"
+                    sx={{ minWidth: 48, px: 2 }}
                   />
                 ))}
             </Tabs>
