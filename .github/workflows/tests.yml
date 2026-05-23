@@ -62,3 +62,4 @@ jobs:
         uses: vercel/repository-dispatch/actions/status@v1
         with:
           name: "Vercel - homegame-officials: test"
+          token: ${{ secrets.GITHUB_TOKEN }}
