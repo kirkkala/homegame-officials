@@ -1,6 +1,10 @@
 # Home Game Officials
 
-A web application to manage game officials (toimitsijat) for basketball home games. Import games from eLSA Excel files (https://github.com/kirkkala/elsa-myclub / https://elsa-myclub.vercel.app/) and assign officials to each game.
+Manage game officials (toimitsijat) for basketball junior division serie games.
+
+Supports importing games from eLSA Excel files (https://github.com/kirkkala/elsa-myclub / https://elsa-myclub.vercel.app/) and help with assigning officials for each game.
+
+Has also team First aid kit bag tracker (who currently has the bag it). Reduces unnecessary messaging, questions and confusion.
 
 ## Tech Stack
 
@@ -111,15 +115,6 @@ pnpm dev
 pnpm run help       # List all scripts and what they do
 ```
 
-### Database Scripts
-
-```bash
-pnpm db:generate     # Generate migrations
-pnpm db:migrate      # Run migrations
-pnpm db:push         # Push schema to database
-pnpm db:studio       # Open Drizzle Studio
-```
-
 ## Environments
 
 Preview deployments should not use the production database.
@@ -137,9 +132,8 @@ Preview deployments should not use the production database.
 
 * **Vercel**
     * Settings → Environment Variables: `POSTGRES_URL`
-    * Scope prod URL to **Production**, preview branch URL to **Preview** only.
-    * Redeploy after changes.
-    * Google login on previews needs that deployment's callback URL in Google Cloud Console.
+        * Scope prod URL to **Production**, preview branch URL to **Preview** only.
+    * Google login on previews needs that deployment's callback URL in [Google Cloud Console](https://console.cloud.google.com/).
 
 * **Schema**
     * `pnpm db:push` on local, then preview URL, then production after merge.

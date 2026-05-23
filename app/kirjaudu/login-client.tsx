@@ -15,6 +15,10 @@ type LoginClientProps = {
 }
 
 export function LoginClient({ adminEmail }: LoginClientProps) {
+  // Obscure the admin email for display.
+  const [local, domain] = adminEmail.split("@")
+  const obscuredAdminEmail = `${local.slice(0, 2)}***${local.slice(-2)}@${domain}`
+
   const handleSignIn = async (
     provider: AuthProvider,
     _formData?: unknown,
@@ -45,7 +49,7 @@ export function LoginClient({ adminEmail }: LoginClientProps) {
               signIn={handleSignIn}
               localeText={{
                 signInTitle: "Joukkeenjohtajan kirjautuminen",
-                signInSubtitle: `Sovelluksen pääkäyttäjä on ${adminEmail}.`,
+                signInSubtitle: `Sovelluksen pääkäyttäjä on ${obscuredAdminEmail}.`,
               }}
               slotProps={{
                 form: { noValidate: true },

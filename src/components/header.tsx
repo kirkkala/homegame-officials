@@ -4,6 +4,8 @@ import {
   Close as CloseIcon,
   HelpOutline as HelpOutlineIcon,
   Home as HomeIcon,
+  Login as LoginIcon,
+  Logout as LogoutIcon,
   MedicalServicesOutlined as MedicalServicesIcon,
   Menu as MenuIcon,
   Settings as SettingsIcon,
@@ -26,14 +28,16 @@ import {
   Tabs,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from "@mui/material"
+import type { Theme } from "@mui/material/styles"
+import { useTheme } from "@mui/material/styles"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { useState } from "react"
 import packageJson from "../../package.json"
-import { AuthActionButton } from "./auth-action-button"
 import { TeamSelector } from "./team-selector"
 
 type PageItem = {
@@ -43,15 +47,69 @@ type PageItem = {
   requiresAuth?: boolean
 }
 
+const navTabSx = {
+  position: "relative",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: 0,
+    left: 12,
+    right: 12,
+    height: 2,
+    bgcolor: "text.secondary",
+    borderRadius: 1,
+    transform: "scaleX(0)",
+    transition: "transform 0.2s ease",
+    transformOrigin: "center",
+  },
+  "&:hover:not(.Mui-selected)::after": {
+    transform: "scaleX(1)",
+  },
+}
+
+const navListItemSx = (theme: Theme) => {
+  const selectedBg = theme.alpha(theme.palette.primary.main, 0.2)
+
+  return {
+    borderRadius: 1,
+    "& .MuiListItemIcon-root": {
+      minWidth: 36,
+    },
+    "&:hover:not(.Mui-selected)": {
+      bgcolor: "grey.100",
+    },
+    "&.Mui-selected": {
+      bgcolor: selectedBg,
+      color: "primary.main",
+      "& .MuiListItemIcon-root": {
+        color: "primary.main",
+      },
+    },
+    "&.Mui-selected:hover": {
+      bgcolor: selectedBg,
+    },
+  }
+}
+
+const navTabsSx = {
+  "& .MuiTab-root": {
+    ...navTabSx,
+    minWidth: { sm: 48, md: 90 },
+    px: { sm: 1, md: 2 },
+  },
+}
+
 const PAGES: PageItem[] = [
   { path: "/", label: "Etusivu", icon: HomeIcon },
-  { path: "/ensiapulaukut", label: "Ensiapulaukut", icon: MedicalServicesIcon },
-  { path: "/kayttoohjeet", label: "Käyttöohjeet", icon: HelpOutlineIcon },
+  { path: "/ensiapulaukut", label: "EA", icon: MedicalServicesIcon },
+  { path: "/kayttoohjeet", label: "Ohjeet", icon: HelpOutlineIcon },
   { path: "/hallinta", label: "Hallinta", icon: SettingsIcon, requiresAuth: true },
 ]
 
 export function MainHeader() {
   const pathname = usePathname()
+  const theme = useTheme()
+  const showTabLabels = useMediaQuery(theme.breakpoints.up("md"))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { data: session, status } = useSession()
   const user = session?.user
@@ -60,10 +118,15 @@ export function MainHeader() {
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open)
 
+  const handleLogout = () => {
+    void signOut({ callbackUrl: "/" })
+    setDrawerOpen(false)
+  }
+
   return (
     <>
       <AppBar position="sticky" color="default" elevation={1} sx={{ top: 0 }}>
-        <Box sx={{ maxWidth: 1280, mx: "auto", width: "100%" }}>
+        <Box sx={{ maxWidth: 1105, mx: "auto", width: "100%" }}>
           <Toolbar sx={{ minHeight: { xs: 64, sm: 96 } }}>
             {/* Mobile: hamburger menu */}
             <IconButton edge="start" aria-label="menu" onClick={toggleDrawer(true)} sx={{ mr: 1 }}>
@@ -103,7 +166,7 @@ export function MainHeader() {
                   component="h1"
                   fontWeight="bold"
                   noWrap
-                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" }, mt: 0, mb: 0 }}
+                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
                 >
                   <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
                     Kotipelien toimitsijat
@@ -144,26 +207,67 @@ export function MainHeader() {
               </Box>
             </Box>
 
-            {/* Desktop: tabs navigation */}
-            <Tabs
-              value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
-              component="nav"
-              sx={{ display: { xs: "none", sm: "flex" }, alignSelf: "flex-end" }}
+            <Box
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                alignSelf: "flex-end",
+                alignItems: "center",
+              }}
             >
-              {visiblePages.map((page) => (
-                <Tab
-                  key={page.path}
-                  label={page.label}
-                  value={page.path}
-                  href={page.path}
-                  component={Link}
-                  icon={<page.icon />}
-                  iconPosition="start"
-                  sx={{ fontWeight: pathname === page.path ? 700 : 400, px: 2 }}
-                />
-              ))}
-            </Tabs>
-            <AuthActionButton logoutOnly />
+              <Tabs
+                value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
+                component="nav"
+                sx={navTabsSx}
+              >
+                {visiblePages.map((page) => (
+                  <Tab
+                    key={page.path}
+                    label={showTabLabels ? page.label : undefined}
+                    value={page.path}
+                    href={page.path}
+                    component={Link}
+                    icon={<page.icon />}
+                    iconPosition={showTabLabels ? "start" : undefined}
+                    aria-label={page.label}
+                    sx={{ fontWeight: pathname === page.path ? 700 : 400 }}
+                  />
+                ))}
+                {!authLoading && user && (
+                  <Tab
+                    label={showTabLabels ? "Logout" : undefined}
+                    icon={<LogoutIcon />}
+                    iconPosition={showTabLabels ? "start" : undefined}
+                    onClick={handleLogout}
+                    aria-label="Logout"
+                    sx={{ fontWeight: 400 }}
+                  />
+                )}
+              </Tabs>
+              {!authLoading && !user && (
+                <IconButton component={Link} href="/kirjaudu" aria-label="Kirjaudu" sx={{ ml: 1 }}>
+                  <LoginIcon />
+                </IconButton>
+              )}
+            </Box>
+            {!authLoading && !user && (
+              <IconButton
+                component={Link}
+                href="/kirjaudu"
+                aria-label="Kirjaudu"
+                sx={{ display: { xs: "inline-flex", sm: "none" }, ml: 1 }}
+              >
+                <LoginIcon />
+              </IconButton>
+            )}
+            {!authLoading && user && (
+              <IconButton
+                aria-label="Logout"
+                onClick={handleLogout}
+                sx={{ display: { xs: "inline-flex", sm: "none" }, ml: 1 }}
+              >
+                <LogoutIcon />
+              </IconButton>
+            )}
           </Toolbar>
         </Box>
       </AppBar>
@@ -182,7 +286,7 @@ export function MainHeader() {
             }}
           >
             <Stack direction="row" alignItems="center" gap={1}>
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 0, mb: 0 }}>
+              <Typography variant="h6" fontWeight="bold">
                 Menu
               </Typography>
             </Stack>
@@ -197,7 +301,7 @@ export function MainHeader() {
 
           <Divider />
 
-          <List sx={{ pt: 1 }}>
+          <List sx={{ pt: 1, "& .MuiListItemButton-root": navListItemSx }}>
             {visiblePages.map((page) => {
               const Icon = page.icon
               const isActive = pathname === page.path
@@ -220,20 +324,29 @@ export function MainHeader() {
                 </ListItem>
               )
             })}
+            {!authLoading && (
+              <>
+                <Divider sx={{ my: 1 }} />
+                <ListItem disablePadding>
+                  {user ? (
+                    <ListItemButton onClick={handleLogout}>
+                      <ListItemIcon>
+                        <LogoutIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Logout" />
+                    </ListItemButton>
+                  ) : (
+                    <ListItemButton component={Link} href="/kirjaudu" onClick={toggleDrawer(false)}>
+                      <ListItemIcon>
+                        <LoginIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Kirjaudu" />
+                    </ListItemButton>
+                  )}
+                </ListItem>
+              </>
+            )}
           </List>
-
-          {!authLoading && (
-            <>
-              <Divider />
-              <Box sx={{ p: 2 }}>
-                <AuthActionButton
-                  fullWidth
-                  onAfterAction={toggleDrawer(false)}
-                  sx={{ justifyContent: "flex-start" }}
-                />
-              </Box>
-            </>
-          )}
         </Box>
       </Drawer>
     </>

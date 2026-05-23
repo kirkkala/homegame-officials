@@ -10,7 +10,7 @@ describe("Footer", () => {
     expect(screen.getByRole("contentinfo")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /Timo Kirkkala/i })).toHaveAttribute(
       "href",
-      "https://github.com/kirkkala"
+      "https://kirkkala.com"
     )
     expect(screen.getByRole("link", { name: /GitHub/i })).toHaveAttribute(
       "href",

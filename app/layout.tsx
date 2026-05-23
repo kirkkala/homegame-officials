@@ -3,6 +3,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter"
 import { Analytics } from "@vercel/analytics/next"
 import type { Metadata, Viewport } from "next"
 import { Suspense } from "react"
+import { EnvironmentBanner } from "@/components/environment-banner"
 import { Providers } from "@/components/providers"
 import { TeamProvider } from "@/components/team-context"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider>
           <ThemeRegistry>
+            <EnvironmentBanner />
             <Providers>
               <Suspense>
                 <TeamProvider>{children}</TeamProvider>

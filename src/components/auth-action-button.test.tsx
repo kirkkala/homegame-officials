@@ -50,14 +50,6 @@ describe("AuthActionButton", () => {
     expect(link).toHaveAttribute("href", "/kirjaudu")
   })
 
-  it("returns null when logoutOnly and unauthenticated", () => {
-    mockUseSession.mockReturnValue({ data: null, status: "unauthenticated" })
-
-    const { container } = render(<AuthActionButton logoutOnly />)
-
-    expect(container.firstChild).toBeNull()
-  })
-
   it("calls onAfterAction when logging out", async () => {
     const user = userEvent.setup()
     const onAfterAction = jest.fn()

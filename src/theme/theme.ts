@@ -34,26 +34,6 @@ export const theme = createTheme({
     primary: { main: "#ff4238" }, // HNMKY red
   },
   components: {
-    MuiTypography: {
-      styleOverrides: {
-        root: {
-          "&.MuiTypography-body1, &.MuiTypography-body2": {
-            marginTop: 8,
-            marginBottom: 8,
-          },
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          "& .MuiTypography-root": {
-            marginTop: 0,
-            marginBottom: 0,
-          },
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: { textTransform: "none" },
@@ -84,25 +64,12 @@ export const theme = createTheme({
         root: {
           paddingTop: 12,
           paddingBottom: 12,
-          "&.Mui-selected": {
-            backgroundColor: "rgba(255, 66, 56, 0.2)", // primary.light equivalent
-            color: "#ff4238",
-            "& .MuiListItemIcon-root": {
-              color: "#ff4238",
-            },
-          },
         },
       },
     },
     MuiListItemText: {
       styleOverrides: {
         root: {
-          marginTop: 0,
-          marginBottom: 0,
-          "& .MuiTypography-root": {
-            marginTop: 0,
-            marginBottom: 0,
-          },
           "&.steps-list-text": {
             "& .MuiListItemText-primary": {
               fontWeight: 600,
