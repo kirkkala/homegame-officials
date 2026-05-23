@@ -72,6 +72,9 @@ const navListItemSx = (theme: Theme) => {
 
   return {
     borderRadius: 1,
+    "& .MuiListItemIcon-root": {
+      minWidth: 36,
+    },
     "&:hover:not(.Mui-selected)": {
       bgcolor: "grey.100",
     },
