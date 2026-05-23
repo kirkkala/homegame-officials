@@ -4,6 +4,8 @@ import {
   Close as CloseIcon,
   HelpOutline as HelpOutlineIcon,
   Home as HomeIcon,
+  Login as LoginIcon,
+  Logout as LogoutIcon,
   MedicalServicesOutlined as MedicalServicesIcon,
   Menu as MenuIcon,
   Settings as SettingsIcon,
@@ -30,10 +32,9 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { useState } from "react"
 import packageJson from "../../package.json"
-import { AuthActionButton } from "./auth-action-button"
 import { TeamSelector } from "./team-selector"
 
 type PageItem = {
@@ -59,6 +60,11 @@ export function MainHeader() {
   const visiblePages = PAGES.filter((page) => !page.requiresAuth || !!user)
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open)
+
+  const handleLogout = () => {
+    void signOut({ callbackUrl: "/" })
+    setDrawerOpen(false)
+  }
 
   return (
     <>
@@ -146,7 +152,13 @@ export function MainHeader() {
 
             {/* Desktop: tabs navigation */}
             <Tabs
-              value={visiblePages.some((page) => page.path === pathname) ? pathname : false}
+              value={
+                visiblePages.some((page) => page.path === pathname)
+                  ? pathname
+                  : pathname === "/kirjaudu"
+                    ? "/kirjaudu"
+                    : false
+              }
               component="nav"
               sx={{ display: { xs: "none", sm: "flex" }, alignSelf: "flex-end" }}
             >
@@ -162,8 +174,36 @@ export function MainHeader() {
                   sx={{ fontWeight: pathname === page.path ? 700 : 400, px: 2 }}
                 />
               ))}
+              {!authLoading &&
+                (user ? (
+                  <Tab
+                    label="Kirjaudu ulos"
+                    icon={<LogoutIcon />}
+                    iconPosition="start"
+                    onClick={handleLogout}
+                    sx={{ fontWeight: 400, px: 2 }}
+                  />
+                ) : (
+                  <Tab
+                    label="Kirjaudu"
+                    value="/kirjaudu"
+                    href="/kirjaudu"
+                    component={Link}
+                    icon={<LoginIcon />}
+                    iconPosition="start"
+                    sx={{ fontWeight: pathname === "/kirjaudu" ? 700 : 400, px: 2 }}
+                  />
+                ))}
             </Tabs>
-            <AuthActionButton logoutOnly />
+            {!authLoading && user && (
+              <IconButton
+                aria-label="Kirjaudu ulos"
+                onClick={handleLogout}
+                sx={{ display: { xs: "inline-flex", sm: "none" }, ml: 1 }}
+              >
+                <LogoutIcon />
+              </IconButton>
+            )}
           </Toolbar>
         </Box>
       </AppBar>
@@ -220,20 +260,29 @@ export function MainHeader() {
                 </ListItem>
               )
             })}
+            {!authLoading && (
+              <>
+                <Divider sx={{ my: 1 }} />
+                <ListItem disablePadding>
+                  {user ? (
+                    <ListItemButton onClick={handleLogout}>
+                      <ListItemIcon>
+                        <LogoutIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Kirjaudu ulos" />
+                    </ListItemButton>
+                  ) : (
+                    <ListItemButton component={Link} href="/kirjaudu" onClick={toggleDrawer(false)}>
+                      <ListItemIcon>
+                        <LoginIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Kirjaudu" />
+                    </ListItemButton>
+                  )}
+                </ListItem>
+              </>
+            )}
           </List>
-
-          {!authLoading && (
-            <>
-              <Divider />
-              <Box sx={{ p: 2 }}>
-                <AuthActionButton
-                  fullWidth
-                  onAfterAction={toggleDrawer(false)}
-                  sx={{ justifyContent: "flex-start" }}
-                />
-              </Box>
-            </>
-          )}
         </Box>
       </Drawer>
     </>

@@ -8,7 +8,6 @@ import { signOut, useSession } from "next-auth/react"
 type AuthActionButtonProps = {
   size?: "small" | "medium"
   fullWidth?: boolean
-  logoutOnly?: boolean
   loginVariant?: "text" | "contained" | "outlined"
   sx?: SxProps<Theme>
   onAfterAction?: () => void
@@ -17,7 +16,6 @@ type AuthActionButtonProps = {
 export function AuthActionButton({
   size = "small",
   fullWidth = false,
-  logoutOnly = false,
   loginVariant = "text",
   sx,
   onAfterAction,
@@ -50,10 +48,6 @@ export function AuthActionButton({
         Kirjaudu ulos
       </Button>
     )
-  }
-
-  if (logoutOnly) {
-    return null
   }
 
   return (
