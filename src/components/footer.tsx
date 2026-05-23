@@ -25,7 +25,7 @@ export function Footer() {
             }}
           />{" "}
           by{" "}
-          <MuiLink href="https://github.com/kirkkala" target="_blank" rel="noopener noreferrer">
+          <MuiLink href="https://kirkkala.com" target="_blank" rel="noopener noreferrer">
             Timo Kirkkala
           </MuiLink>
         </Typography>
