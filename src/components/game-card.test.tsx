@@ -1,14 +1,14 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { GameCard } from "@/components/game-card"
 
-const mockGetPlayers = jest.fn()
-const mockUpdateOfficial = jest.fn()
+const mockGetPlayers = vi.fn()
+const mockUpdateOfficial = vi.fn()
 
-jest.mock("@/lib/storage", () => ({
+vi.mock("@/lib/storage", () => ({
   getPlayers: (...args: unknown[]) => mockGetPlayers(...args),
   updateOfficial: (...args: unknown[]) => mockUpdateOfficial(...args),
 }))
@@ -57,7 +57,7 @@ describe("GameCard", () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("shows player list when selector opens", async () => {

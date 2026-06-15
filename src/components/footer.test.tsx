@@ -1,4 +1,4 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { render, screen } from "@testing-library/react"
 import { Footer } from "@/components/footer"

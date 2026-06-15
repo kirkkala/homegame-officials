@@ -1,26 +1,26 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { render, screen } from "@testing-library/react"
 import { FirstAidBagsSummary } from "@/components/first-aid-bags-summary"
 
-const mockUseTeam = jest.fn()
-const mockUseFirstAidBags = jest.fn()
+const mockUseTeam = vi.fn()
+const mockUseFirstAidBags = vi.fn()
 
-jest.mock("@/components/team-context", () => ({
+vi.mock("@/components/team-context", () => ({
   useTeam: () => mockUseTeam(),
 }))
 
-jest.mock("@/hooks/use-first-aid-bags", () => ({
+vi.mock("@/hooks/use-first-aid-bags", () => ({
   useFirstAidBags: (...args: unknown[]) => mockUseFirstAidBags(...args),
 }))
 
 describe("FirstAidBagsSummary", () => {
   beforeEach(() => {
-    mockUseFirstAidBags.mockReturnValue({ bags: {}, refresh: jest.fn() })
+    mockUseFirstAidBags.mockReturnValue({ bags: {}, refresh: vi.fn() })
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("renders nothing when no team selected", () => {
@@ -55,7 +55,7 @@ describe("FirstAidBagsSummary", () => {
         bag1: { name: "Matti", lastSeenAt: "2025-01-15T12:00:00.000Z" },
         bag2: null,
       },
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     })
 
     render(<FirstAidBagsSummary />)

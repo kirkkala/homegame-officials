@@ -1,20 +1,20 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { AuthActionButton } from "@/components/auth-action-button"
 
-const mockUseSession = jest.fn()
-const mockSignOut = jest.fn()
+const mockUseSession = vi.fn()
+const mockSignOut = vi.fn()
 
-jest.mock("next-auth/react", () => ({
+vi.mock("next-auth/react", () => ({
   useSession: () => mockUseSession(),
   signOut: (...args: unknown[]) => mockSignOut(...args),
 }))
 
 describe("AuthActionButton", () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("renders nothing while session is loading", () => {
@@ -52,7 +52,7 @@ describe("AuthActionButton", () => {
 
   it("calls onAfterAction when logging out", async () => {
     const user = userEvent.setup()
-    const onAfterAction = jest.fn()
+    const onAfterAction = vi.fn()
     mockUseSession.mockReturnValue({
       data: { user: { email: "a@b.c" } },
       status: "authenticated",
