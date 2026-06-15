@@ -12,7 +12,7 @@ Has also team First aid kit bag tracker (who currently has the bag it). Reduces 
 - **Material UI 7** (MUI) for components and styling
 - **Drizzle ORM** + **Neon postgres** for database
 - **xlsx** (SheetJS) for Excel processing
-- **Jest** + **Testing Library** for tests
+- **Vitest** + **Testing Library** for tests
 - **Biome** for lint and format
 
 ### Prerequisites
