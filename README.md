@@ -115,6 +115,18 @@ pnpm dev
 pnpm run help       # List all scripts and what they do
 ```
 
+### Updating xlsx (SheetJS)
+
+`xlsx` is vendored as a `file:` tarball in `vendor/` (pnpm rejects SheetJS's CDN
+URL without a lockfile `integrity`). To bump the version:
+
+```bash
+curl -sL https://cdn.sheetjs.com/xlsx-0.20.4/xlsx-0.20.4.tgz -o vendor/xlsx-0.20.4.tgz
+git rm vendor/xlsx-0.20.3.tgz
+# update "xlsx": "file:vendor/xlsx-0.20.4.tgz" in package.json, then:
+pnpm install
+```
+
 ## Environments
 
 Preview deployments should not use the production database.
