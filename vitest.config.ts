@@ -22,8 +22,13 @@ export default defineConfig({
         "**/*.test.{ts,tsx}",
         "**/*.d.ts",
         "src/test-utils.ts",
+        // Low-value wiring / definitions / presentational-only files
         "app/**/layout.tsx",
         "app/**/robots.ts",
+        "src/theme/**",
+        "src/db/schema.ts",
+        "src/components/providers.tsx",
+        "src/components/environment-banner.tsx",
       ],
     },
   },
