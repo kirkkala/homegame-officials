@@ -1,4 +1,4 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
@@ -71,7 +71,7 @@ describe("StatisticsDialog", () => {
 
   it("calls onClose when close button clicked", async () => {
     const user = userEvent.setup()
-    const onClose = jest.fn()
+    const onClose = vi.fn()
 
     render(<StatisticsDialog open={true} onClose={onClose} games={[]} />)
 

@@ -1,29 +1,29 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import * as firstAidBags from "@/lib/first-aid-bags"
 import EnsiapulaukutPage from "./page"
 
-const mockUseTeam = jest.fn()
+const mockUseTeam = vi.fn()
 
-jest.mock("@/components/team-context", () => ({
+vi.mock("@/components/team-context", () => ({
   useTeam: () => mockUseTeam(),
 }))
 
-jest.mock("@/components/header", () => ({
+vi.mock("@/components/header", () => ({
   MainHeader: () => <div data-testid="main-header" />,
 }))
 
-jest.mock("@/components/footer", () => ({
+vi.mock("@/components/footer", () => ({
   Footer: () => <div data-testid="footer" />,
 }))
 
-jest.mock("@/lib/first-aid-bags", () => ({
-  getBagCountForTeam: jest.fn(),
-  getFirstAidBags: jest.fn(),
-  setBagHolder: jest.fn(),
-  clearBagHolder: jest.fn(),
+vi.mock("@/lib/first-aid-bags", () => ({
+  getBagCountForTeam: vi.fn(),
+  getFirstAidBags: vi.fn(),
+  setBagHolder: vi.fn(),
+  clearBagHolder: vi.fn(),
 }))
 
 describe("EnsiapulaukutPage", () => {
@@ -32,18 +32,18 @@ describe("EnsiapulaukutPage", () => {
       selectedTeam: null,
       isLoading: false,
     })
-    ;(firstAidBags.getBagCountForTeam as jest.Mock).mockReturnValue(3)
-    ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
+    ;(firstAidBags.getBagCountForTeam as ReturnType<typeof vi.fn>).mockReturnValue(3)
+    ;(firstAidBags.getFirstAidBags as ReturnType<typeof vi.fn>).mockResolvedValue({
       bag1: null,
       bag2: null,
       bag3: null,
     })
-    ;(firstAidBags.setBagHolder as jest.Mock).mockResolvedValue({})
-    ;(firstAidBags.clearBagHolder as jest.Mock).mockResolvedValue({})
+    ;(firstAidBags.setBagHolder as ReturnType<typeof vi.fn>).mockResolvedValue({})
+    ;(firstAidBags.clearBagHolder as ReturnType<typeof vi.fn>).mockResolvedValue({})
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("renders loading spinner when isLoading", () => {
@@ -127,7 +127,7 @@ describe("EnsiapulaukutPage", () => {
       selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
-    ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
+    ;(firstAidBags.getFirstAidBags as ReturnType<typeof vi.fn>).mockResolvedValue({
       bag1: { name: "Matti Meikäläinen", lastSeenAt },
       bag2: null,
       bag3: null,
@@ -247,7 +247,7 @@ describe("EnsiapulaukutPage", () => {
       selectedTeam: { id: "team-1", name: "Test", firstAidBagsEnabled: true },
       isLoading: false,
     })
-    ;(firstAidBags.getFirstAidBags as jest.Mock).mockResolvedValue({
+    ;(firstAidBags.getFirstAidBags as ReturnType<typeof vi.fn>).mockResolvedValue({
       bag1: { name: "Matti", lastSeenAt: "2025-01-15T10:00:00Z" },
       bag2: null,
       bag3: null,

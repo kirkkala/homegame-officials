@@ -1,33 +1,33 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen, waitFor } from "@testing-library/react"
 import { GamesList } from "@/components/games-list"
 import * as storage from "@/lib/storage"
 
-const mockUseTeam = jest.fn()
+const mockUseTeam = vi.fn()
 
-jest.mock("@/components/team-context", () => ({
+vi.mock("@/components/team-context", () => ({
   useTeam: () => mockUseTeam(),
 }))
 
-jest.mock("@/components/game-card", () => ({
+vi.mock("@/components/game-card", () => ({
   GameCard: ({ game }: { game: { id: string; homeTeam: string } }) => (
     <div data-testid={`game-card-${game.id}`}>{game.homeTeam}</div>
   ),
 }))
 
-jest.mock("@/components/statistics-dialog", () => ({
+vi.mock("@/components/statistics-dialog", () => ({
   StatisticsDialog: () => null,
 }))
 
-jest.mock("@/components/first-aid-bags-summary", () => ({
+vi.mock("@/components/first-aid-bags-summary", () => ({
   FirstAidBagsSummary: () => <div data-testid="first-aid-summary-mock">First aid summary</div>,
 }))
 
-jest.mock("@/lib/storage", () => ({
-  getGames: jest.fn(),
-  getPlayers: jest.fn(),
+vi.mock("@/lib/storage", () => ({
+  getGames: vi.fn(),
+  getPlayers: vi.fn(),
 }))
 
 const futureGame = {
@@ -63,12 +63,12 @@ const renderGamesList = () => {
 describe("GamesList", () => {
   beforeEach(() => {
     mockUseTeam.mockReturnValue(baseTeamContext)
-    ;(storage.getGames as jest.Mock).mockResolvedValue([futureGame])
-    ;(storage.getPlayers as jest.Mock).mockResolvedValue([])
+    ;(storage.getGames as ReturnType<typeof vi.fn>).mockResolvedValue([futureGame])
+    ;(storage.getPlayers as ReturnType<typeof vi.fn>).mockResolvedValue([])
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("renders nothing when no team selected", () => {

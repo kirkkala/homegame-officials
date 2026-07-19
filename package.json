@@ -1,6 +1,6 @@
 {
   "name": "homegame-officials",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "private": true,
   "scriptDescriptions": {
     "help": "Lists available scripts, you probably just issues this command",
@@ -11,6 +11,7 @@
     "lint:fix": "Fix linting and formatting issues",
     "test": "Run tests",
     "test:watch": "Run tests in watch mode",
+    "test:coverage": "Run tests and report coverage",
     "db:generate": "Generate migrations",
     "db:migrate": "Run migrations",
     "db:push": "Push schema to database",
@@ -23,8 +24,9 @@
     "start": "next start",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -37,16 +39,16 @@
     "@mui/material": "^7.3.11",
     "@mui/material-nextjs": "^7.3.10",
     "@neondatabase/serverless": "^1.1.0",
-    "@tanstack/react-query": "^5.100.11",
+    "@tanstack/react-query": "^5.101.2",
     "@toolpad/core": "^0.16.0",
     "@vercel/analytics": "^2.0.1",
     "drizzle-orm": "^0.45.2",
-    "next": "^16.2.6",
+    "next": "^16.2.10",
     "next-auth": "^4.24.14",
-    "pg": "^8.21.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "pg": "^8.22.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "xlsx": "file:vendor/xlsx-0.20.3.tgz",
     "zod": "^4.4.3"
   },
   "pnpm": {
@@ -56,7 +58,10 @@
       }
     },
     "overrides": {
-      "esbuild": ">=0.25.0"
+      "esbuild": ">=0.25.0",
+      "yaml": ">=2.8.3",
+      "postcss": ">=8.5.10",
+      "uuid": ">=11.1.1"
     },
     "ignoredBuiltDependencies": [
       "esbuild",
@@ -65,18 +70,19 @@
     ]
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.15",
+    "@biomejs/biome": "^2.5.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^24.12.4",
+    "@types/node": "^24.13.3",
     "@types/pg": "^8.20.0",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "drizzle-kit": "^0.31.10",
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1",
-    "typescript": "^5.9.3"
+    "happy-dom": "^20.10.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
   }
 }

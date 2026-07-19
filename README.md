@@ -12,7 +12,7 @@ Has also team First aid kit bag tracker (who currently has the bag it). Reduces 
 - **Material UI 7** (MUI) for components and styling
 - **Drizzle ORM** + **Neon postgres** for database
 - **xlsx** (SheetJS) for Excel processing
-- **Jest** + **Testing Library** for tests
+- **Vitest** + **Testing Library** for tests
 - **Biome** for lint and format
 
 ### Prerequisites
@@ -113,6 +113,18 @@ pnpm dev
 
 ```bash
 pnpm run help       # List all scripts and what they do
+```
+
+### Updating xlsx (SheetJS)
+
+`xlsx` is vendored as a `file:` tarball in `vendor/` (pnpm rejects SheetJS's CDN
+URL without a lockfile `integrity`). To bump the version:
+
+```bash
+curl -sL https://cdn.sheetjs.com/xlsx-0.20.4/xlsx-0.20.4.tgz -o vendor/xlsx-0.20.4.tgz
+git rm vendor/xlsx-0.20.3.tgz
+# update "xlsx": "file:vendor/xlsx-0.20.4.tgz" in package.json, then:
+pnpm install
 ```
 
 ## Environments

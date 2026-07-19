@@ -13,8 +13,8 @@
       "drizzle/**",
       "drizzle.config.ts",
       "next.config.ts",
-      "jest.config.mjs",
-      "jest.setup.mjs",
+      "vitest.config.ts",
+      "vitest.setup.ts",
       "auth.ts",
       "tsconfig.json",
       "package.json",
@@ -37,7 +37,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "complexity": {
         "noImportantStyles": "off",
         "useLiteralKeys": "off",

@@ -1,13 +1,13 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { render, screen } from "@testing-library/react"
 import TietosuojaPage from "./page"
 
-jest.mock("@/components/header", () => ({
+vi.mock("@/components/header", () => ({
   MainHeader: () => <div data-testid="main-header" />,
 }))
 
-jest.mock("@/components/footer", () => ({
+vi.mock("@/components/footer", () => ({
   Footer: () => <div data-testid="footer" />,
 }))
 

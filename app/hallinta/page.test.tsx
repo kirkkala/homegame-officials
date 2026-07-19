@@ -1,4 +1,4 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
@@ -6,52 +6,52 @@ import userEvent from "@testing-library/user-event"
 import * as storage from "@/lib/storage"
 import HallintaPage from "./page"
 
-const mockParseExcelFile = jest.fn()
-const mockUseTeam = jest.fn()
-const mockUseSession = jest.fn()
+const mockParseExcelFile = vi.fn()
+const mockUseTeam = vi.fn()
+const mockUseSession = vi.fn()
 
-jest.mock("@/lib/excel-parser", () => ({
+vi.mock("@/lib/excel-parser", () => ({
   parseExcelFile: (...args: unknown[]) => mockParseExcelFile(...args),
 }))
 
-jest.mock("@/components/team-context", () => ({
+vi.mock("@/components/team-context", () => ({
   useTeam: () => mockUseTeam(),
 }))
 
-jest.mock("next-auth/react", () => ({
+vi.mock("next-auth/react", () => ({
   useSession: () => mockUseSession(),
 }))
 
-jest.mock("@/components/header", () => ({
+vi.mock("@/components/header", () => ({
   MainHeader: () => <div data-testid="main-header" />,
 }))
 
-jest.mock("@/components/footer", () => ({
+vi.mock("@/components/footer", () => ({
   Footer: () => <div data-testid="footer" />,
 }))
 
-jest.mock("@/components/auth-action-button", () => ({
+vi.mock("@/components/auth-action-button", () => ({
   AuthActionButton: () => <div data-testid="auth-action-button" />,
 }))
 
-jest.mock("@/components/team-selector", () => ({
+vi.mock("@/components/team-selector", () => ({
   TeamSelector: () => <div data-testid="team-selector" />,
 }))
 
-jest.mock("@/lib/storage", () => ({
-  getGames: jest.fn(),
-  getPlayers: jest.fn(),
-  getTeamManagers: jest.fn(),
-  getUsers: jest.fn(),
-  saveGames: jest.fn(),
-  clearAllGames: jest.fn(),
-  savePlayer: jest.fn(),
-  deletePlayer: jest.fn(),
-  updateGameHomeStatus: jest.fn(),
-  updateGameDetails: jest.fn(),
-  deleteGame: jest.fn(),
-  addTeamManager: jest.fn(),
-  removeTeamManager: jest.fn(),
+vi.mock("@/lib/storage", () => ({
+  getGames: vi.fn(),
+  getPlayers: vi.fn(),
+  getTeamManagers: vi.fn(),
+  getUsers: vi.fn(),
+  saveGames: vi.fn(),
+  clearAllGames: vi.fn(),
+  savePlayer: vi.fn(),
+  deletePlayer: vi.fn(),
+  updateGameHomeStatus: vi.fn(),
+  updateGameDetails: vi.fn(),
+  deleteGame: vi.fn(),
+  addTeamManager: vi.fn(),
+  removeTeamManager: vi.fn(),
 }))
 
 const renderHallintaPage = () => {
@@ -75,22 +75,22 @@ describe("HallintaPage", () => {
     mockUseTeam.mockReturnValue({
       selectedTeam: { id: "team-1", name: "HNMKY T14 Stadi", createdAt: "2025-01-01" },
       isLoading: false,
-      deleteTeam: jest.fn(),
+      deleteTeam: vi.fn(),
     })
     mockParseExcelFile.mockReset()
-    ;(storage.getGames as jest.Mock).mockResolvedValue([])
-    ;(storage.getPlayers as jest.Mock).mockResolvedValue([])
-    ;(storage.getTeamManagers as jest.Mock).mockResolvedValue([])
-    ;(storage.getUsers as jest.Mock).mockResolvedValue([])
-    ;(storage.saveGames as jest.Mock).mockResolvedValue([])
-    ;(storage.clearAllGames as jest.Mock).mockResolvedValue(undefined)
-    ;(storage.savePlayer as jest.Mock).mockResolvedValue(undefined)
-    ;(storage.deletePlayer as jest.Mock).mockResolvedValue(undefined)
-    ;(storage.updateGameHomeStatus as jest.Mock).mockResolvedValue(undefined)
-    ;(storage.updateGameDetails as jest.Mock).mockResolvedValue(undefined)
-    ;(storage.deleteGame as jest.Mock).mockResolvedValue(undefined)
-    ;(storage.addTeamManager as jest.Mock).mockResolvedValue(undefined)
-    ;(storage.removeTeamManager as jest.Mock).mockResolvedValue(undefined)
+    ;(storage.getGames as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.getPlayers as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.getTeamManagers as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.getUsers as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.saveGames as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.clearAllGames as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(storage.savePlayer as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(storage.deletePlayer as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(storage.updateGameHomeStatus as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(storage.updateGameDetails as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(storage.deleteGame as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(storage.addTeamManager as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(storage.removeTeamManager as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
 
     if (!File.prototype.arrayBuffer) {
       Object.defineProperty(File.prototype, "arrayBuffer", {
@@ -101,7 +101,7 @@ describe("HallintaPage", () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("shows error snackbar when uploading non-excel file", async () => {
@@ -195,7 +195,7 @@ describe("HallintaPage", () => {
 
   it("removes a player after confirmation", async () => {
     const user = userEvent.setup()
-    ;(storage.getPlayers as jest.Mock).mockResolvedValue([
+    ;(storage.getPlayers as ReturnType<typeof vi.fn>).mockResolvedValue([
       { id: "p1", teamId: "team-1", name: "Matti Meikäläinen", createdAt: "2025-01-01" },
     ])
     renderHallintaPage()
@@ -214,7 +214,7 @@ describe("HallintaPage", () => {
 
   it("marks home game via checkbox", async () => {
     const user = userEvent.setup()
-    ;(storage.getGames as jest.Mock).mockResolvedValue([
+    ;(storage.getGames as ReturnType<typeof vi.fn>).mockResolvedValue([
       {
         id: "g1",
         teamId: "team-1",
@@ -280,7 +280,7 @@ describe("HallintaPage", () => {
 
   it("deletes a single game after confirmation", async () => {
     const user = userEvent.setup()
-    ;(storage.getGames as jest.Mock).mockResolvedValue([
+    ;(storage.getGames as ReturnType<typeof vi.fn>).mockResolvedValue([
       {
         id: "g2",
         teamId: "team-1",
@@ -309,7 +309,7 @@ describe("HallintaPage", () => {
 })
 
 describe("HallintaPage delete team", () => {
-  const mockDeleteTeam = jest.fn()
+  const mockDeleteTeam = vi.fn()
 
   beforeEach(() => {
     mockUseSession.mockReturnValue({
@@ -321,15 +321,15 @@ describe("HallintaPage delete team", () => {
       isLoading: false,
       deleteTeam: mockDeleteTeam,
     })
-    ;(storage.getGames as jest.Mock).mockResolvedValue([])
-    ;(storage.getPlayers as jest.Mock).mockResolvedValue([])
-    ;(storage.getTeamManagers as jest.Mock).mockResolvedValue([])
-    ;(storage.getUsers as jest.Mock).mockResolvedValue([])
+    ;(storage.getGames as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.getPlayers as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.getTeamManagers as ReturnType<typeof vi.fn>).mockResolvedValue([])
+    ;(storage.getUsers as ReturnType<typeof vi.fn>).mockResolvedValue([])
     mockDeleteTeam.mockReset()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("opens delete team dialog when clicking Poista joukkue", async () => {

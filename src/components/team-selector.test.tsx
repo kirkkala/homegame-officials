@@ -1,18 +1,18 @@
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="@testing-library/jest-dom/vitest" />
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { fireEvent, render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { TeamSelector } from "@/components/team-selector"
 
-const mockUseTeam = jest.fn()
-const mockUseSession = jest.fn()
+const mockUseTeam = vi.fn()
+const mockUseSession = vi.fn()
 
-jest.mock("@/components/team-context", () => ({
+vi.mock("@/components/team-context", () => ({
   useTeam: () => mockUseTeam(),
 }))
 
-jest.mock("next-auth/react", () => ({
+vi.mock("next-auth/react", () => ({
   useSession: () => mockUseSession(),
 }))
 
@@ -23,10 +23,10 @@ const baseTeamContext = {
   ],
   selectedTeam: { id: "team-1", name: "HNMKY T14 Stadi", createdAt: "2025-01-01" },
   isLoading: false,
-  selectTeam: jest.fn(),
-  createTeam: jest.fn(),
-  deleteTeam: jest.fn(),
-  refreshTeams: jest.fn(),
+  selectTeam: vi.fn(),
+  createTeam: vi.fn(),
+  deleteTeam: vi.fn(),
+  refreshTeams: vi.fn(),
 }
 
 const renderTeamSelector = (props?: React.ComponentProps<typeof TeamSelector>) => {
@@ -48,7 +48,7 @@ describe("TeamSelector", () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it("renders nothing while loading", () => {
