@@ -111,7 +111,7 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
-          "default": "'{\"poytakirja\":null,\"kello\":null}'::jsonb"
+          "default": "'{\"poytakirja\":null,\"kello\":null,\"hyokkaysaika\":null}'::jsonb"
         },
         "created_at": {
           "name": "created_at",

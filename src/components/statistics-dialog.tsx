@@ -92,8 +92,8 @@ export function StatisticsDialog({
       </DialogTitle>
       <DialogContent>
         <Typography variant="caption" color="text.secondary" component="div" sx={{ mb: 2 }}>
-          Tilasto näyttää kuinka monta toimitsijavuoroa (pöytäkirja tai kello) kullakin pelaajalla
-          on vahvistettuna.
+          Tilasto näyttää kuinka monta toimitsijavuoroa (pöytäkirja, kello tai hyökkäysaika)
+          kullakin pelaajalla on vahvistettuna.
         </Typography>
         {stats.length === 0 ? (
           <Box py={4} textAlign="center">

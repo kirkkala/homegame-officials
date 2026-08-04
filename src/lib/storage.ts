@@ -29,6 +29,8 @@ export type Game = {
   officials: {
     poytakirja: OfficialAssignment | null
     kello: OfficialAssignment | null
+    // Optional so existing games without this role stay valid until backfilled.
+    hyokkaysaika?: OfficialAssignment | null
   }
   createdAt: string
 }
@@ -170,7 +172,7 @@ export async function clearAllGames(teamId?: string): Promise<void> {
 export async function updateOfficial(
   gameId: string,
   teamId: string,
-  role: "poytakirja" | "kello",
+  role: "poytakirja" | "kello" | "hyokkaysaika",
   assignment: OfficialAssignment | null
 ): Promise<Game> {
   const res = await fetch(`/api/games/${gameId}`, {

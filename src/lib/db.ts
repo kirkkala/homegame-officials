@@ -174,7 +174,7 @@ export async function createGames(games: Omit<schema.NewGame, "createdAt">[], te
       newGames.map((game) => ({
         ...game,
         teamId,
-        officials: game.officials || { poytakirja: null, kello: null },
+        officials: game.officials || { poytakirja: null, kello: null, hyokkaysaika: null },
       }))
     )
     .returning()
@@ -207,6 +207,10 @@ export async function updateGame(
           ? updates.officials.poytakirja
           : game.officials.poytakirja,
       kello: updates.officials.kello !== undefined ? updates.officials.kello : game.officials.kello,
+      hyokkaysaika:
+        updates.officials.hyokkaysaika !== undefined
+          ? updates.officials.hyokkaysaika
+          : (game.officials.hyokkaysaika ?? null),
     }
   }
 

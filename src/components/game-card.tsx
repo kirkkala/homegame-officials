@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  AvTimer as AvTimerIcon,
   CheckCircle as CheckCircleIcon,
   Clear as ClearIcon,
   Close as CloseIcon,
@@ -45,9 +46,10 @@ import { formatDate } from "@/lib/utils"
 const ROLES = {
   poytakirja: { label: "Pöytäkirja (eSCO)", Icon: LaptopChromebookIcon },
   kello: { label: "Kello (tulostaulu)", Icon: TimerIcon },
+  hyokkaysaika: { label: "Hyökkäysaika (24 s)", Icon: AvTimerIcon },
 } as const
 
-type Role = "poytakirja" | "kello"
+type Role = "poytakirja" | "kello" | "hyokkaysaika"
 
 function OfficialButton({
   gameId,
@@ -602,6 +604,16 @@ export function GameCard({
               gameId={game.id}
               role="kello"
               assignment={game.officials.kello}
+              teamId={game.teamId}
+              gameDivisionId={game.divisionId}
+              gameDate={game.date}
+              gameTime={game.time}
+              playerStats={playerStats}
+            />
+            <OfficialButton
+              gameId={game.id}
+              role="hyokkaysaika"
+              assignment={game.officials.hyokkaysaika ?? null}
               teamId={game.teamId}
               gameDivisionId={game.divisionId}
               gameDate={game.date}

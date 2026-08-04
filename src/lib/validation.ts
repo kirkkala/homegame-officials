@@ -52,6 +52,7 @@ export const updateGameSchema = z.object({
     .object({
       poytakirja: officialAssignmentSchema.optional(),
       kello: officialAssignmentSchema.optional(),
+      hyokkaysaika: officialAssignmentSchema.optional(),
     })
     .optional(),
   teamId: idString.optional(),

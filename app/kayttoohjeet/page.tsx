@@ -84,7 +84,7 @@ export default function KayttoohjeetPage() {
                 </ListItemIcon>
                 <ListItemText
                   primary="2. Jaa toimitsijavuorot"
-                  secondary='Valitse pelin eSCO- ja kellovuoron vastuu painamalla "Valitse pelaaja...". Avautuvasta pudotusvalikosta valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
+                  secondary='Valitse pelin eSCO-, kello- ja hyökkäysaikavuoron (24 s) vastuu painamalla "Valitse pelaaja...". Avautuvasta pudotusvalikosta valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
                   className="steps-list-text"
                 />
               </ListItem>

@@ -10,7 +10,7 @@ export const makeGame = (overrides: Partial<Game> = {}): Game => ({
   date: "2025-01-30",
   time: "18:30",
   location: "Halli 1",
-  officials: { poytakirja: null, kello: null },
+  officials: { poytakirja: null, kello: null, hyokkaysaika: null },
   createdAt: "2025-01-01T00:00:00Z",
   ...overrides,
 })

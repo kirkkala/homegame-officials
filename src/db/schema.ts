@@ -18,6 +18,9 @@ export type OfficialAssignment = {
 export type Officials = {
   poytakirja: OfficialAssignment | null
   kello: OfficialAssignment | null
+  // Optional so existing rows (created before this role existed) remain valid
+  // until they are backfilled / updated.
+  hyokkaysaika?: OfficialAssignment | null
 }
 
 // Teams
@@ -71,7 +74,7 @@ export const games = pgTable("games", {
   officials: jsonb("officials")
     .$type<Officials>()
     .notNull()
-    .default({ poytakirja: null, kello: null }),
+    .default({ poytakirja: null, kello: null, hyokkaysaika: null }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
