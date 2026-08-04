@@ -65,6 +65,16 @@ export const updateGameSchema = z.object({
   location: z.string().max(200).optional(),
 })
 
+export const updateTeamSettingsSchema = z
+  .object({
+    firstAidBagsEnabled: z.boolean().optional(),
+    firstAidBagCount: z.number().int().min(1).max(6).optional(),
+    shotClockEnabled: z.boolean().optional(),
+  })
+  .refine((data) => Object.values(data).some((value) => value !== undefined), {
+    message: "At least one setting must be provided",
+  })
+
 export const teamManagerSchema = z.object({
   email: emailString,
 })

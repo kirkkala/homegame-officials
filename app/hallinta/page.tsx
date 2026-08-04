@@ -74,7 +74,7 @@ import {
   savePlayer,
   updateGameDetails,
   updateGameHomeStatus,
-  updateTeamFirstAidSettings,
+  updateTeamSettings,
 } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
@@ -498,10 +498,22 @@ export default function HallintaPage() {
 
   const updateFirstAidMutation = useMutation({
     mutationFn: (settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }) =>
-      updateTeamFirstAidSettings(selectedTeam!.id, settings),
+      updateTeamSettings(selectedTeam!.id, settings),
     onSuccess: () => {
       refreshTeams()
       setSnackbar({ type: "success", message: "Ensiapulaukut-asetukset päivitetty" })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Asetusten päivitys epäonnistui" })
+    },
+  })
+
+  const updateShotClockMutation = useMutation({
+    mutationFn: (shotClockEnabled: boolean) =>
+      updateTeamSettings(selectedTeam!.id, { shotClockEnabled }),
+    onSuccess: () => {
+      refreshTeams()
+      setSnackbar({ type: "success", message: "Toimitsija-asetukset päivitetty" })
     },
     onError: () => {
       setSnackbar({ type: "error", message: "Asetusten päivitys epäonnistui" })
@@ -907,9 +919,31 @@ export default function HallintaPage() {
                       )}
                     </Box>
 
+                    <Box>
+                      <Typography component="h3" variant="h6" gutterBottom>
+                        Toimitsijat
+                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={!!selectedTeam.shotClockEnabled}
+                            onChange={(_, checked) => updateShotClockMutation.mutate(checked)}
+                            disabled={updateShotClockMutation.isPending}
+                          />
+                        }
+                        label="24 sekunnin kello (hyökkäysaika)"
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        U13 ja vanhemmat: Lisää 24 sekunnin hyökkäyskellon toimitsija otteluihin.
+                      </Typography>
+                    </Box>
+
                     <Divider sx={{ my: 2 }} />
 
                     <Box>
+                      <Typography component="h3" variant="h6" gutterBottom>
+                        Joukkueen pääkäyttäjät
+                      </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Käyttäjät, jotka voivat hallita tämän joukkueen otteluita ja pelaajia.
                         {adminEmail
@@ -973,6 +1007,7 @@ export default function HallintaPage() {
                       startIcon={<DeleteForeverIcon />}
                       onClick={handleDeleteTeam}
                       disabled={deleteTeamMutation.isPending}
+                      sx={{ mt: 2 }}
                     >
                       Poista joukkue
                     </Button>
@@ -1396,16 +1431,17 @@ export default function HallintaPage() {
         onClose={closeDeleteTeamDialog}
         aria-labelledby="delete-team-dialog-title"
       >
-        <DialogTitle id="delete-team-dialog-title">Poista joukkue</DialogTitle>
+        <DialogTitle id="delete-team-dialog-title">
+          Poista joukkue &quot;{deleteTeamDialog.teamName}&quot;?
+        </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Haluatko varmasti poistaa joukkueen &quot;{deleteTeamDialog.teamName}&quot;? Tämä
-            poistaa myös kaikki joukkueen ottelut sekä pelaajat. Toimintoa ei voi peruuttaa.
+            Tämä poistaa myös joukkueen asetukset, ottelut sekä pelaajat. Toimintoa ei voi perua.
           </DialogContentText>
           <TextField
             fullWidth
             size="small"
-            label={`Kirjoita "${deleteTeamDialog.teamName}" vahvistaaksesi`}
+            label={`Kirjoita joukkueen nimi "${deleteTeamDialog.teamName}" vahvistaaksesi`}
             value={deleteTeamDialog.confirmInput}
             onChange={(e) =>
               setDeleteTeamDialog((prev) => ({ ...prev, confirmInput: e.target.value }))

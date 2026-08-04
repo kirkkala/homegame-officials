@@ -30,14 +30,14 @@ const baseGame = {
   createdAt: "2025-01-01T00:00:00Z",
 }
 
-const renderGameCard = (gameOverride = {}) => {
+const renderGameCard = (gameOverride = {}, props: { showShotClock?: boolean } = {}) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <GameCard game={{ ...baseGame, ...gameOverride }} />
+      <GameCard game={{ ...baseGame, ...gameOverride }} {...props} />
     </QueryClientProvider>
   )
 }
@@ -70,17 +70,25 @@ describe("GameCard", () => {
     expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
   })
 
-  it("renders all three official role buttons for a home game", () => {
-    renderGameCard()
+  it("renders all three official role buttons when the shot clock is enabled", () => {
+    renderGameCard({}, { showShotClock: true })
 
     expect(screen.getByTestId("official-button-poytakirja")).toBeInTheDocument()
     expect(screen.getByTestId("official-button-kello")).toBeInTheDocument()
     expect(screen.getByTestId("official-button-hyokkaysaika")).toBeInTheDocument()
   })
 
+  it("hides the shot clock button when the setting is disabled (default)", () => {
+    renderGameCard()
+
+    expect(screen.getByTestId("official-button-poytakirja")).toBeInTheDocument()
+    expect(screen.getByTestId("official-button-kello")).toBeInTheDocument()
+    expect(screen.queryByTestId("official-button-hyokkaysaika")).not.toBeInTheDocument()
+  })
+
   it("assigns a player to the hyokkaysaika (24s) role", async () => {
     const user = userEvent.setup()
-    renderGameCard()
+    renderGameCard({}, { showShotClock: true })
 
     await user.click(screen.getByTestId("official-button-hyokkaysaika"))
 

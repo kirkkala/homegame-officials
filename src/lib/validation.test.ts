@@ -6,6 +6,7 @@ import {
   teamManagerSchema,
   updateBagHolderSchema,
   updateGameSchema,
+  updateTeamSettingsSchema,
   validate,
 } from "@/lib/validation"
 
@@ -143,6 +144,35 @@ describe("validation", () => {
         officials: { poytakirja: { playerName: "Pekka", handledBy: "someone", confirmedBy: null } },
       })
       expect(result.success).toBe(false)
+    })
+  })
+
+  describe("updateTeamSettingsSchema", () => {
+    it("accepts a shot clock toggle on its own", () => {
+      const result = validate(updateTeamSettingsSchema, { shotClockEnabled: true })
+      expect(result).toEqual({ success: true, data: { shotClockEnabled: true } })
+    })
+
+    it("accepts first aid settings on their own", () => {
+      const result = validate(updateTeamSettingsSchema, {
+        firstAidBagsEnabled: true,
+        firstAidBagCount: 3,
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("rejects an empty object (no settings provided)", () => {
+      expect(validate(updateTeamSettingsSchema, {}).success).toBe(false)
+    })
+
+    it("rejects a non-boolean shotClockEnabled", () => {
+      expect(validate(updateTeamSettingsSchema, { shotClockEnabled: "yes" }).success).toBe(false)
+    })
+
+    it.each([0, 7, 2.5])("rejects firstAidBagCount %s", (firstAidBagCount) => {
+      expect(
+        validate(updateTeamSettingsSchema, { firstAidBagsEnabled: true, firstAidBagCount }).success
+      ).toBe(false)
     })
   })
 

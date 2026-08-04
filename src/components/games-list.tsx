@@ -309,6 +309,7 @@ export function GamesList() {
                 game={game}
                 isPast={isGamePast(game.date)}
                 playerStats={playerStats}
+                showShotClock={!!selectedTeam.shotClockEnabled}
               />
             ))}
           </Stack>

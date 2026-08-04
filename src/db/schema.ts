@@ -29,6 +29,8 @@ export const teams = pgTable("teams", {
   name: text("name").notNull(),
   firstAidBagsEnabled: boolean("first_aid_bags_enabled").notNull().default(false),
   firstAidBagCount: text("first_aid_bag_count").notNull().default("3"), // 1-10
+  // 24-second shot clock official (hyökkäysaika) — only needed for U13 and older
+  shotClockEnabled: boolean("shot_clock_enabled").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 

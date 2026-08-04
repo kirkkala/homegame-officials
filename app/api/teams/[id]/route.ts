@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { requireTeamManager } from "@/lib/auth-api"
-import { deleteTeam, getTeamById, updateTeamFirstAidSettings } from "@/lib/db"
+import { deleteTeam, getTeamById, updateTeamSettings } from "@/lib/db"
+import { updateTeamSettingsSchema, validate } from "@/lib/validation"
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,24 +16,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if ("response" in auth) return auth.response
 
     const body = await request.json()
-    const firstAidBagsEnabled = body.firstAidBagsEnabled
-    const firstAidBagCount = body.firstAidBagCount
-
-    if (typeof firstAidBagsEnabled !== "boolean") {
-      return NextResponse.json({ error: "firstAidBagsEnabled must be a boolean" }, { status: 400 })
-    }
-    const count = Number(firstAidBagCount)
-    if (!Number.isInteger(count) || count < 1 || count > 6) {
-      return NextResponse.json(
-        { error: "firstAidBagCount must be an integer between 1 and 6" },
-        { status: 400 }
-      )
+    const result = validate(updateTeamSettingsSchema, body)
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 })
     }
 
-    const updated = await updateTeamFirstAidSettings(id, {
-      firstAidBagsEnabled,
-      firstAidBagCount: count,
-    })
+    const updated = await updateTeamSettings(id, result.data)
     return NextResponse.json(updated)
   } catch (error) {
     console.error("Failed to update team:", error)

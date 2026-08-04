@@ -13,6 +13,7 @@ export type Team = {
   name: string
   firstAidBagsEnabled?: boolean
   firstAidBagCount?: string
+  shotClockEnabled?: boolean
   createdAt: string
 }
 
@@ -74,9 +75,13 @@ export async function deleteTeam(id: string): Promise<void> {
   }
 }
 
-export async function updateTeamFirstAidSettings(
+export async function updateTeamSettings(
   teamId: string,
-  settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }
+  settings: {
+    firstAidBagsEnabled?: boolean
+    firstAidBagCount?: number
+    shotClockEnabled?: boolean
+  }
 ): Promise<Team> {
   const res = await fetch(`/api/teams/${teamId}`, {
     method: "PATCH",

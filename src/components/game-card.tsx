@@ -10,10 +10,12 @@ export function GameCard({
   game,
   isPast = false,
   playerStats,
+  showShotClock = false,
 }: {
   game: Game
   isPast?: boolean
   playerStats?: Map<string, number>
+  showShotClock?: boolean
 }) {
   const gameName = `${game.homeTeam} vs. ${game.awayTeam}`
   return (
@@ -105,17 +107,19 @@ export function GameCard({
               gameTime={game.time}
               playerStats={playerStats}
             />
-            <OfficialAssigner
-              gameId={game.id}
-              role="hyokkaysaika"
-              assignment={game.officials.hyokkaysaika ?? null}
-              teamId={game.teamId}
-              gameName={gameName}
-              gameDivisionId={game.divisionId}
-              gameDate={game.date}
-              gameTime={game.time}
-              playerStats={playerStats}
-            />
+            {showShotClock && (
+              <OfficialAssigner
+                gameId={game.id}
+                role="hyokkaysaika"
+                assignment={game.officials.hyokkaysaika ?? null}
+                teamId={game.teamId}
+                gameName={gameName}
+                gameDivisionId={game.divisionId}
+                gameDate={game.date}
+                gameTime={game.time}
+                playerStats={playerStats}
+              />
+            )}
           </Stack>
         )}
       </CardContent>

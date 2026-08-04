@@ -52,16 +52,28 @@ export async function deleteTeam(id: string) {
   await db.delete(schema.teams).where(eq(schema.teams.id, id))
 }
 
-export async function updateTeamFirstAidSettings(
+export async function updateTeamSettings(
   id: string,
-  settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }
+  settings: {
+    firstAidBagsEnabled?: boolean
+    firstAidBagCount?: number
+    shotClockEnabled?: boolean
+  }
 ) {
+  const updateData: Partial<schema.Team> = {}
+  if (settings.firstAidBagsEnabled !== undefined) {
+    updateData.firstAidBagsEnabled = settings.firstAidBagsEnabled
+  }
+  if (settings.firstAidBagCount !== undefined) {
+    updateData.firstAidBagCount = String(Math.min(6, Math.max(1, settings.firstAidBagCount)))
+  }
+  if (settings.shotClockEnabled !== undefined) {
+    updateData.shotClockEnabled = settings.shotClockEnabled
+  }
+
   const result = await db
     .update(schema.teams)
-    .set({
-      firstAidBagsEnabled: settings.firstAidBagsEnabled,
-      firstAidBagCount: String(Math.min(6, Math.max(1, settings.firstAidBagCount))),
-    })
+    .set(updateData)
     .where(eq(schema.teams.id, id))
     .returning()
   return result[0]
