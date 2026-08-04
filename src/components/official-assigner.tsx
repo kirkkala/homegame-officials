@@ -40,7 +40,7 @@ import {
   Typography,
 } from "@mui/material"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect, useRef, useState } from "react"
+import { type ElementType, type ReactNode, useEffect, useRef, useState } from "react"
 import { getPlayers, type OfficialAssignment, type Player, updateOfficial } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
@@ -107,7 +107,7 @@ function PlayerPicker({
           inputRef={inputRef}
           fullWidth
           size="small"
-          placeholder="Hae pelaajaa..."
+          placeholder="Etsi..."
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           slotProps={{
@@ -152,6 +152,60 @@ function PlayerPicker({
   )
 }
 
+/**
+ * Shared dialog header showing the official role, contextual action and game info.
+ * Reused across the selection, confirm-handler and destructive-confirm dialogs so
+ * every dialog surfaces the same "which official / which game" context.
+ */
+function OfficialDialogHeader({
+  Icon,
+  label,
+  action,
+  gameDivisionId,
+  gameDate,
+  gameTime,
+  gameName,
+  onClose,
+}: {
+  Icon: ElementType
+  label: string
+  action?: string
+  gameDivisionId?: string | null
+  gameDate: string
+  gameTime: string
+  gameName: string
+  onClose?: () => void
+}) {
+  return (
+    <Box sx={{ minWidth: 0 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
+          <Icon sx={{ color: "text.secondary", flexShrink: 0 }} />
+          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }} noWrap>
+            {label}
+          </Typography>
+        </Stack>
+        {onClose && (
+          <IconButton size="small" aria-label="Sulje valikko" onClick={onClose}>
+            <CloseIcon sx={{ fontSize: "1rem" }} />
+          </IconButton>
+        )}
+      </Stack>
+      {action && (
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          {action}
+        </Typography>
+      )}
+      <Typography variant="body2" color="text.secondary">
+        {[gameDivisionId ?? null, `${formatDate(gameDate)} klo ${gameTime}`]
+          .filter(Boolean)
+          .join(" / ")}
+      </Typography>
+      <Typography variant="body2">{gameName}</Typography>
+    </Box>
+  )
+}
+
 export function OfficialAssigner({
   gameId,
   role,
@@ -181,9 +235,9 @@ export function OfficialAssigner({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean
-    message: string
+    message: ReactNode
     onConfirm: () => void
-  }>({ open: false, message: "", onConfirm: () => {} })
+  }>({ open: false, message: null, onConfirm: () => {} })
   const { label, Icon } = ROLES[role]
 
   // Mutation for updating official
@@ -219,7 +273,12 @@ export function OfficialAssigner({
       setSelectionOpen(false)
       setConfirmDialog({
         open: true,
-        message: `Vaihda ${assignment.playerName} → ${playerName}?`,
+        message: (
+          <>
+            Vaihda pelaajavastuu <strong>{assignment.playerName}</strong> →{" "}
+            <strong>{playerName}</strong>?
+          </>
+        ),
         onConfirm: () => mutation.mutate({ playerName, handledBy: null, confirmedBy: null }),
       })
       return
@@ -256,7 +315,12 @@ export function OfficialAssigner({
     setSelectionOpen(false)
     setConfirmDialog({
       open: true,
-      message: `Poista pelaajan ${assignment?.playerName} toimitsijavastuu tästä ottelusta?`,
+      message: (
+        <>
+          Poista pelaajan <strong>{assignment?.playerName}</strong> toimitsijavastuu tästä
+          ottelusta?
+        </>
+      ),
       onConfirm: () => mutation.mutate(null),
     })
   }
@@ -346,32 +410,16 @@ export function OfficialAssigner({
         fullWidth
       >
         <DialogTitle sx={{ px: 1.5, pt: 2.5, pb: 1.5 }}>
-          <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={1}>
-            <Stack direction="row" spacing={1} sx={{ minWidth: 0 }}>
-              <Icon sx={{ mt: 0.5, color: "text.secondary", flexShrink: 0 }} />
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-                  {label}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {getActionHeading()}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {[gameDivisionId ?? null, `${formatDate(gameDate)} klo ${gameTime}`]
-                    .filter(Boolean)
-                    .join(" / ")}
-                </Typography>
-                <Typography variant="body2">{gameName}</Typography>
-              </Box>
-            </Stack>
-            <IconButton
-              size="small"
-              aria-label="Sulje valikko"
-              onClick={() => setSelectionOpen(false)}
-            >
-              <CloseIcon sx={{ fontSize: "1rem" }} />
-            </IconButton>
-          </Stack>
+          <OfficialDialogHeader
+            Icon={Icon}
+            label={label}
+            action={getActionHeading()}
+            gameDivisionId={gameDivisionId}
+            gameDate={gameDate}
+            gameTime={gameTime}
+            gameName={gameName}
+            onClose={() => setSelectionOpen(false)}
+          />
         </DialogTitle>
         <DialogContent dividers sx={{ px: 0, pt: 1, pb: 1.5 }}>
           <List disablePadding>
@@ -490,6 +538,17 @@ export function OfficialAssigner({
             handleConfirm()
           }}
         >
+          <DialogTitle sx={{ px: 3, pt: 2.5, pb: 1 }}>
+            <OfficialDialogHeader
+              Icon={Icon}
+              label={label}
+              action={dialogType === "guardian" ? "Huoltaja tekee vuoron" : "Juniori poolista"}
+              gameDivisionId={gameDivisionId}
+              gameDate={gameDate}
+              gameTime={gameTime}
+              gameName={gameName}
+            />
+          </DialogTitle>
           <DialogContent>
             {dialogType === "guardian" ? (
               <Typography variant="body2">
@@ -543,21 +602,20 @@ export function OfficialAssigner({
         onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-description"
+        maxWidth="xs"
+        fullWidth
       >
-        <DialogTitle id="confirm-dialog-title" sx={{ pb: 0.5 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Icon fontSize="small" sx={{ color: "text.secondary" }} />
-            <Box sx={{ minWidth: 0 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-                {label}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {gameName}
-              </Typography>
-            </Box>
-          </Stack>
+        <DialogTitle id="confirm-dialog-title" sx={{ pb: 1.5 }}>
+          <OfficialDialogHeader
+            Icon={Icon}
+            label={label}
+            gameDivisionId={gameDivisionId}
+            gameDate={gameDate}
+            gameTime={gameTime}
+            gameName={gameName}
+          />
         </DialogTitle>
-        <DialogContent>
+        <DialogContent dividers>
           <DialogContentText id="confirm-dialog-description">
             {confirmDialog.message}
           </DialogContentText>
