@@ -84,7 +84,7 @@ export default function KayttoohjeetPage() {
                 </ListItemIcon>
                 <ListItemText
                   primary="2. Jaa toimitsijavuorot"
-                  secondary='Valitse pelin eSCO-, kello- ja hyökkäysaikavuoron (24 s) vastuu painamalla "Valitse pelaaja...". Avautuvasta pudotusvalikosta valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
+                  secondary='Valitse pelin eSCO-, kello- ja hyökkäysaikavuoron (24 s) vastuu painamalla "Valitse pelaaja...". Valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
                   className="steps-list-text"
                 />
               </ListItem>
@@ -94,7 +94,7 @@ export default function KayttoohjeetPage() {
                 </ListItemIcon>
                 <ListItemText
                   primary="3. Vahvista vuoro"
-                  secondary='Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista" painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai pyydetäänkö tehtävän tekijäksi juniori joukkueenjohtajan avustuksella.'
+                  secondary='Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista" painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai pyydetäänkö tehtävän tekijäksi juniori joukkueenjohtajan avustuksella. Poolista otetun henkilön nimen voi lisätä myöhemmin jos se ei vielä ole tiedossa.'
                   className="steps-list-text"
                 />
               </ListItem>
