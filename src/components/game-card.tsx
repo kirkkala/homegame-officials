@@ -589,7 +589,7 @@ export function GameCard({
         </Box>
 
         {game.isHomeGame && (
-          <Stack direction={{ xs: "column", sm: "row" }} gap={1} sx={{ mt: { xs: 0, sm: 1.5 } }}>
+          <Stack direction={{ xs: "column", md: "row" }} gap={1} sx={{ mt: { xs: 0, md: 1.5 } }}>
             <OfficialButton
               gameId={game.id}
               role="poytakirja"
