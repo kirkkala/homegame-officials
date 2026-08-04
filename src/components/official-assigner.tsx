@@ -10,6 +10,7 @@ import {
   HourglassEmpty as HourglassEmptyIcon,
   LaptopChromebook as LaptopChromebookIcon,
   Person as PersonIcon,
+  Search as SearchIcon,
   SwapHoriz as SwapHorizIcon,
   Timer as TimerIcon,
 } from "@mui/icons-material"
@@ -28,6 +29,7 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  InputAdornment,
   List,
   ListItemIcon,
   ListItemText,
@@ -38,8 +40,8 @@ import {
   Typography,
 } from "@mui/material"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
-import { getPlayers, type OfficialAssignment, updateOfficial } from "@/lib/storage"
+import { useEffect, useRef, useState } from "react"
+import { getPlayers, type OfficialAssignment, type Player, updateOfficial } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
 export const ROLES = {
@@ -49,6 +51,106 @@ export const ROLES = {
 } as const
 
 export type Role = "poytakirja" | "kello" | "hyokkaysaika"
+
+/** Searchable player list, shared by the initial selection and the "change player" flows. */
+function PlayerPicker({
+  players,
+  loading,
+  playerStats,
+  onSelect,
+}: {
+  players: Player[]
+  loading: boolean
+  playerStats?: Map<string, number>
+  onSelect: (playerName: string) => void
+}) {
+  const [search, setSearch] = useState("")
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Focus the search once players are available. Runs after the dialog/accordion
+  // has mounted the field (via rAF, so it wins over the Dialog's initial focus).
+  useEffect(() => {
+    if (loading || players.length === 0) return
+    const raf = requestAnimationFrame(() => inputRef.current?.focus())
+    return () => cancelAnimationFrame(raf)
+  }, [loading, players.length])
+
+  if (loading) {
+    return (
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ px: 2, py: 1.5 }}>
+        <CircularProgress size={20} />
+        <Typography variant="body2">Ladataan...</Typography>
+      </Stack>
+    )
+  }
+
+  if (players.length === 0) {
+    return (
+      <Typography variant="body2" sx={{ px: 2, py: 1.5 }}>
+        Ei pelaajia{" "}
+        <Typography component="span" sx={{ fontSize: "0.8rem" }}>
+          (lisää pelaajia hallinnan kautta)
+        </Typography>
+      </Typography>
+    )
+  }
+
+  const query = search.trim().toLowerCase()
+  const filtered = [...players]
+    .filter((player) => player.name.toLowerCase().includes(query))
+    .sort((a, b) => a.name.localeCompare(b.name, "fi"))
+
+  return (
+    <>
+      <Box sx={{ px: 1.5, pb: 1 }}>
+        <TextField
+          inputRef={inputRef}
+          fullWidth
+          size="small"
+          placeholder="Hae pelaajaa..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            },
+            htmlInput: { "data-testid": "official-player-search" },
+          }}
+        />
+      </Box>
+      <List
+        disablePadding
+        sx={{ display: "flex", flexDirection: "column", maxHeight: 240, overflowY: "auto" }}
+      >
+        {filtered.length === 0 ? (
+          <MenuItem disabled>
+            <ListItemText>Ei hakua vastaavia pelaajia</ListItemText>
+          </MenuItem>
+        ) : (
+          filtered.map((player) => {
+            const shiftCount = playerStats?.get(player.name) ?? 0
+            return (
+              <MenuItem
+                key={player.id}
+                onClick={() => onSelect(player.name)}
+                data-testid={`official-player-${player.id}`}
+              >
+                <ListItemText>{player.name}</ListItemText>
+                <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                  {shiftCount}
+                </Typography>
+              </MenuItem>
+            )
+          })
+        )}
+      </List>
+    </>
+  )
+}
 
 export function OfficialAssigner({
   gameId,
@@ -117,7 +219,7 @@ export function OfficialAssigner({
       setSelectionOpen(false)
       setConfirmDialog({
         open: true,
-        message: `Vaihdetaanko ${assignment.playerName} → ${playerName}?`,
+        message: `Vaihda ${assignment.playerName} → ${playerName}?`,
         onConfirm: () => mutation.mutate({ playerName, handledBy: null, confirmedBy: null }),
       })
       return
@@ -191,37 +293,6 @@ export function OfficialAssigner({
   }
 
   const isBusy = mutation.isPending || isPropStale
-  const playerListItems = loadingPlayers ? (
-    <MenuItem disabled>
-      <CircularProgress size={20} sx={{ mr: 1 }} />
-      <ListItemText>Ladataan...</ListItemText>
-    </MenuItem>
-  ) : players.length === 0 ? (
-    <MenuItem key="empty" disabled>
-      <ListItemText>
-        Ei pelaajia{" "}
-        <Typography sx={{ fontSize: "0.8rem" }}>(lisää pelaajia hallinnan kautta)</Typography>
-      </ListItemText>
-    </MenuItem>
-  ) : (
-    [...players]
-      .sort((a, b) => a.name.localeCompare(b.name, "fi"))
-      .map((player) => {
-        const shiftCount = playerStats?.get(player.name) ?? 0
-        return (
-          <MenuItem
-            key={player.id}
-            onClick={() => handleSelectPlayer(player.name)}
-            data-testid={`official-player-${player.id}`}
-          >
-            <ListItemText>{player.name}</ListItemText>
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-              {shiftCount}
-            </Typography>
-          </MenuItem>
-        )
-      })
-  )
 
   return (
     <>
@@ -374,15 +445,23 @@ export function OfficialAssigner({
                 <ListItemText>Poista toimitsijavastuu</ListItemText>
               </MenuItem>
             )}
-            {/* Player list - only when no assignment yet */}
-            {!displayAssignment && playerListItems}
           </List>
+          {/* Player list - only when no assignment yet */}
+          {!displayAssignment && (
+            <PlayerPicker
+              players={players}
+              loading={loadingPlayers}
+              playerStats={playerStats}
+              onSelect={handleSelectPlayer}
+            />
+          )}
           {/* Change player list - hidden under accordion when unconfirmed */}
           {displayAssignment && !isConfirmed && (
             <Accordion
               disableGutters
               elevation={0}
               square
+              slotProps={{ transition: { unmountOnExit: true } }}
               sx={{ backgroundColor: "transparent", borderTop: 1, borderColor: "divider" }}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -391,18 +470,13 @@ export function OfficialAssigner({
                   <Typography variant="body2">Vaihda pelaajavastuu</Typography>
                 </Stack>
               </AccordionSummary>
-              <AccordionDetails sx={{ p: 0 }}>
-                <List
-                  disablePadding
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    maxHeight: 240,
-                    overflowY: "auto",
-                  }}
-                >
-                  {playerListItems}
-                </List>
+              <AccordionDetails sx={{ p: 0, pb: 1 }}>
+                <PlayerPicker
+                  players={players}
+                  loading={loadingPlayers}
+                  playerStats={playerStats}
+                  onSelect={handleSelectPlayer}
+                />
               </AccordionDetails>
             </Accordion>
           )}
