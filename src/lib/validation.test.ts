@@ -129,6 +129,15 @@ describe("validation", () => {
       expect(result.success).toBe(true)
     })
 
+    it("accepts a hyokkaysaika (24s shot clock) assignment", () => {
+      const result = validate(updateGameSchema, {
+        officials: {
+          hyokkaysaika: { playerName: "Aino", handledBy: "pool", confirmedBy: null },
+        },
+      })
+      expect(result.success).toBe(true)
+    })
+
     it("rejects an unknown handledBy value", () => {
       const result = validate(updateGameSchema, {
         officials: { poytakirja: { playerName: "Pekka", handledBy: "someone", confirmedBy: null } },

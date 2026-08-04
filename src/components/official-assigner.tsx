@@ -271,10 +271,8 @@ export function OfficialAssigner({
     })
   }
 
-  const getButtonColor = () => {
-    if (isUnassigned) return "warning"
-    return isConfirmed ? "success" : "warning"
-  }
+  // Green once a handler is confirmed, amber while still pending/unassigned.
+  const statusColor = isConfirmed ? "success" : "warning"
 
   const getStatusLabel = () => {
     if (!displayAssignment?.handledBy) return "Vahvista"
@@ -301,7 +299,7 @@ export function OfficialAssigner({
         onClick={() => setSelectionOpen(true)}
         disabled={isBusy}
         startIcon={isBusy ? <CircularProgress size={20} color="inherit" /> : false}
-        color={getButtonColor()}
+        color={statusColor}
         data-testid={`official-button-${role}`}
         sx={{
           flex: 1,
@@ -332,7 +330,7 @@ export function OfficialAssigner({
               <Chip
                 label={getStatusLabel()}
                 size="small"
-                color={isConfirmed ? "success" : "warning"}
+                color={statusColor}
                 icon={isConfirmed ? <CheckCircleIcon /> : <HourglassEmptyIcon />}
               />
             )}

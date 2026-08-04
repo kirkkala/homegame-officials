@@ -70,6 +70,66 @@ describe("GameCard", () => {
     expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
   })
 
+  it("renders all three official role buttons for a home game", () => {
+    renderGameCard()
+
+    expect(screen.getByTestId("official-button-poytakirja")).toBeInTheDocument()
+    expect(screen.getByTestId("official-button-kello")).toBeInTheDocument()
+    expect(screen.getByTestId("official-button-hyokkaysaika")).toBeInTheDocument()
+  })
+
+  it("assigns a player to the hyokkaysaika (24s) role", async () => {
+    const user = userEvent.setup()
+    renderGameCard()
+
+    await user.click(screen.getByTestId("official-button-hyokkaysaika"))
+
+    const playerItem = await screen.findByTestId("official-player-p1")
+    await user.click(playerItem)
+
+    expect(mockUpdateOfficial).toHaveBeenCalledWith("game-1", "team-1", "hyokkaysaika", {
+      playerName: "Matti Meikäläinen",
+      handledBy: null,
+      confirmedBy: null,
+    })
+  })
+
+  it("shows the game name in the selection dialog", async () => {
+    const user = userEvent.setup()
+    renderGameCard()
+
+    await openPoytakirjaMenu(user)
+
+    expect(await screen.findByText("HNMKY Stadi 2014 vs. KlaNMKY")).toBeInTheDocument()
+  })
+
+  it("filters the player list via the search field", async () => {
+    const user = userEvent.setup()
+    renderGameCard()
+
+    await openPoytakirjaMenu(user)
+    expect(await screen.findByTestId("official-player-p1")).toBeInTheDocument()
+    expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
+
+    await user.type(screen.getByTestId("official-player-search"), "teppo")
+
+    expect(screen.queryByTestId("official-player-p1")).not.toBeInTheDocument()
+    expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
+  })
+
+  it("shows a no-results message when the search matches nothing", async () => {
+    const user = userEvent.setup()
+    renderGameCard()
+
+    await openPoytakirjaMenu(user)
+    await screen.findByTestId("official-player-p1")
+
+    await user.type(screen.getByTestId("official-player-search"), "zzz")
+
+    expect(screen.queryByTestId("official-player-p1")).not.toBeInTheDocument()
+    expect(screen.getByText("Ei hakua vastaavia pelaajia")).toBeInTheDocument()
+  })
+
   it("selecting a player updates the assignment", async () => {
     const user = userEvent.setup()
     renderGameCard()

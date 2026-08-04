@@ -91,6 +91,49 @@ describe("computePlayerStats", () => {
     expect(result.get("Matti")).toBe(2)
   })
 
+  it("counts the hyokkaysaika (24s shot clock) role", () => {
+    const games = [
+      makeGame({
+        officials: {
+          poytakirja: null,
+          kello: null,
+          hyokkaysaika: { playerName: "Aino", handledBy: "guardian", confirmedBy: "Eeva" },
+        },
+      }),
+    ]
+    const result = computePlayerStats(games)
+    expect(result.get("Aino")).toBe(1)
+  })
+
+  it("counts all three roles for the same player", () => {
+    const games = [
+      makeGame({
+        officials: {
+          poytakirja: { playerName: "Matti", handledBy: "guardian", confirmedBy: "Eeva" },
+          kello: { playerName: "Matti", handledBy: "pool", confirmedBy: null },
+          hyokkaysaika: { playerName: "Matti", handledBy: "guardian", confirmedBy: "Liisa" },
+        },
+      }),
+    ]
+    const result = computePlayerStats(games)
+    expect(result.get("Matti")).toBe(3)
+  })
+
+  it("ignores a missing hyokkaysaika key (legacy games)", () => {
+    const games = [
+      makeGame({
+        // Legacy row created before the hyokkaysaika role existed
+        officials: {
+          poytakirja: { playerName: "Matti", handledBy: "guardian", confirmedBy: "Eeva" },
+          kello: null,
+        },
+      }),
+    ]
+    const result = computePlayerStats(games)
+    expect(result.get("Matti")).toBe(1)
+    expect(result.size).toBe(1)
+  })
+
   it("counts multiple players across multiple games", () => {
     const games = [
       makeGame({
