@@ -9,6 +9,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   Groups as GroupsIcon,
   HelpOutline as HelpOutlineIcon,
+  Settings as SettingsIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import {
@@ -54,7 +55,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import NextLink from "next/link"
 import { useSession } from "next-auth/react"
 import { type InputHTMLAttributes, useCallback, useEffect, useRef, useState } from "react"
-import { AuthActionButton } from "@/components/auth-action-button"
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 import { useTeam } from "@/components/team-context"
@@ -68,7 +68,6 @@ import {
   getGames,
   getPlayers,
   getTeamManagers,
-  getUsers,
   removeTeamManager,
   saveGames,
   savePlayer,
@@ -322,12 +321,6 @@ export default function HallintaPage() {
     queryKey: ["team-managers", selectedTeam?.id],
     queryFn: () => getTeamManagers(selectedTeam!.id),
     enabled: !!selectedTeam,
-  })
-
-  const { data: users = [], isLoading: usersLoading } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-    enabled: isAdmin,
   })
 
   // Mutations
@@ -799,16 +792,28 @@ export default function HallintaPage() {
     subtitle = selectedTeam.name
     content = (
       <Stack gap={3}>
-        {!authLoading && (
-          <Box sx={{ mb: 1 }}>
-            <AuthActionButton />
-          </Box>
+        {!authLoading && isAdmin && (
+          <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1} sx={{ mb: 1 }}>
+            <Button
+              component={NextLink}
+              href="/hallinta/admin"
+              size="small"
+              variant="text"
+              startIcon={<SettingsIcon />}
+              data-testid="admin-zone-button"
+              sx={{
+                textTransform: "none",
+                color: "text.secondary",
+                "&:hover": { bgcolor: "transparent", color: "text.primary" },
+              }}
+            >
+              Admin zone
+            </Button>
+          </Stack>
         )}
 
         {(() => {
-          const tabKeys = isAdmin
-            ? ["admin", "general", "players", "games"]
-            : ["general", "players", "games"]
+          const tabKeys = ["general", "players", "games"]
           const currentKey = tabKeys[activeTab] ?? "general"
           return (
             <>
@@ -820,62 +825,16 @@ export default function HallintaPage() {
                 aria-label="Hallinnan välilehdet"
                 sx={{ borderBottom: 1, borderColor: "divider" }}
               >
-                {isAdmin && <Tab label="Admin zone" data-testid="admin-tab" />}
                 <Tab label="Joukkueen asetukset" data-testid="general-tab" />
                 <Tab label={`Pelaajat (${players.length})`} data-testid="players-tab" />
                 <Tab label={`Ottelut (${existingGames.length})`} data-testid="games-tab" />
               </Tabs>
 
-              {currentKey === "admin" && (
-                <Stack gap={2}>
-                  <Box>
-                    <Typography component="h3" variant="h6">
-                      Rekisteröityneet käyttäjät ({users.length})
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Näkyy vain järjestelmän pääkäyttäjälle.
-                    </Typography>
-                  </Box>
-                  {usersLoading ? (
-                    <Stack alignItems="center" py={2}>
-                      <CircularProgress size={24} />
-                    </Stack>
-                  ) : users.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">
-                      Ei rekisteröityneitä käyttäjiä.
-                    </Typography>
-                  ) : (
-                    <Stack gap={1}>
-                      {users.map((u) => (
-                        <Stack
-                          key={u.id}
-                          direction="row"
-                          flexWrap="wrap"
-                          alignItems="center"
-                          gap={1}
-                        >
-                          <Chip label={u.email} />
-                          {u.teams.length > 0 ? (
-                            u.teams.map((t) => (
-                              <Chip key={t.id} label={t.name} size="small" variant="outlined" />
-                            ))
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              ei hallittavia joukkueita
-                            </Typography>
-                          )}
-                        </Stack>
-                      ))}
-                    </Stack>
-                  )}
-                </Stack>
-              )}
-
               {currentKey === "general" && (
                 <Stack gap={3}>
                   <Stack gap={2}>
                     <Typography component="h2" variant="h5">
-                      Asetukset: {selectedTeam.name}
+                      {selectedTeam.name} joukkueen asetukset
                     </Typography>
                     <Box>
                       <Typography component="h3" variant="h6" gutterBottom>
@@ -900,7 +859,7 @@ export default function HallintaPage() {
                             disabled={updateFirstAidMutation.isPending}
                           />
                         }
-                        label="Ensiapulaukkujen seuranta käytössä"
+                        label="Ensiapulaukkujen seuranta"
                       />
                       {selectedTeam.firstAidBagsEnabled && (
                         <Box sx={{ mt: 2 }}>
@@ -951,7 +910,8 @@ export default function HallintaPage() {
                         label="24 sekunnin kello (hyökkäysaika)"
                       />
                       <Typography variant="body2" color="text.secondary">
-                        U13 ja vanhemmat: Lisää 24 sekunnin hyökkäyskellon toimitsija otteluihin.
+                        Asetus lisää 24 sekunnin hyökkäyskellon toimitsijavalinnan otteluille.
+                        Hyökkäysaikaa käytetään U13 ja vanhempien ikäluokkien sarjoissa.
                       </Typography>
                     </Box>
 
@@ -1036,12 +996,13 @@ export default function HallintaPage() {
                 <Stack gap={2}>
                   <Box>
                     <Typography component="h2" variant="h5">
-                      Joukkueen {selectedTeam.name} pelaajat ({players.length})
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Joukkueen pelaajat toimitsijavuorovastuun valintalistaan.
+                      {selectedTeam.name} joukkueen pelaajat ({players.length})
                     </Typography>
                   </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Nimet toimitsijavuorovastuun valintalistaan, lisää uudet pelaajat tekstikenttään
+                    yksi per rivi. Käytä vain etu- tai lempinimiä.
+                  </Typography>
                   {playersLoading ? (
                     <Stack alignItems="center" py={2}>
                       <CircularProgress size={24} />
@@ -1095,7 +1056,7 @@ export default function HallintaPage() {
               {currentKey === "games" && (
                 <Stack gap={3}>
                   <Typography component="h2" variant="h5">
-                    Joukkueen {selectedTeam.name} ottelut ({existingGames.length})
+                    {selectedTeam.name} joukkueen ottelut ({existingGames.length})
                   </Typography>
                   <Accordion
                     expanded={shouldExpandImport || importExpanded}
