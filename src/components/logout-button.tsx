@@ -59,7 +59,12 @@ export function LogoutButton({
               <Typography
                 variant="caption"
                 noWrap
-                sx={{ color: "text.secondary", fontSize: "0.6rem", textTransform: "none", maxWidth: 180 }}
+                sx={{
+                  color: "text.secondary",
+                  fontSize: "0.6rem",
+                  textTransform: "none",
+                  maxWidth: 180,
+                }}
               >
                 ({email})
               </Typography>

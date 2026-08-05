@@ -1079,9 +1079,12 @@ export default function HallintaPage() {
                       expandIcon={<ExpandMoreIcon />}
                       sx={{ "&:hover": { backgroundColor: "action.hover" } }}
                     >
-                      <Typography component="h2" variant="h5">
-                        Tuo otteluita
-                      </Typography>
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <UploadFileIcon />
+                        <Typography component="h2" variant="h6">
+                          Tuo otteluita
+                        </Typography>
+                      </Stack>
                     </AccordionSummary>
                     <AccordionDetails>
                       <Stack gap={2}>
