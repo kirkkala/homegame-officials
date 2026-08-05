@@ -52,16 +52,28 @@ export async function deleteTeam(id: string) {
   await db.delete(schema.teams).where(eq(schema.teams.id, id))
 }
 
-export async function updateTeamFirstAidSettings(
+export async function updateTeamSettings(
   id: string,
-  settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }
+  settings: {
+    firstAidBagsEnabled?: boolean
+    firstAidBagCount?: number
+    shotClockEnabled?: boolean
+  }
 ) {
+  const updateData: Partial<schema.Team> = {}
+  if (settings.firstAidBagsEnabled !== undefined) {
+    updateData.firstAidBagsEnabled = settings.firstAidBagsEnabled
+  }
+  if (settings.firstAidBagCount !== undefined) {
+    updateData.firstAidBagCount = String(Math.min(6, Math.max(1, settings.firstAidBagCount)))
+  }
+  if (settings.shotClockEnabled !== undefined) {
+    updateData.shotClockEnabled = settings.shotClockEnabled
+  }
+
   const result = await db
     .update(schema.teams)
-    .set({
-      firstAidBagsEnabled: settings.firstAidBagsEnabled,
-      firstAidBagCount: String(Math.min(6, Math.max(1, settings.firstAidBagCount))),
-    })
+    .set(updateData)
     .where(eq(schema.teams.id, id))
     .returning()
   return result[0]
@@ -85,10 +97,33 @@ export async function createUser(user: schema.NewUser) {
 }
 
 export async function getUsers() {
-  return db
-    .select({ id: schema.users.id, email: schema.users.email })
+  const rows = await db
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      teamId: schema.teams.id,
+      teamName: schema.teams.name,
+    })
     .from(schema.users)
-    .orderBy(schema.users.email)
+    .leftJoin(schema.teamManagers, eq(schema.users.id, schema.teamManagers.userId))
+    .leftJoin(schema.teams, eq(schema.teamManagers.teamId, schema.teams.id))
+    .orderBy(schema.users.email, schema.teams.name)
+
+  const byUser = new Map<
+    string,
+    { id: string; email: string; teams: { id: string; name: string }[] }
+  >()
+  for (const row of rows) {
+    let user = byUser.get(row.id)
+    if (!user) {
+      user = { id: row.id, email: row.email, teams: [] }
+      byUser.set(row.id, user)
+    }
+    if (row.teamId && row.teamName) {
+      user.teams.push({ id: row.teamId, name: row.teamName })
+    }
+  }
+  return Array.from(byUser.values())
 }
 
 // ============ TEAM MANAGERS ============
@@ -174,7 +209,7 @@ export async function createGames(games: Omit<schema.NewGame, "createdAt">[], te
       newGames.map((game) => ({
         ...game,
         teamId,
-        officials: game.officials || { poytakirja: null, kello: null },
+        officials: game.officials || { poytakirja: null, kello: null, hyokkaysaika: null },
       }))
     )
     .returning()
@@ -207,6 +242,10 @@ export async function updateGame(
           ? updates.officials.poytakirja
           : game.officials.poytakirja,
       kello: updates.officials.kello !== undefined ? updates.officials.kello : game.officials.kello,
+      hyokkaysaika:
+        updates.officials.hyokkaysaika !== undefined
+          ? updates.officials.hyokkaysaika
+          : (game.officials.hyokkaysaika ?? null),
     }
   }
 

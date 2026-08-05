@@ -9,6 +9,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   Groups as GroupsIcon,
   HelpOutline as HelpOutlineIcon,
+  Settings as SettingsIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import {
@@ -54,7 +55,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import NextLink from "next/link"
 import { useSession } from "next-auth/react"
 import { type InputHTMLAttributes, useCallback, useEffect, useRef, useState } from "react"
-import { AuthActionButton } from "@/components/auth-action-button"
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 import { useTeam } from "@/components/team-context"
@@ -68,13 +68,12 @@ import {
   getGames,
   getPlayers,
   getTeamManagers,
-  getUsers,
   removeTeamManager,
   saveGames,
   savePlayer,
   updateGameDetails,
   updateGameHomeStatus,
-  updateTeamFirstAidSettings,
+  updateTeamSettings,
 } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 
@@ -324,12 +323,6 @@ export default function HallintaPage() {
     enabled: !!selectedTeam,
   })
 
-  const { data: users = [], isLoading: usersLoading } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-    enabled: isAdmin,
-  })
-
   // Mutations
   const importMutation = useMutation({
     mutationFn: async () => {
@@ -498,10 +491,22 @@ export default function HallintaPage() {
 
   const updateFirstAidMutation = useMutation({
     mutationFn: (settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }) =>
-      updateTeamFirstAidSettings(selectedTeam!.id, settings),
+      updateTeamSettings(selectedTeam!.id, settings),
     onSuccess: () => {
       refreshTeams()
       setSnackbar({ type: "success", message: "Ensiapulaukut-asetukset päivitetty" })
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Asetusten päivitys epäonnistui" })
+    },
+  })
+
+  const updateShotClockMutation = useMutation({
+    mutationFn: (shotClockEnabled: boolean) =>
+      updateTeamSettings(selectedTeam!.id, { shotClockEnabled }),
+    onSuccess: () => {
+      refreshTeams()
+      setSnackbar({ type: "success", message: "Toimitsija-asetukset päivitetty" })
     },
     onError: () => {
       setSnackbar({ type: "error", message: "Asetusten päivitys epäonnistui" })
@@ -740,6 +745,24 @@ export default function HallintaPage() {
   const shouldExpandImport = parsedGames.length > 0 || existingGames.length === 0
   let content: React.ReactNode
 
+  const adminZoneLink = !authLoading && isAdmin && (
+    <Button
+      component={NextLink}
+      href="/hallinta/admin"
+      size="small"
+      variant="text"
+      startIcon={<SettingsIcon />}
+      data-testid="admin-zone-button"
+      sx={{
+        textTransform: "none",
+        color: "text.secondary",
+        "&:hover": { bgcolor: "transparent", color: "text.primary" },
+      }}
+    >
+      Admin zone
+    </Button>
+  )
+
   if (authLoading) {
     content = (
       <Stack alignItems="center" py={8}>
@@ -787,16 +810,8 @@ export default function HallintaPage() {
     subtitle = selectedTeam.name
     content = (
       <Stack gap={3}>
-        {!authLoading && (
-          <Box sx={{ mb: 1 }}>
-            <AuthActionButton />
-          </Box>
-        )}
-
         {(() => {
-          const tabKeys = isAdmin
-            ? ["admin", "general", "players", "games"]
-            : ["general", "players", "games"]
+          const tabKeys = ["general", "players", "games"]
           const currentKey = tabKeys[activeTab] ?? "general"
           return (
             <>
@@ -808,45 +823,16 @@ export default function HallintaPage() {
                 aria-label="Hallinnan välilehdet"
                 sx={{ borderBottom: 1, borderColor: "divider" }}
               >
-                {isAdmin && <Tab label="Admin zone" data-testid="admin-tab" />}
                 <Tab label="Joukkueen asetukset" data-testid="general-tab" />
                 <Tab label={`Pelaajat (${players.length})`} data-testid="players-tab" />
                 <Tab label={`Ottelut (${existingGames.length})`} data-testid="games-tab" />
               </Tabs>
 
-              {currentKey === "admin" && (
-                <Stack gap={2}>
-                  <Box>
-                    <Typography component="h3" variant="h6">
-                      Rekisteröityneet käyttäjät ({users.length})
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Näkyy vain järjestelmän pääkäyttäjälle.
-                    </Typography>
-                  </Box>
-                  {usersLoading ? (
-                    <Stack alignItems="center" py={2}>
-                      <CircularProgress size={24} />
-                    </Stack>
-                  ) : users.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">
-                      Ei rekisteröityneitä käyttäjiä.
-                    </Typography>
-                  ) : (
-                    <Stack direction="row" flexWrap="wrap" gap={1}>
-                      {users.map((u) => (
-                        <Chip key={u.id} label={u.email} />
-                      ))}
-                    </Stack>
-                  )}
-                </Stack>
-              )}
-
               {currentKey === "general" && (
                 <Stack gap={3}>
                   <Stack gap={2}>
                     <Typography component="h2" variant="h5">
-                      Asetukset: {selectedTeam.name}
+                      {selectedTeam.name} joukkueen asetukset
                     </Typography>
                     <Box>
                       <Typography component="h3" variant="h6" gutterBottom>
@@ -871,7 +857,7 @@ export default function HallintaPage() {
                             disabled={updateFirstAidMutation.isPending}
                           />
                         }
-                        label="Ensiapulaukkujen seuranta käytössä"
+                        label="Ensiapulaukkujen seuranta"
                       />
                       {selectedTeam.firstAidBagsEnabled && (
                         <Box sx={{ mt: 2 }}>
@@ -907,9 +893,32 @@ export default function HallintaPage() {
                       )}
                     </Box>
 
+                    <Box>
+                      <Typography component="h3" variant="h6" gutterBottom>
+                        Toimitsijat
+                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={!!selectedTeam.shotClockEnabled}
+                            onChange={(_, checked) => updateShotClockMutation.mutate(checked)}
+                            disabled={updateShotClockMutation.isPending}
+                          />
+                        }
+                        label="24 sekunnin kello (hyökkäysaika)"
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        Asetus lisää 24 sekunnin hyökkäyskellon toimitsijavalinnan otteluille.
+                        Hyökkäysaikaa käytetään U13 ja vanhempien ikäluokkien sarjoissa.
+                      </Typography>
+                    </Box>
+
                     <Divider sx={{ my: 2 }} />
 
                     <Box>
+                      <Typography component="h3" variant="h6" gutterBottom>
+                        Joukkueen pääkäyttäjät
+                      </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Käyttäjät, jotka voivat hallita tämän joukkueen otteluita ja pelaajia.
                         {adminEmail
@@ -973,6 +982,7 @@ export default function HallintaPage() {
                       startIcon={<DeleteForeverIcon />}
                       onClick={handleDeleteTeam}
                       disabled={deleteTeamMutation.isPending}
+                      sx={{ mt: 2 }}
                     >
                       Poista joukkue
                     </Button>
@@ -982,14 +992,18 @@ export default function HallintaPage() {
 
               {currentKey === "players" && (
                 <Stack gap={2}>
-                  <Box>
-                    <Typography component="h2" variant="h5">
-                      Joukkueen {selectedTeam.name} pelaajat ({players.length})
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Joukkueen pelaajat toimitsijavuorovastuun valintalistaan.
-                    </Typography>
-                  </Box>
+                  <Typography component="h2" variant="h5">
+                    {selectedTeam.name} joukkueen pelaajat ({players.length})
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Lisää uudet pelaajat tekstikenttään yksi per rivi. Käytä vain etu- tai
+                    lempinimiä.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Voit poistaa pelaajan roskakori-painikkeella. Pelaajan poistaminen säilyttää
+                    otteluihin mahdollisesti merkityn vuorovastuun.
+                  </Typography>
+
                   {playersLoading ? (
                     <Stack alignItems="center" py={2}>
                       <CircularProgress size={24} />
@@ -1004,8 +1018,11 @@ export default function HallintaPage() {
                               key={player.id}
                               label={player.name}
                               onDelete={() => handleDeletePlayer(player.id)}
-                              deleteIcon={<CloseIcon data-testid={`player-delete-${player.id}`} />}
+                              deleteIcon={
+                                <DeleteOutlineIcon data-testid={`player-delete-${player.id}`} />
+                              }
                               data-testid={`player-chip-${player.id}`}
+                              title={`Poista ${player.name}`}
                             />
                           ))}
                       </Stack>
@@ -1041,9 +1058,13 @@ export default function HallintaPage() {
               )}
 
               {currentKey === "games" && (
-                <Stack gap={3}>
+                <Stack gap={2}>
                   <Typography component="h2" variant="h5">
-                    Joukkueen {selectedTeam.name} ottelut ({existingGames.length})
+                    {selectedTeam.name} joukkueen ottelut ({existingGames.length})
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Joukkueen otteluiden hallinta. Tuo ottelut excel-tiedostota tai lisää käsin
+                    painamalla "Tuo otteluita".
                   </Typography>
                   <Accordion
                     expanded={shouldExpandImport || importExpanded}
@@ -1056,9 +1077,12 @@ export default function HallintaPage() {
                       expandIcon={<ExpandMoreIcon />}
                       sx={{ "&:hover": { backgroundColor: "action.hover" } }}
                     >
-                      <Typography component="h2" variant="h5">
-                        Tuo otteluita
-                      </Typography>
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <UploadFileIcon />
+                        <Typography component="h2" variant="h6">
+                          Tuo otteluita
+                        </Typography>
+                      </Stack>
                     </AccordionSummary>
                     <AccordionDetails>
                       <Stack gap={2}>
@@ -1211,9 +1235,9 @@ export default function HallintaPage() {
                   {existingGames.length > 0 && (
                     <>
                       <Typography variant="body2" color="text.secondary" mb={2}>
-                        Merkitse kotipelit rastilla jotta niihin voi lisätä toimitsijoita. Voit myös
-                        poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa valinnan
-                        automaattisesti.
+                        Merkitse joukkueen kotipelit jotta niihin voi lisätä toimitsijoita. Voit
+                        myös poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa
+                        valinnan automaattisesti.
                       </Typography>
 
                       <GamesTable
@@ -1264,6 +1288,11 @@ export default function HallintaPage() {
 
   return (
     <PageLayout subtitle={subtitle}>
+      {adminZoneLink && (
+        <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+          {adminZoneLink}
+        </Stack>
+      )}
       {content}
 
       {/* Edit Game Dialog */}
@@ -1396,16 +1425,17 @@ export default function HallintaPage() {
         onClose={closeDeleteTeamDialog}
         aria-labelledby="delete-team-dialog-title"
       >
-        <DialogTitle id="delete-team-dialog-title">Poista joukkue</DialogTitle>
+        <DialogTitle id="delete-team-dialog-title">
+          Poista joukkue &quot;{deleteTeamDialog.teamName}&quot;?
+        </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Haluatko varmasti poistaa joukkueen &quot;{deleteTeamDialog.teamName}&quot;? Tämä
-            poistaa myös kaikki joukkueen ottelut sekä pelaajat. Toimintoa ei voi peruuttaa.
+            Tämä poistaa myös joukkueen asetukset, ottelut sekä pelaajat. Toimintoa ei voi perua.
           </DialogContentText>
           <TextField
             fullWidth
             size="small"
-            label={`Kirjoita "${deleteTeamDialog.teamName}" vahvistaaksesi`}
+            label={`Kirjoita joukkueen nimi "${deleteTeamDialog.teamName}" vahvistaaksesi`}
             value={deleteTeamDialog.confirmInput}
             onChange={(e) =>
               setDeleteTeamDialog((prev) => ({ ...prev, confirmInput: e.target.value }))

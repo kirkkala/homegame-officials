@@ -55,14 +55,10 @@ export function computePlayerStats(games: Game[]): Map<string, number> {
   const counts = new Map<string, number>()
 
   for (const game of games) {
-    const poytakirja = game.officials.poytakirja
-    const kello = game.officials.kello
-
-    if (poytakirja?.playerName && poytakirja.handledBy) {
-      counts.set(poytakirja.playerName, (counts.get(poytakirja.playerName) || 0) + 1)
-    }
-    if (kello?.playerName && kello.handledBy) {
-      counts.set(kello.playerName, (counts.get(kello.playerName) || 0) + 1)
+    for (const assignment of Object.values(game.officials)) {
+      if (assignment?.playerName && assignment.handledBy) {
+        counts.set(assignment.playerName, (counts.get(assignment.playerName) || 0) + 1)
+      }
     }
   }
 

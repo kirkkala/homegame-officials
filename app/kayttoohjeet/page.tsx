@@ -23,6 +23,49 @@ import {
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 
+const steps = [
+  {
+    icon: <PersonAddIcon />,
+    title: "1. Valitse joukkue",
+    description: `
+      Valitse oma joukkueesi. Valinta tallentuu selaimesi välimuistiin ja
+      joukkueen nimi säilyy selaimen URL osoitteessa joten voit jakaa linkin
+      jolla pääsee suoraan oikean joukkueen peleihin.
+    `,
+  },
+  {
+    icon: <UploadFileIcon />,
+    title: "2. Jaa toimitsijavuorot",
+    description: `
+      Valitse pelin eSCO-, kello- ja tarvittaessa hyökkäysajan (24 sekuntia) vastuu
+      painamalla "Valitse pelaaja...". Valitse pelaaja kenen huoltajille
+      toimitsijavuoron vastuu halutaan osoittaa.
+    `,
+  },
+  {
+    icon: <AssignmentAddIcon />,
+    title: "3. Vahvista vuoro",
+    description: `
+      Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai
+      kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista"
+      painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai
+      palkataanko tehtävän tekijäksi juniori joukkueenjohtajan avustuksella
+      (maksua vastaan). Poolista otetun tekijän nimen voi lisätä myöhemmin
+      mikäli se ei valintahetkellä ole tiedossa.
+    `,
+  },
+  {
+    icon: <CheckCircleIcon />,
+    title: "4. Seuraa tilannetta",
+    description: `
+      Vahvistetut vuorot näkyvät vihreänä, odottavat oranssina. Mikäli vaihdat
+      nimeämisiä sovi siitä toisen vanhemman/huoltajan tai joukkueenjohtajan
+      kanssa. Menneet pelit ovat automaattisesti piilotettuina mutta niitä voi
+      tarkastella valitsemalla "Menneet pelit" -valinnan etusivulla.
+    `,
+  },
+]
+
 export default function KayttoohjeetPage() {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -37,77 +80,57 @@ export default function KayttoohjeetPage() {
               Mikä tämä on?
             </Typography>
             <Typography>
-              Kotipelien toimitsijat -sovellus auttaa jakamaan Namikan kotipelien toimitsijavuoroja.
-              Kirjautuminen ei ole pakollista — sitä tarvitsee vain jojo hallintaa varten.
+              Sovellus on vaihtoehto excel-jumpalle kotipelien toimitsijavuorojen jakamiseen.
             </Typography>
             <Typography>
-              Timo Kirkkala askarteli applikaation harrasteprojektina AI:n kanssa että
-              toimitsijavuorojen kanssa säätäminen veisi vähemmän aikaa excelin parissa. Koodi on
-              julkaistu avoimena lähdekoodina{" "}
-              <Link
-                href="https://github.com/kirkkala/homegame-officials"
-                target="_blank"
-                rel="noopener"
-              >
-                GitHubissa
-              </Link>
-              .
+              Sekä joukkueenjohtaja että vanhemmat voivat vahvistaa toimitsijavuoroja kauden aikana.
+              Sovelluksesta näkee helposti, että vuorot on hoidettu kaikkiin peleihin ja jaettu
+              tasaisesti.
+            </Typography>
+            <Typography>
+              Vain joukkueenjohtajan tarvitsee kirjautua joukkueensa pelien hallintaa varten.
+              Vanhemmat vahvistavat heille osoitetun toimitsijavuoron tekemisen ilman kirjautumista.
+              Mikäli toimitsijavuoro on osoitettu vanhemmalle, on hänen vastuulla varmistaa että
+              siihen on tekijä; joko itse, pyytämällä toista joukkueen vanhempaa tai valitsemalla
+              juniorin poolista (maksua vastaan) tekemään kyseisen vuoron.
+            </Typography>
+            <Typography>
+              Sovelluksessa on myös helppo seuranta joukkueen ensiapulaukuista jotta peliä
+              edeltävinä päivinä voi varmistaa että laukut kulkeutuvat mukaan otteluihin.
             </Typography>
             <Typography component="h3" variant="h5">
               Näin pääset alkuun
             </Typography>
             <Typography>
-              Joukkueenjohtaja luo joukkueen{" "}
+              Joukkueenjohtaja kirjautuu sisään ja luo joukkueen{" "}
               <Link href="https://elsa-myclub.hnmky.fi/" target="_blank" rel="noopener">
                 eLSA → MyClub Muuntaja
               </Link>{" "}
               appilla tehdystä excel-tiedostosta sekä lisää pelaajat ja merkitsee kotiottelut
-              hallintapaneelin kautta.
+              hallintapaneelin kautta. Hallintapaneelista voi aktivoida ensiapulaukujen seurannan
+              sekä tarvittaessa 24 sekunnin heittokellon toimitsijavuoron (vain U13 ja vanhemmat).
+              Oletuksena sovelluksessa on vain pöytäkirja (eSCO) sekä kello (tulostaulu)
+              toimitsijavastuina.
             </Typography>
             <Typography>
-              Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista.
+              Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista:
             </Typography>
             <List className="steps-list">
-              <ListItem className="steps-list-item">
-                <ListItemIcon className="steps-list-icon">
-                  <PersonAddIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="1. Valitse joukkue"
-                  secondary="Valitse oma joukkueesi. Valinta tallentuu selaimesi välimuistiin ja joukkueen nimi säilyy selaimen URL osoitteessa joten voit jakaa linkin jolla pääsee suoraan oikean joukkueen peleihin."
-                  className="steps-list-text"
-                />
-              </ListItem>
-              <ListItem className="steps-list-item">
-                <ListItemIcon className="steps-list-icon">
-                  <UploadFileIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="2. Jaa toimitsijavuorot"
-                  secondary='Valitse pelin eSCO- ja kellovuoron vastuu painamalla "Valitse pelaaja...". Avautuvasta pudotusvalikosta valitse pelaaja kenen huoltajille toimitsijavuoron vastuu halutaan osoittaa.'
-                  className="steps-list-text"
-                />
-              </ListItem>
-              <ListItem className="steps-list-item">
-                <ListItemIcon className="steps-list-icon">
-                  <AssignmentAddIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="3. Vahvista vuoro"
-                  secondary='Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista" painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai pyydetäänkö tehtävän tekijäksi juniori joukkueenjohtajan avustuksella.'
-                  className="steps-list-text"
-                />
-              </ListItem>
-              <ListItem className="steps-list-item">
-                <ListItemIcon className="steps-list-icon">
-                  <CheckCircleIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="4. Seuraa tilannetta"
-                  secondary="Vahvistetut vuorot näkyvät vihreänä, odottavat oranssina. Mikäli vaihdat nimeämisiä sovi siitä toisen vanhemman/huoltajan tai joukkueenjohtajan kanssa."
-                  className="steps-list-text"
-                />
-              </ListItem>
+              {steps.map((step) => (
+                <ListItem key={step.title} className="steps-list-item">
+                  <ListItemIcon
+                    className="steps-list-icon"
+                    sx={{ mt: 0.75, color: "primary.main" }}
+                  >
+                    {step.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={step.title}
+                    secondary={step.description}
+                    className="steps-list-text"
+                  />
+                </ListItem>
+              ))}
             </List>
             <Typography component="h3" variant="h5">
               Ensiapulaukut
@@ -116,8 +139,27 @@ export default function KayttoohjeetPage() {
               Jos joukkueenjohtaja on ottanut ensiapulaukkujen seurannan käyttöön, näet{" "}
               <Link href="/ensiapulaukut">Ensiapulaukut</Link>-sivulla kenellä ensiapulaukut
               parhaillaan ovat. Eli ota laukku haltuun lisäämällä nimesi tänne jos laukku on tullut
-              mukaasi pelistä! Näin kaikki tietävät missä laukut ovat ja vähennetään
-              WhatsApp-viestien määrää 🩹
+              mukaasi pelistä! Näin koko joukkueella on mahdollisuus nähdä yhdestä paikkaa kenellä
+              laukut kulloinkin ovat ja vähennämme ryhmän WhatsApp-viestien määrää.
+            </Typography>
+            <Typography component="h3" variant="h5">
+              Kuka tämän on tehnyt?
+            </Typography>
+            <Typography>
+              HNKY Stadi 2014 tyttöjen jojo Timo Kirkkala on askarrellut applikaatiota
+              harrasteprojektina syksystä 2025 että toimitsijavuorojen kanssa säätäminen veisi
+              vähemmän aikaa excelin parissa.
+            </Typography>
+            <Typography>
+              Koodi on julkaistu avoimena lähdekoodina{" "}
+              <Link
+                href="https://github.com/kirkkala/homegame-officials"
+                target="_blank"
+                rel="noopener"
+              >
+                GitHubissa
+              </Link>
+              .
             </Typography>
           </Stack>
         </Paper>

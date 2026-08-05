@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       date: game.date,
       time: game.time,
       location: game.location,
-      officials: { poytakirja: null, kello: null },
+      officials: { poytakirja: null, kello: null, hyokkaysaika: null },
     }))
 
     const savedGames = await createGames(gamesWithIds, teamId)

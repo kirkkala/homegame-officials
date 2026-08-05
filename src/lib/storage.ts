@@ -13,6 +13,7 @@ export type Team = {
   name: string
   firstAidBagsEnabled?: boolean
   firstAidBagCount?: string
+  shotClockEnabled?: boolean
   createdAt: string
 }
 
@@ -29,6 +30,8 @@ export type Game = {
   officials: {
     poytakirja: OfficialAssignment | null
     kello: OfficialAssignment | null
+    // Optional so existing games without this role stay valid until backfilled.
+    hyokkaysaika?: OfficialAssignment | null
   }
   createdAt: string
 }
@@ -43,6 +46,7 @@ export type Player = {
 export type User = {
   id: string
   email: string
+  teams: { id: string; name: string }[]
 }
 
 // Teams
@@ -72,9 +76,13 @@ export async function deleteTeam(id: string): Promise<void> {
   }
 }
 
-export async function updateTeamFirstAidSettings(
+export async function updateTeamSettings(
   teamId: string,
-  settings: { firstAidBagsEnabled: boolean; firstAidBagCount: number }
+  settings: {
+    firstAidBagsEnabled?: boolean
+    firstAidBagCount?: number
+    shotClockEnabled?: boolean
+  }
 ): Promise<Team> {
   const res = await fetch(`/api/teams/${teamId}`, {
     method: "PATCH",
@@ -170,7 +178,7 @@ export async function clearAllGames(teamId?: string): Promise<void> {
 export async function updateOfficial(
   gameId: string,
   teamId: string,
-  role: "poytakirja" | "kello",
+  role: "poytakirja" | "kello" | "hyokkaysaika",
   assignment: OfficialAssignment | null
 ): Promise<Game> {
   const res = await fetch(`/api/games/${gameId}`, {

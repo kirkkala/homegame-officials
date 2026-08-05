@@ -18,6 +18,9 @@ export type OfficialAssignment = {
 export type Officials = {
   poytakirja: OfficialAssignment | null
   kello: OfficialAssignment | null
+  // Optional so existing rows (created before this role existed) remain valid
+  // until they are backfilled / updated.
+  hyokkaysaika?: OfficialAssignment | null
 }
 
 // Teams
@@ -26,6 +29,8 @@ export const teams = pgTable("teams", {
   name: text("name").notNull(),
   firstAidBagsEnabled: boolean("first_aid_bags_enabled").notNull().default(false),
   firstAidBagCount: text("first_aid_bag_count").notNull().default("3"), // 1-10
+  // 24-second shot clock official (hyökkäysaika) — only needed for U13 and older
+  shotClockEnabled: boolean("shot_clock_enabled").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
@@ -71,7 +76,7 @@ export const games = pgTable("games", {
   officials: jsonb("officials")
     .$type<Officials>()
     .notNull()
-    .default({ poytakirja: null, kello: null }),
+    .default({ poytakirja: null, kello: null, hyokkaysaika: null }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 

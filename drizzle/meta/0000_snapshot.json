@@ -111,7 +111,7 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
-          "default": "'{\"poytakirja\":null,\"kello\":null}'::jsonb"
+          "default": "'{\"poytakirja\":null,\"kello\":null,\"hyokkaysaika\":null}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
@@ -272,6 +272,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'3'"
+        },
+        "shot_clock_enabled": {
+          "name": "shot_clock_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
