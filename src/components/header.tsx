@@ -35,9 +35,10 @@ import { useTheme } from "@mui/material/styles"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { useState } from "react"
 import packageJson from "../../package.json"
+import { LogoutButton, logout } from "./logout-button"
 import { TeamSelector } from "./team-selector"
 
 type PageItem = {
@@ -119,7 +120,7 @@ export function MainHeader() {
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open)
 
   const handleLogout = () => {
-    void signOut({ callbackUrl: "/" })
+    void logout()
     setDrawerOpen(false)
   }
 
@@ -233,14 +234,7 @@ export function MainHeader() {
                   />
                 ))}
                 {!authLoading && user && (
-                  <Tab
-                    label={showTabLabels ? "Logout" : undefined}
-                    icon={<LogoutIcon />}
-                    iconPosition={showTabLabels ? "start" : undefined}
-                    onClick={handleLogout}
-                    aria-label="Logout"
-                    sx={{ fontWeight: 400 }}
-                  />
+                  <LogoutButton variant="tab" showLabel={showTabLabels} email={user.email} />
                 )}
               </Tabs>
               {!authLoading && !user && (
@@ -329,12 +323,11 @@ export function MainHeader() {
                 <Divider sx={{ my: 1 }} />
                 <ListItem disablePadding>
                   {user ? (
-                    <ListItemButton onClick={handleLogout}>
-                      <ListItemIcon>
-                        <LogoutIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Logout" />
-                    </ListItemButton>
+                    <LogoutButton
+                      variant="list"
+                      email={user.email}
+                      onAfterAction={() => setDrawerOpen(false)}
+                    />
                   ) : (
                     <ListItemButton component={Link} href="/kirjaudu" onClick={toggleDrawer(false)}>
                       <ListItemIcon>

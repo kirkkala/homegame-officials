@@ -1065,7 +1065,8 @@ export default function HallintaPage() {
                     {selectedTeam.name} joukkueen ottelut ({existingGames.length})
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Joukkueen otteluiden hallinta. Tuo ottelut excel-tiedostota tai lisää käsin painamalla "Tuo otteluita".
+                    Joukkueen otteluiden hallinta. Tuo ottelut excel-tiedostota tai lisää käsin
+                    painamalla "Tuo otteluita".
                   </Typography>
                   <Accordion
                     expanded={shouldExpandImport || importExpanded}
@@ -1233,9 +1234,9 @@ export default function HallintaPage() {
                   {existingGames.length > 0 && (
                     <>
                       <Typography variant="body2" color="text.secondary" mb={2}>
-                        Merkitse joukkueen kotipelit jotta niihin voi lisätä toimitsijoita. Voit myös poistaa
-                        ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa valinnan
-                        automaattisesti.
+                        Merkitse joukkueen kotipelit jotta niihin voi lisätä toimitsijoita. Voit
+                        myös poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa
+                        valinnan automaattisesti.
                       </Typography>
 
                       <GamesTable
