@@ -994,15 +994,18 @@ export default function HallintaPage() {
 
               {currentKey === "players" && (
                 <Stack gap={2}>
-                  <Box>
-                    <Typography component="h2" variant="h5">
-                      {selectedTeam.name} joukkueen pelaajat ({players.length})
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Nimet toimitsijavuorovastuun valintalistaan, lisää uudet pelaajat tekstikenttään
-                    yksi per rivi. Käytä vain etu- tai lempinimiä.
+                  <Typography component="h2" variant="h5">
+                    {selectedTeam.name} joukkueen pelaajat ({players.length})
                   </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Lisää uudet pelaajat tekstikenttään yksi per rivi. Käytä vain etu- tai
+                    lempinimiä.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Voit poistaa pelaajan roskakori-painikkeella. Pelaajan poistaminen säilyttää
+                    otteluihin mahdollisesti merkityn vuorovastuun.
+                  </Typography>
+
                   {playersLoading ? (
                     <Stack alignItems="center" py={2}>
                       <CircularProgress size={24} />
@@ -1017,8 +1020,11 @@ export default function HallintaPage() {
                               key={player.id}
                               label={player.name}
                               onDelete={() => handleDeletePlayer(player.id)}
-                              deleteIcon={<CloseIcon data-testid={`player-delete-${player.id}`} />}
+                              deleteIcon={
+                                <DeleteOutlineIcon data-testid={`player-delete-${player.id}`} />
+                              }
                               data-testid={`player-chip-${player.id}`}
+                              title={`Poista ${player.name}`}
                             />
                           ))}
                       </Stack>
@@ -1054,9 +1060,12 @@ export default function HallintaPage() {
               )}
 
               {currentKey === "games" && (
-                <Stack gap={3}>
+                <Stack gap={2}>
                   <Typography component="h2" variant="h5">
                     {selectedTeam.name} joukkueen ottelut ({existingGames.length})
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Joukkueen otteluiden hallinta. Tuo ottelut excel-tiedostota tai lisää käsin painamalla "Tuo otteluita".
                   </Typography>
                   <Accordion
                     expanded={shouldExpandImport || importExpanded}
@@ -1224,8 +1233,8 @@ export default function HallintaPage() {
                   {existingGames.length > 0 && (
                     <>
                       <Typography variant="body2" color="text.secondary" mb={2}>
-                        Merkitse kotipelit rastilla jotta niihin voi lisätä toimitsijoita. Voit myös
-                        poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa valinnan
+                        Merkitse joukkueen kotipelit jotta niihin voi lisätä toimitsijoita. Voit myös poistaa
+                        ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa valinnan
                         automaattisesti.
                       </Typography>
 
