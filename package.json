@@ -3,7 +3,7 @@
   "version": "2.0.12",
   "private": true,
   "scriptDescriptions": {
-    "help": "Lists available scripts, you probably just issues this command",
+    "help": "Lists available scripts, you probably just issued this command",
     "dev": "Start development server",
     "build": "Build for production",
     "start": "Start production server",
