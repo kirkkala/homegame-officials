@@ -845,9 +845,26 @@ export default function HallintaPage() {
                       Ei rekisteröityneitä käyttäjiä.
                     </Typography>
                   ) : (
-                    <Stack direction="row" flexWrap="wrap" gap={1}>
+                    <Stack gap={1}>
                       {users.map((u) => (
-                        <Chip key={u.id} label={u.email} />
+                        <Stack
+                          key={u.id}
+                          direction="row"
+                          flexWrap="wrap"
+                          alignItems="center"
+                          gap={1}
+                        >
+                          <Chip label={u.email} />
+                          {u.teams.length > 0 ? (
+                            u.teams.map((t) => (
+                              <Chip key={t.id} label={t.name} size="small" variant="outlined" />
+                            ))
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              ei hallittavia joukkueita
+                            </Typography>
+                          )}
+                        </Stack>
                       ))}
                     </Stack>
                   )}

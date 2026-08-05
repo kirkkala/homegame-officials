@@ -46,6 +46,7 @@ export type Player = {
 export type User = {
   id: string
   email: string
+  teams: { id: string; name: string }[]
 }
 
 // Teams

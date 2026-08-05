@@ -97,10 +97,33 @@ export async function createUser(user: schema.NewUser) {
 }
 
 export async function getUsers() {
-  return db
-    .select({ id: schema.users.id, email: schema.users.email })
+  const rows = await db
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      teamId: schema.teams.id,
+      teamName: schema.teams.name,
+    })
     .from(schema.users)
-    .orderBy(schema.users.email)
+    .leftJoin(schema.teamManagers, eq(schema.users.id, schema.teamManagers.userId))
+    .leftJoin(schema.teams, eq(schema.teamManagers.teamId, schema.teams.id))
+    .orderBy(schema.users.email, schema.teams.name)
+
+  const byUser = new Map<
+    string,
+    { id: string; email: string; teams: { id: string; name: string }[] }
+  >()
+  for (const row of rows) {
+    let user = byUser.get(row.id)
+    if (!user) {
+      user = { id: row.id, email: row.email, teams: [] }
+      byUser.set(row.id, user)
+    }
+    if (row.teamId && row.teamName) {
+      user.teams.push({ id: row.teamId, name: row.teamName })
+    }
+  }
+  return Array.from(byUser.values())
 }
 
 // ============ TEAM MANAGERS ============
