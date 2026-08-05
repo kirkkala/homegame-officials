@@ -745,6 +745,24 @@ export default function HallintaPage() {
   const shouldExpandImport = parsedGames.length > 0 || existingGames.length === 0
   let content: React.ReactNode
 
+  const adminZoneLink = !authLoading && isAdmin && (
+    <Button
+      component={NextLink}
+      href="/hallinta/admin"
+      size="small"
+      variant="text"
+      startIcon={<SettingsIcon />}
+      data-testid="admin-zone-button"
+      sx={{
+        textTransform: "none",
+        color: "text.secondary",
+        "&:hover": { bgcolor: "transparent", color: "text.primary" },
+      }}
+    >
+      Admin zone
+    </Button>
+  )
+
   if (authLoading) {
     content = (
       <Stack alignItems="center" py={8}>
@@ -792,26 +810,6 @@ export default function HallintaPage() {
     subtitle = selectedTeam.name
     content = (
       <Stack gap={3}>
-        {!authLoading && isAdmin && (
-          <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1} sx={{ mb: 1 }}>
-            <Button
-              component={NextLink}
-              href="/hallinta/admin"
-              size="small"
-              variant="text"
-              startIcon={<SettingsIcon />}
-              data-testid="admin-zone-button"
-              sx={{
-                textTransform: "none",
-                color: "text.secondary",
-                "&:hover": { bgcolor: "transparent", color: "text.primary" },
-              }}
-            >
-              Admin zone
-            </Button>
-          </Stack>
-        )}
-
         {(() => {
           const tabKeys = ["general", "players", "games"]
           const currentKey = tabKeys[activeTab] ?? "general"
@@ -1290,6 +1288,11 @@ export default function HallintaPage() {
 
   return (
     <PageLayout subtitle={subtitle}>
+      {adminZoneLink && (
+        <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+          {adminZoneLink}
+        </Stack>
+      )}
       {content}
 
       {/* Edit Game Dialog */}
