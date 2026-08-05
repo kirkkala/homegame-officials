@@ -37,7 +37,7 @@ const steps = [
     icon: <UploadFileIcon />,
     title: "2. Jaa toimitsijavuorot",
     description: `
-      Valitse pelin eSCO-, kello- ja hyökkäysaikavuoron (24 s) vastuu
+      Valitse pelin eSCO-, kello- ja tarvittaessa hyökkäysajan (24 sekuntia) vastuu
       painamalla "Valitse pelaaja...". Valitse pelaaja kenen huoltajille
       toimitsijavuoron vastuu halutaan osoittaa.
     `,
@@ -49,9 +49,9 @@ const steps = [
       Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai
       kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista"
       painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai
-      pyydetäänkö tehtävän tekijäksi juniori joukkueenjohtajan avustuksella.
-      Poolista otetun henkilön nimen voi lisätä myöhemmin jos se ei vielä ole
-      tiedossa.
+      palkataanko tehtävän tekijäksi juniori joukkueenjohtajan avustuksella
+      (maksua vastaan). Poolista otetun tekijän nimen voi lisätä myöhemmin
+      mikäli se ei valintahetkellä ole tiedossa.
     `,
   },
   {
@@ -60,7 +60,8 @@ const steps = [
     description: `
       Vahvistetut vuorot näkyvät vihreänä, odottavat oranssina. Mikäli vaihdat
       nimeämisiä sovi siitä toisen vanhemman/huoltajan tai joukkueenjohtajan
-      kanssa.
+      kanssa. Menneet pelit ovat automaattisesti piilotettuina mutta niitä voi
+      tarkastella valitsemalla "Menneet pelit" -valinnan etusivulla.
     `,
   },
 ]
@@ -79,40 +80,48 @@ export default function KayttoohjeetPage() {
               Mikä tämä on?
             </Typography>
             <Typography>
-              Kotipelien toimitsijat -sovellus auttaa jakamaan Namikan kotipelien toimitsijavuoroja.
-              Kirjautuminen ei ole pakollista — sitä tarvitsee vain jojo hallintaa varten.
+              Sovellus on vaihtoehto excel-jumpalle kotipelien toimitsijavuorojen jakamiseen.
             </Typography>
             <Typography>
-              Timo Kirkkala askarteli applikaation harrasteprojektina AI:n kanssa että
-              toimitsijavuorojen kanssa säätäminen veisi vähemmän aikaa excelin parissa. Koodi on
-              julkaistu avoimena lähdekoodina{" "}
-              <Link
-                href="https://github.com/kirkkala/homegame-officials"
-                target="_blank"
-                rel="noopener"
-              >
-                GitHubissa
-              </Link>
-              .
+              Sekä joukkueenjohtaja että vanhemmat voivat vahvistaa toimitsijavuoroja kauden aikana.
+              Sovelluksesta näkee helposti, että vuorot on hoidettu kaikkiin peleihin ja jaettu
+              tasaisesti.
+            </Typography>
+            <Typography>
+              Vain joukkueenjohtajan tarvitsee kirjautua joukkueensa pelien hallintaa varten.
+              Vanhemmat vahvistavat heille osoitetun toimitsijavuoron tekemisen ilman kirjautumista.
+              Mikäli toimitsijavuoro on osoitettu vanhemmalle, on hänen vastuulla varmistaa että
+              siihen on tekijä; joko itse, pyytämällä toista joukkueen vanhempaa tai valitsemalla
+              juniorin poolista (maksua vastaan) tekemään kyseisen vuoron.
+            </Typography>
+            <Typography>
+              Sovelluksessa on myös helppo seuranta joukkueen ensiapulaukuista jotta peliä
+              edeltävinä päivinä voi varmistaa että laukut kulkeutuvat mukaan otteluihin.
             </Typography>
             <Typography component="h3" variant="h5">
               Näin pääset alkuun
             </Typography>
             <Typography>
-              Joukkueenjohtaja luo joukkueen{" "}
+              Joukkueenjohtaja kirjautuu sisään ja luo joukkueen{" "}
               <Link href="https://elsa-myclub.hnmky.fi/" target="_blank" rel="noopener">
                 eLSA → MyClub Muuntaja
               </Link>{" "}
               appilla tehdystä excel-tiedostosta sekä lisää pelaajat ja merkitsee kotiottelut
-              hallintapaneelin kautta.
+              hallintapaneelin kautta. Hallintapaneelista voi aktivoida ensiapulaukujen seurannan
+              sekä tarvittaessa 24 sekunnin heittokellon toimitsijavuoron (vain U13 ja vanhemmat).
+              Oletuksena sovelluksessa on vain pöytäkirja (eSCO) sekä kello (tulostaulu)
+              toimitsijavastuina.
             </Typography>
             <Typography>
-              Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista.
+              Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista:
             </Typography>
             <List className="steps-list">
               {steps.map((step) => (
                 <ListItem key={step.title} className="steps-list-item">
-                  <ListItemIcon className="steps-list-icon" sx={{ mt: 0.75, color: "primary.main" }}>
+                  <ListItemIcon
+                    className="steps-list-icon"
+                    sx={{ mt: 0.75, color: "primary.main" }}
+                  >
                     {step.icon}
                   </ListItemIcon>
                   <ListItemText
@@ -130,8 +139,27 @@ export default function KayttoohjeetPage() {
               Jos joukkueenjohtaja on ottanut ensiapulaukkujen seurannan käyttöön, näet{" "}
               <Link href="/ensiapulaukut">Ensiapulaukut</Link>-sivulla kenellä ensiapulaukut
               parhaillaan ovat. Eli ota laukku haltuun lisäämällä nimesi tänne jos laukku on tullut
-              mukaasi pelistä! Näin kaikki tietävät missä laukut ovat ja vähennetään
-              WhatsApp-viestien määrää 🩹
+              mukaasi pelistä! Näin koko joukkueella on mahdollisuus nähdä yhdestä paikkaa kenellä
+              laukut kulloinkin ovat ja vähennämme ryhmän WhatsApp-viestien määrää.
+            </Typography>
+            <Typography component="h3" variant="h5">
+              Kuka tämän on tehnyt?
+            </Typography>
+            <Typography>
+              HNKY Stadi 2014 tyttöjen jojo Timo Kirkkala on askarrellut applikaatiota
+              harrasteprojektina syksystä 2025 että toimitsijavuorojen kanssa säätäminen veisi
+              vähemmän aikaa excelin parissa.
+            </Typography>
+            <Typography>
+              Koodi on julkaistu avoimena lähdekoodina{" "}
+              <Link
+                href="https://github.com/kirkkala/homegame-officials"
+                target="_blank"
+                rel="noopener"
+              >
+                GitHubissa
+              </Link>
+              .
             </Typography>
           </Stack>
         </Paper>
