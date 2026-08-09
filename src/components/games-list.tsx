@@ -122,7 +122,12 @@ export function GamesList() {
 
   if (teamLoading || gamesLoading) {
     return (
-      <Stack alignItems="center" py={8}>
+      <Stack
+        sx={{
+          alignItems: "center",
+          py: 8,
+        }}
+      >
         <CircularProgress />
       </Stack>
     )
@@ -131,10 +136,12 @@ export function GamesList() {
   const filterCheckboxes = (
     <Stack
       direction={{ xs: "column", sm: "row" }}
-      alignItems={{ xs: "flex-start", sm: "center" }}
       spacing={{ xs: 0, sm: 2 }}
       useFlexGap
-      sx={{ "& .MuiFormControlLabel-root": { marginBottom: 0 } }}
+      sx={{
+        alignItems: { xs: "flex-start", sm: "center" },
+        "& .MuiFormControlLabel-root": { marginBottom: 0 },
+      }}
     >
       <FormControlLabel
         control={
@@ -166,24 +173,36 @@ export function GamesList() {
   if (allGames.length === 0) {
     return (
       <>
-        <Stack gap={{ xs: 2, sm: 3 }}>
+        <Stack
+          sx={{
+            gap: { xs: 2, sm: 3 },
+          }}
+        >
           <Stack
             direction={{ xs: "column", sm: "row" }}
-            justifyContent="space-between"
-            alignItems={{ xs: "stretch", sm: "center" }}
-            gap={2}
             sx={{
+              justifyContent: "space-between",
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: 2,
               bgcolor: "background.paper",
               borderRadius: 1,
               px: 2,
               py: 1.5,
             }}
           >
-            <Stack direction="row" alignItems="center" gap={1}>
+            <Stack
+              direction="row"
+              sx={{
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               <Typography
                 variant="h2"
-                fontWeight="bold"
-                sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                }}
               >
                 {selectedTeam.name}
               </Typography>
@@ -204,7 +223,12 @@ export function GamesList() {
               </Box>
             )}
           </Stack>
-          <Stack alignItems="center" py={6}>
+          <Stack
+            sx={{
+              alignItems: "center",
+              py: 6,
+            }}
+          >
             <CalendarMonthIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
             <Typography variant="h5" gutterBottom>
               Ei otteluita joukkueella {selectedTeam.name}
@@ -231,25 +255,43 @@ export function GamesList() {
 
   return (
     <>
-      <Stack gap={{ xs: 2, sm: 3 }}>
+      <Stack
+        sx={{
+          gap: { xs: 2, sm: 3 },
+        }}
+      >
         <Stack
           direction={{ xs: "column", sm: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "stretch", sm: "center" }}
-          gap={2}
           sx={{
+            justifyContent: "space-between",
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: 2,
             bgcolor: "background.paper",
             borderRadius: 1,
             px: 2,
             py: 1.5,
           }}
         >
-          <Stack gap={1} minWidth={0} sx={{ order: { xs: 0, sm: 0 } }}>
-            <Stack direction="row" alignItems="center" gap={1}>
+          <Stack
+            sx={{
+              gap: 1,
+              minWidth: 0,
+              order: { xs: 0, sm: 0 },
+            }}
+          >
+            <Stack
+              direction="row"
+              sx={{
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               <Typography
                 variant="h2"
-                fontWeight="bold"
-                sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                }}
               >
                 {selectedTeam.name}
               </Typography>
@@ -284,25 +326,33 @@ export function GamesList() {
         </Stack>
         {games.length === 0 ? (
           <Stack
-            alignItems="center"
-            py={6}
             sx={{
+              alignItems: "center",
+              py: 6,
               bgcolor: "background.paper",
               borderRadius: 1,
               px: 2,
-              py: 1.5,
             }}
           >
             <Typography variant="h6" gutterBottom>
               Ei otteluita valituilla suodattimilla
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               Poista &quot;Näytä vain kotipelit&quot; tai valitse &quot;Näytä pelatut pelit&quot;
               nähdäksesi kaikki ottelut.
             </Typography>
           </Stack>
         ) : (
-          <Stack gap={{ xs: 1.5, sm: 2 }}>
+          <Stack
+            sx={{
+              gap: { xs: 1.5, sm: 2 },
+            }}
+          >
             {games.map((game) => (
               <GameCard
                 key={game.id}

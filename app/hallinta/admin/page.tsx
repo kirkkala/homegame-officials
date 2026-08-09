@@ -50,7 +50,12 @@ export default function AdminPage() {
   if (authLoading) {
     return (
       <PageLayout>
-        <Stack alignItems="center" py={8}>
+        <Stack
+          sx={{
+            alignItems: "center",
+            py: 8,
+          }}
+        >
           <CircularProgress />
         </Stack>
       </PageLayout>
@@ -60,7 +65,13 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <PageLayout>
-        <Stack alignItems="center" py={8} gap={2}>
+        <Stack
+          sx={{
+            alignItems: "center",
+            py: 8,
+            gap: 2,
+          }}
+        >
           <Typography>Tämä sivu on vain järjestelmän pääkäyttäjälle.</Typography>
           <Button component={NextLink} href="/hallinta">
             Siirry joukkueen asetuksiin
@@ -72,7 +83,11 @@ export default function AdminPage() {
 
   return (
     <PageLayout>
-      <Stack gap={3}>
+      <Stack
+        sx={{
+          gap: 3,
+        }}
+      >
         <Box>
           <Button
             component={NextLink}
@@ -89,29 +104,60 @@ export default function AdminPage() {
         </Box>
 
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Stack gap={2}>
+          <Stack
+            sx={{
+              gap: 2,
+            }}
+          >
             <Typography component="h3" variant="h6">
               Rekisteröityneet käyttäjät ({users.length})
             </Typography>
             {usersLoading ? (
-              <Stack alignItems="center" py={2}>
+              <Stack
+                sx={{
+                  alignItems: "center",
+                  py: 2,
+                }}
+              >
                 <CircularProgress size={24} />
               </Stack>
             ) : users.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 Ei rekisteröityneitä käyttäjiä.
               </Typography>
             ) : (
-              <Stack gap={1}>
+              <Stack
+                sx={{
+                  gap: 1,
+                }}
+              >
                 {users.map((u) => (
-                  <Stack key={u.id} direction="row" flexWrap="wrap" alignItems="center" gap={1}>
+                  <Stack
+                    key={u.id}
+                    direction="row"
+                    sx={{
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
                     <Chip label={u.email} />
                     {u.teams.length > 0 ? (
                       u.teams.map((t) => (
                         <Chip key={t.id} label={t.name} size="small" variant="outlined" />
                       ))
                     ) : (
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         ei hallittavia joukkueita
                       </Typography>
                     )}

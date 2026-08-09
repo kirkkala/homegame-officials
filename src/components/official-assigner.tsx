@@ -31,9 +31,9 @@ import {
   IconButton,
   InputAdornment,
   List,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  MenuItem,
   Snackbar,
   Stack,
   TextField,
@@ -77,7 +77,15 @@ function PlayerPicker({
 
   if (loading) {
     return (
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ px: 2, py: 1.5 }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          alignItems: "center",
+          px: 2,
+          py: 1.5,
+        }}
+      >
         <CircularProgress size={20} />
         <Typography variant="body2">Ladataan...</Typography>
       </Stack>
@@ -127,23 +135,29 @@ function PlayerPicker({
         sx={{ display: "flex", flexDirection: "column", maxHeight: 240, overflowY: "auto" }}
       >
         {filtered.length === 0 ? (
-          <MenuItem disabled>
+          <ListItemButton disabled>
             <ListItemText>Ei hakua vastaavia pelaajia</ListItemText>
-          </MenuItem>
+          </ListItemButton>
         ) : (
           filtered.map((player) => {
             const shiftCount = playerStats?.get(player.name) ?? 0
             return (
-              <MenuItem
+              <ListItemButton
                 key={player.id}
                 onClick={() => onSelect(player.name)}
                 data-testid={`official-player-${player.id}`}
               >
                 <ListItemText>{player.name}</ListItemText>
-                <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                    ml: 2,
+                  }}
+                >
                   {shiftCount}
                 </Typography>
-              </MenuItem>
+              </ListItemButton>
             )
           })
         )}
@@ -178,8 +192,22 @@ function OfficialDialogHeader({
 }) {
   return (
     <Box sx={{ minWidth: 0 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: "center",
+            minWidth: 0,
+          }}
+        >
           <Icon sx={{ color: "text.secondary", flexShrink: 0 }} />
           <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }} noWrap>
             {label}
@@ -196,7 +224,12 @@ function OfficialDialogHeader({
           {action}
         </Typography>
       )}
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{
+          color: "text.secondary",
+        }}
+      >
         {[gameDivisionId ?? null, `${formatDate(gameDate)} klo ${gameTime}`]
           .filter(Boolean)
           .join(" / ")}
@@ -381,12 +414,30 @@ export function OfficialAssigner({
           }),
         }}
       >
-        <Stack alignItems="flex-start" sx={{ overflow: "hidden" }}>
-          <Stack direction="row" spacing={1} alignItems="center">
+        <Stack
+          sx={{
+            alignItems: "flex-start",
+            overflow: "hidden",
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <Icon sx={{ verticalAlign: "middle" }} />
             <Typography>{label}</Typography>
           </Stack>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ pt: 1 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              alignItems: "center",
+              pt: 1,
+            }}
+          >
             <Typography sx={{ fontWeight: "bold" }} noWrap>
               {isBusy ? "Tallennetaan..." : displayAssignment?.playerName || "Valitse pelaaja..."}
             </Typography>
@@ -425,7 +476,7 @@ export function OfficialAssigner({
           <List disablePadding>
             {/* Confirmation options - only when player assigned but not yet confirmed */}
             {displayAssignment && !isConfirmed && (
-              <MenuItem
+              <ListItemButton
                 key="guardian"
                 onClick={() => handleOpenDialog("guardian")}
                 data-testid="official-confirm-guardian"
@@ -434,10 +485,10 @@ export function OfficialAssigner({
                   <GroupIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText>Huoltaja tekee vuoron</ListItemText>
-              </MenuItem>
+              </ListItemButton>
             )}
             {displayAssignment && !isConfirmed && (
-              <MenuItem
+              <ListItemButton
                 key="pool"
                 onClick={() => handleOpenDialog("pool")}
                 data-testid="official-confirm-pool"
@@ -446,10 +497,10 @@ export function OfficialAssigner({
                   <PersonIcon color="secondary" />
                 </ListItemIcon>
                 <ListItemText>Juniori poolista</ListItemText>
-              </MenuItem>
+              </ListItemButton>
             )}
             {displayAssignment?.handledBy === "guardian" && (
-              <MenuItem
+              <ListItemButton
                 key="guardian-edit"
                 onClick={() => handleOpenDialog("guardian")}
                 data-testid="official-edit-guardian"
@@ -458,10 +509,10 @@ export function OfficialAssigner({
                   <GroupIcon color="primary" />
                 </ListItemIcon>
                 <ListItemText>Muokkaa vuoron tekijän nimeä</ListItemText>
-              </MenuItem>
+              </ListItemButton>
             )}
             {displayAssignment?.handledBy === "pool" && (
-              <MenuItem
+              <ListItemButton
                 key="pool-edit"
                 onClick={() => handleOpenDialog("pool")}
                 data-testid="official-edit-pool"
@@ -472,24 +523,28 @@ export function OfficialAssigner({
                 <ListItemText>
                   {displayAssignment.confirmedBy ? "Muokkaa juniorin nimeä" : "Lisää juniorin nimi"}
                 </ListItemText>
-              </MenuItem>
+              </ListItemButton>
             )}
             {displayAssignment && isConfirmed && (
-              <MenuItem key="unconfirm" onClick={handleUnconfirm} data-testid="official-unconfirm">
+              <ListItemButton
+                key="unconfirm"
+                onClick={handleUnconfirm}
+                data-testid="official-unconfirm"
+              >
                 <ListItemIcon>
                   <HourglassEmptyIcon color="warning" />
                 </ListItemIcon>
                 <ListItemText>Poista vuoron tekijä</ListItemText>
-              </MenuItem>
+              </ListItemButton>
             )}
             {/* Remove option - when player assigned */}
             {displayAssignment && (
-              <MenuItem key="clear" onClick={handleClear} data-testid="official-clear">
+              <ListItemButton key="clear" onClick={handleClear} data-testid="official-clear">
                 <ListItemIcon>
                   <ClearIcon color="error" />
                 </ListItemIcon>
                 <ListItemText>Poista toimitsijavastuu</ListItemText>
-              </MenuItem>
+              </ListItemButton>
             )}
           </List>
           {/* Player list - only when no assignment yet */}
@@ -511,7 +566,13 @@ export function OfficialAssigner({
               sx={{ backgroundColor: "transparent", borderTop: 1, borderColor: "divider" }}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    alignItems: "center",
+                  }}
+                >
                   <SwapHorizIcon fontSize="small" color="action" />
                   <Typography variant="body2">Vaihda pelaajavastuu</Typography>
                 </Stack>
@@ -579,7 +640,7 @@ export function OfficialAssigner({
               value={name}
               onChange={(e) => setName(e.target.value)}
               size="small"
-              inputProps={{ "data-testid": "official-confirm-input" }}
+              slotProps={{ htmlInput: { "data-testid": "official-confirm-input" } }}
               sx={{ mt: 2 }}
             />
           </DialogContent>

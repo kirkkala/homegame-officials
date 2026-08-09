@@ -25,8 +25,21 @@ export function FirstAidBagsSummary() {
       <CardActionArea component={NextLink} href="/ensiapulaukut">
         <CardContent sx={{ p: { xs: 0, sm: 2 } }}>
           <Stack spacing={0.5}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-              <Stack direction="row" alignItems="center" spacing={0.5}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Stack
+                direction="row"
+                spacing={0.5}
+                sx={{
+                  alignItems: "center",
+                }}
+              >
                 <MedicalServicesIcon color="primary" fontSize="small" />
                 <Typography variant="subtitle2">Ensiapulaukut</Typography>
               </Stack>
@@ -56,7 +69,13 @@ export function FirstAidBagsSummary() {
                 })}
               </Box>
             ) : (
-              <Typography variant="caption" color="text.secondary" sx={{ pl: 3 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                  pl: 3,
+                }}
+              >
                 Ei merkattuja haltijoita
               </Typography>
             )}

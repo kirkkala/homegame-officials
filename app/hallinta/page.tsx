@@ -4,11 +4,11 @@ import {
   Add as AddIcon,
   Close as CloseIcon,
   DeleteForever as DeleteForeverIcon,
-  DeleteOutline as DeleteOutlineIcon,
+  DeleteOutlined as DeleteOutlineIcon,
   EditOutlined as EditOutlinedIcon,
   ExpandMore as ExpandMoreIcon,
   Groups as GroupsIcon,
-  HelpOutline as HelpOutlineIcon,
+  HelpOutlineOutlined as HelpIcon,
   Settings as SettingsIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
@@ -765,13 +765,23 @@ export default function HallintaPage() {
 
   if (authLoading) {
     content = (
-      <Stack alignItems="center" py={8}>
+      <Stack
+        sx={{
+          alignItems: "center",
+          py: 8,
+        }}
+      >
         <CircularProgress />
       </Stack>
     )
   } else if (!user) {
     content = (
-      <Stack alignItems="center" py={8}>
+      <Stack
+        sx={{
+          alignItems: "center",
+          py: 8,
+        }}
+      >
         <Typography>Joukkueenjohtajan hallintapaneeli, vain kirjautuneille käyttäjille.</Typography>
         <Button component={NextLink} href="/">
           Siirry etusivulle
@@ -780,18 +790,34 @@ export default function HallintaPage() {
     )
   } else if (teamLoading) {
     content = (
-      <Stack alignItems="center" py={8}>
+      <Stack
+        sx={{
+          alignItems: "center",
+          py: 8,
+        }}
+      >
         <CircularProgress />
       </Stack>
     )
   } else if (!selectedTeam) {
     content = (
-      <Stack alignItems="center" py={8}>
+      <Stack
+        sx={{
+          alignItems: "center",
+          py: 8,
+        }}
+      >
         <GroupsIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
         <Typography variant="h5" gutterBottom>
           Valitse tai luo joukkue
         </Typography>
-        <Typography color="text.secondary" mb={3} textAlign="center">
+        <Typography
+          sx={{
+            color: "text.secondary",
+            mb: 3,
+            textAlign: "center",
+          }}
+        >
           Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä kotipelit.
         </Typography>
         <TeamSelector showCreateButton />
@@ -799,7 +825,7 @@ export default function HallintaPage() {
           component={NextLink}
           href="/kayttoohjeet"
           size="small"
-          startIcon={<HelpOutlineIcon />}
+          startIcon={<HelpIcon />}
           sx={{ mt: 4, color: "text.secondary" }}
         >
           Käyttöohjeet
@@ -809,7 +835,11 @@ export default function HallintaPage() {
   } else {
     subtitle = selectedTeam.name
     content = (
-      <Stack gap={3}>
+      <Stack
+        sx={{
+          gap: 3,
+        }}
+      >
         {(() => {
           const tabKeys = ["general", "players", "games"]
           const currentKey = tabKeys[activeTab] ?? "general"
@@ -829,8 +859,16 @@ export default function HallintaPage() {
               </Tabs>
 
               {currentKey === "general" && (
-                <Stack gap={3}>
-                  <Stack gap={2}>
+                <Stack
+                  sx={{
+                    gap: 3,
+                  }}
+                >
+                  <Stack
+                    sx={{
+                      gap: 2,
+                    }}
+                  >
                     <Typography component="h2" variant="h5">
                       {selectedTeam.name} joukkueen asetukset
                     </Typography>
@@ -907,7 +945,12 @@ export default function HallintaPage() {
                         }
                         label="24 sekunnin kello (hyökkäysaika)"
                       />
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         Asetus lisää 24 sekunnin hyökkäyskellon toimitsijavalinnan otteluille.
                         Hyökkäysaikaa käytetään U13 ja vanhempien ikäluokkien sarjoissa.
                       </Typography>
@@ -919,7 +962,12 @@ export default function HallintaPage() {
                       <Typography component="h3" variant="h6" gutterBottom>
                         Joukkueen pääkäyttäjät
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         Käyttäjät, jotka voivat hallita tämän joukkueen otteluita ja pelaajia.
                         {adminEmail
                           ? ` Järjestelmän pääkäyttäjä ${adminEmail} voi hallita kaikkia joukkueita.`
@@ -927,11 +975,22 @@ export default function HallintaPage() {
                       </Typography>
                     </Box>
                     {managersLoading ? (
-                      <Stack alignItems="center" py={2}>
+                      <Stack
+                        sx={{
+                          alignItems: "center",
+                          py: 2,
+                        }}
+                      >
                         <CircularProgress size={24} />
                       </Stack>
                     ) : (
-                      <Stack direction="row" flexWrap="wrap" gap={1}>
+                      <Stack
+                        direction="row"
+                        sx={{
+                          flexWrap: "wrap",
+                          gap: 1,
+                        }}
+                      >
                         {managers.map((manager) => {
                           const isSelf = manager.email === userEmail
                           const canRemove = !isSelf
@@ -951,7 +1010,13 @@ export default function HallintaPage() {
                       </Stack>
                     )}
                     <Box component="form" onSubmit={handleAddManager}>
-                      <Stack direction={{ xs: "column", sm: "row" }} gap={2} alignItems="center">
+                      <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        sx={{
+                          gap: 2,
+                          alignItems: "center",
+                        }}
+                      >
                         <TextField
                           fullWidth
                           size="small"
@@ -991,26 +1056,52 @@ export default function HallintaPage() {
               )}
 
               {currentKey === "players" && (
-                <Stack gap={2}>
+                <Stack
+                  sx={{
+                    gap: 2,
+                  }}
+                >
                   <Typography component="h2" variant="h5">
                     {selectedTeam.name} joukkueen pelaajat ({players.length})
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     Lisää uudet pelaajat tekstikenttään yksi per rivi. Käytä vain etu- tai
                     lempinimiä.
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     Voit poistaa pelaajan roskakori-painikkeella. Pelaajan poistaminen säilyttää
                     otteluihin mahdollisesti merkityn vuorovastuun.
                   </Typography>
 
                   {playersLoading ? (
-                    <Stack alignItems="center" py={2}>
+                    <Stack
+                      sx={{
+                        alignItems: "center",
+                        py: 2,
+                      }}
+                    >
                       <CircularProgress size={24} />
                     </Stack>
                   ) : (
                     players.length > 0 && (
-                      <Stack direction="row" flexWrap="wrap" gap={1} my={2}>
+                      <Stack
+                        direction="row"
+                        sx={{
+                          flexWrap: "wrap",
+                          gap: 1,
+                          my: 2,
+                        }}
+                      >
                         {[...players]
                           .sort((a, b) => a.name.localeCompare(b.name, "fi"))
                           .map((player) => (
@@ -1036,7 +1127,7 @@ export default function HallintaPage() {
                       value={playerNames}
                       onChange={(e) => setPlayerNames(e.target.value)}
                       placeholder="Lisää pelaajia (yksi per rivi)"
-                      inputProps={{ "data-testid": "players-textarea" }}
+                      slotProps={{ htmlInput: { "data-testid": "players-textarea" } }}
                       sx={{ mb: 2 }}
                     />
                     <Button
@@ -1058,11 +1149,20 @@ export default function HallintaPage() {
               )}
 
               {currentKey === "games" && (
-                <Stack gap={2}>
+                <Stack
+                  sx={{
+                    gap: 2,
+                  }}
+                >
                   <Typography component="h2" variant="h5">
                     {selectedTeam.name} joukkueen ottelut ({existingGames.length})
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     Joukkueen otteluiden hallinta. Tuo ottelut excel-tiedostota tai lisää käsin
                     painamalla "Tuo otteluita".
                   </Typography>
@@ -1077,7 +1177,13 @@ export default function HallintaPage() {
                       expandIcon={<ExpandMoreIcon />}
                       sx={{ "&:hover": { backgroundColor: "action.hover" } }}
                     >
-                      <Stack direction="row" alignItems="center" gap={1}>
+                      <Stack
+                        direction="row"
+                        sx={{
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
                         <UploadFileIcon />
                         <Typography component="h2" variant="h6">
                           Tuo otteluita
@@ -1085,10 +1191,19 @@ export default function HallintaPage() {
                       </Stack>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Stack gap={2}>
+                      <Stack
+                        sx={{
+                          gap: 2,
+                        }}
+                      >
                         {parsedGames.length === 0 && (
                           <Box>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "text.secondary",
+                              }}
+                            >
                               Tuo ottelut joko{" "}
                               <Link
                                 href="https://elsa-myclub.hnmky.fi"
@@ -1100,7 +1215,12 @@ export default function HallintaPage() {
                               tehdyistä excel-tiedostosta tai MyClubin tapahtumalistauksesta
                               ladatusta excel-tiedostosta.
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "text.secondary",
+                              }}
+                            >
                               Voit myös lisätä otteluita yksitellen painamalla &quot;Lisää
                               manuaalisesti&quot; painiketta.
                             </Typography>
@@ -1125,7 +1245,12 @@ export default function HallintaPage() {
                                 bgcolor: isDragging ? "primary.50" : "transparent",
                               }}
                             >
-                              <Typography color="text.secondary" gutterBottom>
+                              <Typography
+                                gutterBottom
+                                sx={{
+                                  color: "text.secondary",
+                                }}
+                              >
                                 Vedä Excel-tiedosto tähän tai
                               </Typography>
                               <Button
@@ -1164,9 +1289,11 @@ export default function HallintaPage() {
                           <>
                             <Stack
                               direction="row"
-                              alignItems="center"
-                              justifyContent="space-between"
-                              mb={2}
+                              sx={{
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                mb: 2,
+                              }}
                             >
                               <Stack>
                                 <Typography
@@ -1176,7 +1303,12 @@ export default function HallintaPage() {
                                 >
                                   Esikatselu: {parsedGames.length} ottelua
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    color: "text.secondary",
+                                  }}
+                                >
                                   Tarkista tuotavien otteluiden oikeellisuus, merkitse kotipelit
                                   rastilla ja paina &quot;Tuo ottelut&quot; painiketta
                                   tallentaaksesi ottelut.
@@ -1185,9 +1317,11 @@ export default function HallintaPage() {
                               <Stack
                                 direction="row"
                                 spacing={1}
-                                alignItems="center"
-                                flexWrap="nowrap"
-                                sx={{ ml: 4 }}
+                                sx={{
+                                  alignItems: "center",
+                                  flexWrap: "nowrap",
+                                  ml: 4,
+                                }}
                               >
                                 <Button
                                   variant="outlined"
@@ -1234,7 +1368,13 @@ export default function HallintaPage() {
                   {/* Existing Games */}
                   {existingGames.length > 0 && (
                     <>
-                      <Typography variant="body2" color="text.secondary" mb={2}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                          mb: 2,
+                        }}
+                      >
                         Merkitse joukkueen kotipelit jotta niihin voi lisätä toimitsijoita. Voit
                         myös poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa
                         valinnan automaattisesti.
@@ -1289,7 +1429,15 @@ export default function HallintaPage() {
   return (
     <PageLayout subtitle={subtitle}>
       {adminZoneLink && (
-        <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 1,
+            mb: 2,
+          }}
+        >
           {adminZoneLink}
         </Stack>
       )}
@@ -1305,8 +1453,18 @@ export default function HallintaPage() {
           {editDialog.mode === "add" ? "Lisää ottelu" : "Muokkaa ottelua"}
         </DialogTitle>
         <DialogContent>
-          <Stack gap={2} mt={2}>
-            <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+          <Stack
+            sx={{
+              gap: 2,
+              mt: 2,
+            }}
+          >
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              sx={{
+                gap: 2,
+              }}
+            >
               {renderEditField(
                 "Sarja",
                 editDialog.division,
@@ -1314,7 +1472,12 @@ export default function HallintaPage() {
                 "edit-game-division"
               )}
             </Stack>
-            <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              sx={{
+                gap: 2,
+              }}
+            >
               {renderEditField(
                 "Päivämäärä",
                 editDialog.date,
@@ -1330,7 +1493,12 @@ export default function HallintaPage() {
                 { type: "time" }
               )}
             </Stack>
-            <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              sx={{
+                gap: 2,
+              }}
+            >
               {renderEditField(
                 "Koti",
                 editDialog.homeTeam,
@@ -1344,7 +1512,12 @@ export default function HallintaPage() {
                 "edit-game-away"
               )}
             </Stack>
-            <Stack direction={{ xs: "column", sm: "row" }} gap={2}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              sx={{
+                gap: 2,
+              }}
+            >
               {renderEditField(
                 "Paikka",
                 editDialog.location,
@@ -1354,7 +1527,13 @@ export default function HallintaPage() {
               )}
             </Stack>
             {editDialog.mode === "add" && (
-              <Stack direction="row" alignItems="center" gap={1}>
+              <Stack
+                direction="row"
+                sx={{
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
                 <Checkbox
                   checked={editDialog.isHomeGame}
                   color="success"
@@ -1441,7 +1620,7 @@ export default function HallintaPage() {
               setDeleteTeamDialog((prev) => ({ ...prev, confirmInput: e.target.value }))
             }
             placeholder={deleteTeamDialog.teamName}
-            inputProps={{ "data-testid": "delete-team-confirm-input" }}
+            slotProps={{ htmlInput: { "data-testid": "delete-team-confirm-input" } }}
           />
         </DialogContent>
         <DialogActions>

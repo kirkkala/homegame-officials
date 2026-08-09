@@ -42,7 +42,11 @@ export function LoginClient({ adminEmail }: LoginClientProps) {
     >
       <MainHeader />
       <Container maxWidth="sm" sx={{ py: 4, flex: 1 }}>
-        <Stack gap={2}>
+        <Stack
+          sx={{
+            gap: 2,
+          }}
+        >
           <AppProvider theme={theme}>
             <SignInPage
               providers={providers}

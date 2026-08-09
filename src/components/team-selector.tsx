@@ -96,7 +96,13 @@ export function TeamSelector({
           Luo joukkue
         </Button>
       ) : (
-        <Stack direction="row" alignItems="center" gap={1}>
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
           <FormControl
             size={size}
             fullWidth={fullWidth}
@@ -169,7 +175,7 @@ export function TeamSelector({
                 setNewTeamName(e.target.value)
                 createMutation.reset()
               }}
-              inputProps={{ "data-testid": "team-create-input" }}
+              slotProps={{ htmlInput: { "data-testid": "team-create-input" } }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault()
@@ -178,7 +184,13 @@ export function TeamSelector({
               }}
               error={!!createMutation.error}
             />
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                mt: 2,
+              }}
+            >
               Joukkueenjohtaja luo joukkueen ja lisää pelaajat sekä ottelut hallintasivulta.
             </Typography>
           </Box>

@@ -40,7 +40,14 @@ export function GameCard({
             mb: 1,
           }}
         >
-          <Stack direction="row" alignItems="center" gap={0.75} sx={{ gridArea: "meta" }}>
+          <Stack
+            direction="row"
+            sx={{
+              alignItems: "center",
+              gap: 0.75,
+              gridArea: "meta",
+            }}
+          >
             {game.divisionId && (
               <Chip label={game.divisionId} size="small" sx={{ fontWeight: 600 }} />
             )}
@@ -55,15 +62,20 @@ export function GameCard({
           {game.location && (
             <Stack
               direction="row"
-              alignItems="center"
-              gap={0.5}
-              sx={{ gridArea: "location", justifySelf: { xs: "flex-start", sm: "flex-end" } }}
+              sx={{
+                alignItems: "center",
+                gap: 0.5,
+                gridArea: "location",
+                justifySelf: { xs: "flex-start", sm: "flex-end" },
+              }}
             >
               <PlaceIcon sx={{ fontSize: "1rem", color: "text.secondary" }} />
               <Typography
                 variant="body2"
-                color="text.secondary"
-                textAlign={{ xs: "left", sm: "right" }}
+                sx={{
+                  color: "text.secondary",
+                  textAlign: { xs: "left", sm: "right" },
+                }}
               >
                 {game.location}
               </Typography>
@@ -72,11 +84,21 @@ export function GameCard({
 
           <Typography
             variant="body1"
-            fontWeight={game.isHomeGame ? "bold" : "normal"}
-            sx={{ gridArea: "teams", lineHeight: 1.3, mt: 1 }}
+            sx={{
+              fontWeight: game.isHomeGame ? "bold" : "normal",
+              gridArea: "teams",
+              lineHeight: 1.3,
+              mt: 1,
+            }}
           >
             {game.homeTeam}
-            <Typography component="span" color="text.secondary" sx={{ mx: 0.5 }}>
+            <Typography
+              component="span"
+              sx={{
+                color: "text.secondary",
+                mx: 0.5,
+              }}
+            >
               vs.
             </Typography>
             {game.awayTeam}
@@ -84,7 +106,13 @@ export function GameCard({
         </Box>
 
         {game.isHomeGame && (
-          <Stack direction={{ xs: "column", md: "row" }} gap={1} sx={{ mt: { xs: 0, md: 1.5 } }}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            sx={{
+              gap: 1,
+              mt: { xs: 0, md: 1.5 },
+            }}
+          >
             <OfficialAssigner
               gameId={game.id}
               role="poytakirja"

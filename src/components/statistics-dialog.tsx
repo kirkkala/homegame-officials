@@ -78,8 +78,20 @@ export function StatisticsDialog({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" gap={1}>
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Stack
+            direction="row"
+            sx={{
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
             <LeaderboardIcon color="primary" />
             <Typography variant="h6" component="span">
               Toimitsijavuorotilasto
@@ -91,13 +103,29 @@ export function StatisticsDialog({
         </Stack>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="caption" color="text.secondary" component="div" sx={{ mb: 2 }}>
+        <Typography
+          variant="caption"
+          component="div"
+          sx={{
+            color: "text.secondary",
+            mb: 2,
+          }}
+        >
           Tilasto näyttää kuinka monta toimitsijavuoroa (pöytäkirja, kello tai hyökkäysaika)
           kullakin pelaajalla on vahvistettuna.
         </Typography>
         {stats.length === 0 ? (
-          <Box py={4} textAlign="center">
-            <Typography color="text.secondary">
+          <Box
+            sx={{
+              py: 4,
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               Ei vielä vahvistettuja toimitsijavuoroja.
             </Typography>
           </Box>
@@ -114,14 +142,24 @@ export function StatisticsDialog({
                     borderColor: "divider",
                   }}
                 >
-                  <Stack direction="row" alignItems="center" gap={1.5} sx={{ minWidth: 40 }}>
+                  <Stack
+                    direction="row"
+                    sx={{
+                      alignItems: "center",
+                      gap: 1.5,
+                      minWidth: 40,
+                    }}
+                  >
                     {medalColor ? (
                       <EmojiEventsIcon sx={{ color: medalColor, fontSize: "1.5rem" }} />
                     ) : (
                       <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ width: 24, textAlign: "center" }}
+                        sx={{
+                          color: "text.secondary",
+                          width: 24,
+                          textAlign: "center",
+                        }}
                       >
                         {index + 1}.
                       </Typography>
@@ -130,13 +168,15 @@ export function StatisticsDialog({
                   <ListItemText
                     primary={stat.name}
                     slotProps={{
-                      primary: { fontWeight: medalColor ? 600 : 400 },
+                      primary: { sx: { fontWeight: medalColor ? 600 : 400 } },
                     }}
                   />
                   <Typography
                     variant="body1"
-                    fontWeight="bold"
                     color={medalColor ? "primary.main" : "text.secondary"}
+                    sx={{
+                      fontWeight: "bold",
+                    }}
                   >
                     {stat.count}
                   </Typography>
