@@ -6,8 +6,8 @@ import { readFile } from "node:fs/promises"
 import path from "node:path"
 import { parseExcelFile } from "@/lib/excel-parser"
 
-const toArrayBuffer = (buffer: Buffer) =>
-  buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
+const toArrayBuffer = (buffer: Buffer): ArrayBuffer =>
+  buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer
 
 describe("excel-parser", () => {
   it("parses elsa-myclub-import.xlsx into games", async () => {

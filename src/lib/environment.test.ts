@@ -48,7 +48,7 @@ describe("getEnvironmentInfo", () => {
   })
 
   it("returns local development label", () => {
-    process.env.NODE_ENV = "development"
+    vi.stubEnv("NODE_ENV", "development")
 
     expect(getEnvironmentInfo()).toEqual({
       label: "Local development",
@@ -57,7 +57,7 @@ describe("getEnvironmentInfo", () => {
   })
 
   it("returns null for unknown production-like environments", () => {
-    process.env.NODE_ENV = "production"
+    vi.stubEnv("NODE_ENV", "production")
 
     expect(getEnvironmentInfo()).toBeNull()
   })

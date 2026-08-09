@@ -1,7 +1,7 @@
 import { getBagCountForTeam, getFirstAidBags, setBagHolder } from "@/lib/first-aid-bags"
 
 const jsonFetch = (body: unknown) =>
-  vi.fn(() =>
+  vi.fn<typeof fetch>(() =>
     Promise.resolve(
       new Response(JSON.stringify(body), { headers: { "content-type": "application/json" } })
     )
@@ -57,7 +57,8 @@ describe("setBagHolder", () => {
       "/api/first-aid-bags",
       expect.objectContaining({ method: "PATCH" })
     )
-    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+    const [, requestInit] = fetchMock.mock.calls[0]!
+    const body = JSON.parse(requestInit!.body as string)
     expect(body).toEqual({ teamId: "team-1", bagNumber: 1, holder: { name: "Pekka" } })
   })
 
@@ -69,6 +70,6 @@ describe("setBagHolder", () => {
 
     // Only the getFirstAidBags GET fires, never a PATCH.
     expect(fetchMock).toHaveBeenCalledTimes(1)
-    expect(fetchMock.mock.calls[0][1]).toBeUndefined()
+    expect(fetchMock.mock.calls[0]![1]).toBeUndefined()
   })
 })
