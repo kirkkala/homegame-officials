@@ -104,12 +104,30 @@ function BagCard({
       data-testid={`bag-card-${bagNumber}`}
     >
       <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <Stack direction="row" alignItems="baseline" justifyContent="space-between" gap={1}>
-          <Typography variant="h6" component="h3" fontWeight="bold">
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "baseline",
+            justifyContent: "space-between",
+            gap: 1,
+          }}
+        >
+          <Typography
+            variant="h6"
+            component="h3"
+            sx={{
+              fontWeight: "bold",
+            }}
+          >
             Laukku #{bagNumber}
           </Typography>
           {holder && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {formatDate(holder.lastSeenAt)}
             </Typography>
           )}
@@ -120,15 +138,30 @@ function BagCard({
             <>
               <Stack
                 direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                flexWrap="wrap"
-                gap={0.5}
-                sx={{ mt: 0.5 }}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: 0.5,
+                  mt: 0.5,
+                }}
               >
-                <Stack direction="row" spacing={1} alignItems="center" minWidth={0}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    alignItems: "center",
+                    minWidth: 0,
+                  }}
+                >
                   <PersonIcon sx={{ fontSize: 22, color: "primary.main", flexShrink: 0 }} />
-                  <Typography variant="subtitle1" fontWeight={600} noWrap>
+                  <Typography
+                    variant="subtitle1"
+                    noWrap
+                    sx={{
+                      fontWeight: 600,
+                    }}
+                  >
                     {holder.name}
                   </Typography>
                 </Stack>
@@ -143,7 +176,12 @@ function BagCard({
               )}
             </>
           ) : (
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               Oivoi, ei nimeä! Toivottavasti laukku on tallessa! 🥺
             </Typography>
           )}
@@ -176,7 +214,14 @@ function BagCard({
           >
             <DialogTitle>Ota haltuun laukku #{bagNumber}</DialogTitle>
             <DialogContent>
-              <Typography variant="body2" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  display: "block",
+                  mb: 1,
+                }}
+              >
                 Onko laukku sinulla? Anna nimesi ja tallenna.
               </Typography>
               <TextField
@@ -232,37 +277,92 @@ export default function EnsiapulaukutPage() {
           </Box>
         ) : !selectedTeam ? (
           <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
               <MedicalServicesIcon color="primary" sx={{ fontSize: 32 }} />
-              <Typography variant="h5" component="h2" fontWeight="bold">
+              <Typography
+                variant="h5"
+                component="h2"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 Ensiapulaukut
               </Typography>
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               Valitse joukkue nähdäksesi ensiapulaukut.
             </Typography>
           </Paper>
         ) : !selectedTeam?.firstAidBagsEnabled ? (
           <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
               <MedicalServicesIcon color="primary" sx={{ fontSize: 32 }} />
-              <Typography variant="h5" component="h2" fontWeight="bold">
+              <Typography
+                variant="h5"
+                component="h2"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 Ensiapulaukut
               </Typography>
             </Stack>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               Ensiapulaukkujen seuranta ei ole käytössä joukkueella {selectedTeam.name}.
             </Typography>
           </Paper>
         ) : (
           <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 } }}>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
               <MedicalServicesIcon color="primary" sx={{ fontSize: 32 }} />
-              <Typography variant="h5" component="h2" fontWeight="bold">
+              <Typography
+                variant="h5"
+                component="h2"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {selectedTeam.name} ensiapulaukkujen haltijat
               </Typography>
             </Stack>
-            <Grid container spacing={2} alignItems="stretch">
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                alignItems: "stretch",
+              }}
+            >
               {Array.from({ length: bagCount }, (_, i) => i + 1).map((bagNum) => (
                 <Grid
                   key={bagNum}

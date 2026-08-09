@@ -2,7 +2,7 @@
 
 import {
   Close as CloseIcon,
-  HelpOutline as HelpOutlineIcon,
+  HelpOutlineOutlined as HelpIcon,
   Home as HomeIcon,
   Login as LoginIcon,
   Logout as LogoutIcon,
@@ -103,7 +103,7 @@ const navTabsSx = {
 const PAGES: PageItem[] = [
   { path: "/", label: "Etusivu", icon: HomeIcon },
   { path: "/ensiapulaukut", label: "EA", icon: MedicalServicesIcon },
-  { path: "/kayttoohjeet", label: "Ohjeet", icon: HelpOutlineIcon },
+  { path: "/kayttoohjeet", label: "Ohjeet", icon: HelpIcon },
   { path: "/hallinta", label: "Hallinta", icon: SettingsIcon, requiresAuth: true },
 ]
 
@@ -165,9 +165,11 @@ export function MainHeader() {
                 <Typography
                   variant="h6"
                   component="h1"
-                  fontWeight="bold"
                   noWrap
-                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: { xs: "1rem", sm: "1.25rem" },
+                  }}
                 >
                   <MuiLink href="/" color="inherit" sx={{ textDecoration: "none" }}>
                     Kotipelien toimitsijat
@@ -279,8 +281,19 @@ export function MainHeader() {
               color: "primary.contrastText",
             }}
           >
-            <Stack direction="row" alignItems="center" gap={1}>
-              <Typography variant="h6" fontWeight="bold">
+            <Stack
+              direction="row"
+              sx={{
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 Menu
               </Typography>
             </Stack>
@@ -312,7 +325,7 @@ export function MainHeader() {
                     </ListItemIcon>
                     <ListItemText
                       primary={page.label}
-                      slotProps={{ primary: { fontWeight: isActive ? 700 : 400 } }}
+                      slotProps={{ primary: { sx: { fontWeight: isActive ? 700 : 400 } } }}
                     />
                   </ListItemButton>
                 </ListItem>
