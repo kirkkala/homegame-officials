@@ -951,8 +951,10 @@ export default function HallintaPage() {
                           color: "text.secondary",
                         }}
                       >
-                        Asetus lisää 24 sekunnin hyökkäyskellon toimitsijavalinnan otteluille.<br />
-                        Hyökkäysaika tarvitaan U14 I div. SM karsintoihin sekä vanhempien ikäluokkien sarjoissa.
+                        Asetus lisää 24 sekunnin hyökkäyskellon toimitsijavalinnan otteluille.
+                        <br />
+                        Hyökkäysaika tarvitaan U14 I div. SM karsintoihin sekä vanhempien
+                        ikäluokkien sarjoissa.
                       </Typography>
                     </Box>
 
