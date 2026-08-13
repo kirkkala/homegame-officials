@@ -4,6 +4,7 @@ import {
   AssignmentAdd as AssignmentAddIcon,
   CheckCircle as CheckCircleIcon,
   HomeOutlined as HomeOutlinedIcon,
+  MedicalServicesOutlined as MedicalServicesIcon,
   PersonAdd as PersonAddIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
@@ -29,41 +30,36 @@ const steps = [
     icon: <PersonAddIcon />,
     title: "1. Valitse joukkue",
     description: `
-      Valitse oma joukkueesi ylätunnisteen pudotusvalikosta. Valinta tallentuu
-      selaimesi välimuistiin ja joukkueen nimi säilyy selaimen URL osoitteessa
-      joten voit jakaa linkin muille joukkueen vanhemmille jotta he pääsevät
-      näkemään suoraan oman joukkueen pelit ja toimitsijavuorot.
+      Valitse joukkue yläpalkin valikosta tai kännykällä hampurilaisvalikon alta.
+      Selaimesi muistaa valinnan, ja voit jakaa sivun linkin muille vanhemmille -
+      he näkevät linkillä suoraan oikean joukkueen pelit.
     `,
   },
   {
     icon: <UploadFileIcon />,
     title: "2. Jaa toimitsijavuorot",
     description: `
-      Valitse pelin eSCO-, kello- ja tarvittaessa hyökkäysajan (24 sekuntia)
-      vastuu painamalla "Valitse pelaaja...". Valitse pelaaja kenen huoltajille
-      toimitsijavuoron vastuu halutaan osoittaa.
+      Paina pelin toimitsijavuoron kohdalla "Valitse pelaaja..." ja osoita eSCO-,
+      kello- tai 24 sekunnin vuoro pelaajan huoltajille.
     `,
   },
   {
     icon: <AssignmentAddIcon />,
     title: "3. Vahvista vuoro",
     description: `
-      Kun toimitsijavuoro odottaa vahvistusta, joko joukkueenjohtaja tai
-      kyseisen pelaajan huoltaja vahvistaa vuoron painamalla "Vahvista"
-      painiketta ja valitsee hoitaako vanhempi (huoltaja) itse vuoron vai
-      palkataanko tehtävän tekijäksi juniori joukkueenjohtajan avustuksella
-      (maksua vastaan). Poolista otetun tekijän nimen voi lisätä myöhemmin
-      mikäli se ei valintahetkellä ole tiedossa.
+      Joukkueenjohtaja tai huoltaja painaa "Vahvista" ja kirjaa, tekeekö
+      vuoron vanhempi itse vai juniori poolista (maksua vastaan). Juniorin
+      nimen voi tarvittaessa lisätä vuorolle myöhemmin.
     `,
   },
   {
     icon: <CheckCircleIcon />,
     title: "4. Seuraa tilannetta",
     description: `
-      Vahvistetut vuorot näkyvät vihreänä, odottavat oranssina. Mikäli vaihdat
-      nimeämisiä sovi siitä toisen vanhemman/huoltajan tai joukkueenjohtajan
-      kanssa. Menneet pelit ovat automaattisesti piilotettuina mutta niitä voi
-      tarkastella valitsemalla "Menneet pelit" -valinnan etusivulla.
+      Vihreä = vahvistettu, oranssi = odottaa vahvistusta. Jos vaihdat
+      nimeämistä, sovi siitä etukäteen. Menneet pelit löytyvät valitsemalla
+      "Näytä menneet pelit" listauksessa. Mikäli joukkueenjohtaja on lisännyt
+      myös vieraspelit ne saa piilotettua listauksesta.
     `,
   },
 ]
@@ -81,47 +77,45 @@ export default function KayttoohjeetPage() {
             <Typography component="h3" variant="h5">
               Mikä tämä on?
             </Typography>
-            <Typography>
-              Sovellus on vaihtoehto excel-jumpalle junnukoriksen kotipelien toimitsijavuorojen
-              jakamiseen ja seurantaan.
+            <Typography sx={{ fontWeight: 500 }}>
+              Nettisivu junnukoriksen joukkueen kotipelien toimitsijavuorojen jakoon ja seurantaan.
             </Typography>
             <Typography>
-              Sekä joukkueenjohtaja että vanhemmat voivat poimia ja vahvistaa toimitsijavuoroja
-              kauden aikana. Sovelluksesta voi kaikki seurata, että kaikkiin sarjapeleihin on
-              hoidettu tarvittava määrä toimitsijoita sekä että vuorojen hoitaminen jakaantuu
-              tasaisesti joukkueen jäsenien kesken.
+              Joukkueenjohtaja voi yhdessä joukkueen vanhempien kanssa jakaa toimitsijavuoroja
+              kauden aikana tämän nettisivun kautta. Kaikki näkevät yhdellä silmäyksellä, että
+              jokaiseen peliin löytyy toimitsijat ja että vuorot jakautuvat tasaisesti joukkueen
+              jäsenien kesken.
             </Typography>
             <Typography>
-              Vain joukkueenjohtajan tarvitsee kirjautua joukkueensa pelien hallintaa varten.
-              Vanhemmat vahvistavat heille osoitetun toimitsijavuoron ilman kirjautumista. Mikäli
-              toimitsijavuoro on osoitettu vanhemmalle, on hänen vastuullaan varmistaa että siihen
-              on tekijä; joko itse, pyytämällä toista joukkueen vanhempaa tai valitsemalla juniorin
-              poolista (maksua vastaan) tekemään kyseisen vuoron.
+              Kirjautuminen tarvitaan vain joukkueenjohtajalta. Vanhemmat vahvistavat omat vuoronsa
+              ilman tunnuksia. Vuoron saaneen huoltajan tehtävä on varmistaa, että joku hoitaa sen –
+              itse, toinen vanhempi tai juniori poolista (maksua vastaan).
             </Typography>
             <Typography>
-              Sovelluksessa on lisäksi helppo seuranta joukkueen ensiapulaukuista jotta peliä
-              edeltävinä päivinä voidaan varmistaa että laukut kulkeutuvat mukaan otteluihin.
+              Täällä voi myös seurata myös missä joukkueen ensiapulaukut ovat!
             </Typography>
             <Typography component="h3" variant="h5">
               Näin pääset alkuun
             </Typography>
+            <Typography component="h4" variant="h6">
+              Joukkueenjohtajalle
+            </Typography>
             <Typography>
-              Joukkueenjohtaja kirjautuu sisään, luo joukkueen sekä lisää pelaajat ja tuo ottelut{" "}
+              Kirjaudu sisään, luo joukkue, lisää pelaajat ja tuo ottelut{" "}
               <Link href="https://elsa-myclub.hnmky.fi/" target="_blank" rel="noopener">
                 eLSA → MyClub Muuntaja
-              </Link>{" "}
-              appilla tehdystä excel-tiedostosta tai käsin kirjoittamalla otteluiden tiedot
-              hallintapaneelin kautta.
+              </Link>
+              -excelistä tai kirjoita pelit käsin hallintapaneelissa.
             </Typography>
             <Typography>
-              Hallintapaneelista voi aktivoida ensiapulaukujen seurannan sekä tarvittaessa 24
-              sekunnin heittokellon toimitsijavuoron (vanhempien ikäluokkien sarjoihin). Oletuksena
-              sovelluksessa on pelkästään pöytäkirja (eSCO) sekä kello (tulostaulu)
-              toimitsijavastuut.
+              Hallintapaneelista voit laittaa päälle ensiapulaukkujen serannan sekä tarvittaessa 24
+              sekunnin kellon (vanhempien sarjoihin). Oletuksena käytössä on vain pöytäkirja (eSCO)
+              sekä tulostaulu.
             </Typography>
-            <Typography>
-              Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista:
+            <Typography component="h4" variant="h6">
+              Vanhemmille
             </Typography>
+            <Typography>Kirjautumista ei tarvita – näin etenet:</Typography>
             <List className="steps-list">
               {steps.map((step) => (
                 <ListItem key={step.title} className="steps-list-item">
@@ -139,27 +133,30 @@ export default function KayttoohjeetPage() {
                 </ListItem>
               ))}
             </List>
-            <Typography component="h3" variant="h5">
-              Ensiapulaukut
-            </Typography>
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+              <MedicalServicesIcon color="primary" />
+              <Typography component="h3" variant="h5">
+                Ensiapulaukut
+              </Typography>
+            </Stack>
             <Typography>
-              Mikäli joukkueenjohtaja on aktivoinut ensiapulaukkujen seurannan käyttöön, näet{" "}
-              <Link href="/ensiapulaukut">Ensiapulaukut</Link>-sivulla kenellä ensiapulaukut
-              parhaillaan ovat. Ota laukku haltuun lisäämällä nimesi seurantaan jos laukku on tullut
-              mukaasi pelistä! Näin koko joukkueella on mahdollisuus nähdä yhdestä paikkaa kenellä
-              laukut kulloinkin ovat ja vähennämme joukkueiden WhatsApp ryhmien viestien määrää.
+              Jos joukkueenjohtaja on aktivoinut seurannan, näet{" "}
+              <Link href="/ensiapulaukut">Ensiapulaukut</Link>-sivulla kenellä laukut ovat. Kun
+              laukku tulee mukaasi pelistä, lisää nimesi seurantaan painamalla "Ota laukku haltuun"
+              tai "Vaihda haltija" mikäli laukku on merkitty edelliselle haltijalle. Näin koko
+              joukkue näkee tilanteen helposti ilman ylimääräisiä WhatsApp-kyselyitä.
             </Typography>
             <Divider />
             <Typography component="h2" variant="h5">
               Kuka tämmöisen meni tekemään? Ja miksi?
             </Typography>
             <Typography>
-              HNMKY Stadi 2014 tyttöjen jojo Timo Kirkkala kyllästyi excelien kanssa sekoiluun ja
-              askarteli applikaation omaan hupiin syksyllä 2025. Ja miksipä ei hyvää jakaisi
-              eteenpäin niin tein tästä ihan oikean nettipalvelun. Toivottavasti nautit käytöstä!
+              HNMKY Stadi 2014 tyttöjen jojo Timo Kirkkala kyllästyi excel-sekoiluun ja askarteli
+              applikaation omaan hupiin syksyllä 2025. Hyvä jaettiin eteenpäin ihan oikeana
+              nettipalveluna – toivottavasti nautit käytöstä!
             </Typography>
             <Typography>
-              Koodi on julkaistu avoimena lähdekoodina{" "}
+              Koodi on avoimena lähdekoodina{" "}
               <Link
                 href="https://github.com/kirkkala/homegame-officials"
                 target="_blank"
@@ -167,11 +164,8 @@ export default function KayttoohjeetPage() {
               >
                 GitHubissa
               </Link>
-              .
-            </Typography>
-            <Typography>
-              Kaikenlainen palaute on erittäin tervetullutta! Ota tekikään yhteyttä namikan Jojo-
-              kanavalla Whatsappissa taikka sähköpostilla{" "}
+              . Palaute on tervetullutta – ota yhteyttä joukkueen jojo-kanavalla WhatsAppissa tai
+              sähköpostilla{" "}
               <Link href="mailto:timo.kirkkala@gmail.com">timo.kirkkala@gmail.com</Link>.
             </Typography>
           </Stack>
