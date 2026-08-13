@@ -11,6 +11,7 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   Link,
   List,
   ListItem,
@@ -28,17 +29,18 @@ const steps = [
     icon: <PersonAddIcon />,
     title: "1. Valitse joukkue",
     description: `
-      Valitse oma joukkueesi. Valinta tallentuu selaimesi välimuistiin ja
-      joukkueen nimi säilyy selaimen URL osoitteessa joten voit jakaa linkin
-      jolla pääsee suoraan oikean joukkueen peleihin.
+      Valitse oma joukkueesi ylätunnisteen pudotusvalikosta. Valinta tallentuu
+      selaimesi välimuistiin ja joukkueen nimi säilyy selaimen URL osoitteessa
+      joten voit jakaa linkin muille joukkueen vanhemmille jotta he pääsevät
+      näkemään suoraan oman joukkueen pelit ja toimitsijavuorot.
     `,
   },
   {
     icon: <UploadFileIcon />,
     title: "2. Jaa toimitsijavuorot",
     description: `
-      Valitse pelin eSCO-, kello- ja tarvittaessa hyökkäysajan (24 sekuntia) vastuu
-      painamalla "Valitse pelaaja...". Valitse pelaaja kenen huoltajille
+      Valitse pelin eSCO-, kello- ja tarvittaessa hyökkäysajan (24 sekuntia)
+      vastuu painamalla "Valitse pelaaja...". Valitse pelaaja kenen huoltajille
       toimitsijavuoron vastuu halutaan osoittaa.
     `,
   },
@@ -80,37 +82,42 @@ export default function KayttoohjeetPage() {
               Mikä tämä on?
             </Typography>
             <Typography>
-              Sovellus on vaihtoehto excel-jumpalle kotipelien toimitsijavuorojen jakamiseen.
+              Sovellus on vaihtoehto excel-jumpalle junnukoriksen kotipelien toimitsijavuorojen
+              jakamiseen ja seurantaan.
             </Typography>
             <Typography>
-              Sekä joukkueenjohtaja että vanhemmat voivat vahvistaa toimitsijavuoroja kauden aikana.
-              Sovelluksesta näkee helposti, että vuorot on hoidettu kaikkiin peleihin ja jaettu
-              tasaisesti.
+              Sekä joukkueenjohtaja että vanhemmat voivat poimia ja vahvistaa toimitsijavuoroja
+              kauden aikana. Sovelluksesta voi kaikki seurata, että kaikkiin sarjapeleihin on
+              hoidettu tarvittava määrä toimitsijoita sekä että vuorojen hoitaminen jakaantuu
+              tasaisesti joukkueen jäsenien kesken.
             </Typography>
             <Typography>
               Vain joukkueenjohtajan tarvitsee kirjautua joukkueensa pelien hallintaa varten.
-              Vanhemmat vahvistavat heille osoitetun toimitsijavuoron tekemisen ilman kirjautumista.
-              Mikäli toimitsijavuoro on osoitettu vanhemmalle, on hänen vastuulla varmistaa että
-              siihen on tekijä; joko itse, pyytämällä toista joukkueen vanhempaa tai valitsemalla
-              juniorin poolista (maksua vastaan) tekemään kyseisen vuoron.
+              Vanhemmat vahvistavat heille osoitetun toimitsijavuoron ilman kirjautumista. Mikäli
+              toimitsijavuoro on osoitettu vanhemmalle, on hänen vastuullaan varmistaa että siihen
+              on tekijä; joko itse, pyytämällä toista joukkueen vanhempaa tai valitsemalla juniorin
+              poolista (maksua vastaan) tekemään kyseisen vuoron.
             </Typography>
             <Typography>
-              Sovelluksessa on myös helppo seuranta joukkueen ensiapulaukuista jotta peliä
-              edeltävinä päivinä voi varmistaa että laukut kulkeutuvat mukaan otteluihin.
+              Sovelluksessa on lisäksi helppo seuranta joukkueen ensiapulaukuista jotta peliä
+              edeltävinä päivinä voidaan varmistaa että laukut kulkeutuvat mukaan otteluihin.
             </Typography>
             <Typography component="h3" variant="h5">
               Näin pääset alkuun
             </Typography>
             <Typography>
-              Joukkueenjohtaja kirjautuu sisään ja luo joukkueen{" "}
+              Joukkueenjohtaja kirjautuu sisään, luo joukkueen sekä lisää pelaajat ja tuo ottelut{" "}
               <Link href="https://elsa-myclub.hnmky.fi/" target="_blank" rel="noopener">
                 eLSA → MyClub Muuntaja
               </Link>{" "}
-              appilla tehdystä excel-tiedostosta sekä lisää pelaajat ja merkitsee kotiottelut
-              hallintapaneelin kautta. Hallintapaneelista voi aktivoida ensiapulaukujen seurannan
-              sekä tarvittaessa 24 sekunnin heittokellon toimitsijavuoron (vain U13 ja vanhemmat).
-              Oletuksena sovelluksessa on vain pöytäkirja (eSCO) sekä kello (tulostaulu)
-              toimitsijavastuina.
+              appilla tehdystä excel-tiedostosta tai käsin kirjoittamalla otteluiden tiedot
+              hallintapaneelin kautta.
+            </Typography>
+            <Typography>
+              Hallintapaneelista voi aktivoida ensiapulaukujen seurannan sekä tarvittaessa 24
+              sekunnin heittokellon toimitsijavuoron (vanhempien ikäluokkien sarjoihin). Oletuksena
+              sovelluksessa on pelkästään pöytäkirja (eSCO) sekä kello (tulostaulu)
+              toimitsijavastuut.
             </Typography>
             <Typography>
               Joukkueen vanhemmat käyttävät applikaatiota ilman kirjautumista:
@@ -136,19 +143,20 @@ export default function KayttoohjeetPage() {
               Ensiapulaukut
             </Typography>
             <Typography>
-              Jos joukkueenjohtaja on ottanut ensiapulaukkujen seurannan käyttöön, näet{" "}
+              Mikäli joukkueenjohtaja on aktivoinut ensiapulaukkujen seurannan käyttöön, näet{" "}
               <Link href="/ensiapulaukut">Ensiapulaukut</Link>-sivulla kenellä ensiapulaukut
-              parhaillaan ovat. Eli ota laukku haltuun lisäämällä nimesi tänne jos laukku on tullut
+              parhaillaan ovat. Ota laukku haltuun lisäämällä nimesi seurantaan jos laukku on tullut
               mukaasi pelistä! Näin koko joukkueella on mahdollisuus nähdä yhdestä paikkaa kenellä
-              laukut kulloinkin ovat ja vähennämme ryhmän WhatsApp-viestien määrää.
+              laukut kulloinkin ovat ja vähennämme joukkueiden WhatsApp ryhmien viestien määrää.
             </Typography>
-            <Typography component="h3" variant="h5">
-              Kuka tämän on tehnyt?
+            <Divider />
+            <Typography component="h2" variant="h5">
+              Kuka tämmöisen meni tekemään? Ja miksi?
             </Typography>
             <Typography>
-              HNKY Stadi 2014 tyttöjen jojo Timo Kirkkala on askarrellut applikaatiota
-              harrasteprojektina syksystä 2025 että toimitsijavuorojen kanssa säätäminen veisi
-              vähemmän aikaa excelin parissa.
+              HNMKY Stadi 2014 tyttöjen jojo Timo Kirkkala kyllästyi excelien kanssa sekoiluun ja
+              askarteli applikaation omaan hupiin syksyllä 2025. Ja miksipä ei hyvää jakaisi
+              eteenpäin niin tein tästä ihan oikean nettipalvelun. Toivottavasti nautit käytöstä!
             </Typography>
             <Typography>
               Koodi on julkaistu avoimena lähdekoodina{" "}
@@ -160,6 +168,11 @@ export default function KayttoohjeetPage() {
                 GitHubissa
               </Link>
               .
+            </Typography>
+            <Typography>
+              Kaikenlainen palaute on erittäin tervetullutta! Ota tekikään yhteyttä namikan Jojo-
+              kanavalla Whatsappissa taikka sähköpostilla{" "}
+              <Link href="mailto:timo.kirkkala@gmail.com">timo.kirkkala@gmail.com</Link>.
             </Typography>
           </Stack>
         </Paper>
