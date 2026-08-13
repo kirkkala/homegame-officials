@@ -94,6 +94,7 @@ export default function KayttoohjeetPage() {
             <Typography>
               Täällä voi myös seurata myös missä joukkueen ensiapulaukut ovat!
             </Typography>
+            <Divider />
             <Typography component="h3" variant="h5">
               Näin pääset alkuun
             </Typography>
@@ -133,6 +134,7 @@ export default function KayttoohjeetPage() {
                 </ListItem>
               ))}
             </List>
+            <Divider />
             <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <MedicalServicesIcon color="primary" />
               <Typography component="h3" variant="h5">
