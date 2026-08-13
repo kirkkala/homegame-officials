@@ -4,7 +4,7 @@ Manage game officials (toimitsijat) for basketball junior division serie games.
 
 Supports importing games from eLSA Excel files (https://github.com/kirkkala/elsa-myclub / https://elsa-myclub.vercel.app/) and help with assigning officials for each game.
 
-Has also team First aid kit bag tracker (who currently has the bag it). Reduces unnecessary messaging, questions and confusion.
+Has also team First aid kit bag tracker (who currently has the bag). Reduces unnecessary messaging, questions and confusion.
 
 ## Tech Stack
 
@@ -17,7 +17,7 @@ Has also team First aid kit bag tracker (who currently has the bag it). Reduces 
 
 ### Prerequisites
 
-- Node.js 24 (with nvm)
+- Node.js 26 (with nvm)
 - pnpm
 
 ## Project Structure

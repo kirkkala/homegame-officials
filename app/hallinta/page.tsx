@@ -952,7 +952,9 @@ export default function HallintaPage() {
                         }}
                       >
                         Asetus lisää 24 sekunnin hyökkäyskellon toimitsijavalinnan otteluille.
-                        Hyökkäysaikaa käytetään U13 ja vanhempien ikäluokkien sarjoissa.
+                        <br />
+                        Hyökkäysaika tarvitaan U14 I div. SM karsintoihin sekä vanhempien
+                        ikäluokkien sarjoissa.
                       </Typography>
                     </Box>
 
