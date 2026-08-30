@@ -186,7 +186,7 @@ describe("HallintaPage", () => {
 
     await user.click(screen.getByTestId("players-tab"))
     expect(
-      await screen.findByText(/Saat pelaajalisstan helpoiten MyClubin jäsenlistauksesta/i)
+      await screen.findByText(/Saat pelaajalistan helpoiten MyClubin jäsenlistauksesta/i)
     ).toBeInTheDocument()
     expect(
       screen.queryByText(/Voit poistaa pelaajan roskakori-painikkeella/i)
@@ -214,7 +214,7 @@ describe("HallintaPage", () => {
 
     expect(await screen.findByTestId("player-chip-p1")).toBeInTheDocument()
     expect(
-      screen.queryByText(/Saat pelaajalisstan helpoiten MyClubin jäsenlistauksesta/i)
+      screen.queryByText(/Saat pelaajalistan helpoiten MyClubin jäsenlistauksesta/i)
     ).not.toBeInTheDocument()
     expect(screen.getByText(/Voit poistaa pelaajan roskakori-painikkeella/i)).toBeInTheDocument()
 
