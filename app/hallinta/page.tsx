@@ -572,7 +572,7 @@ export default function HallintaPage() {
     const parsed = await parseExcelFile(arrayBuffer)
     setParsedGames(parsed)
     if (parsed.length === 0) {
-      setSnackbar({ type: "info", message: "Excel-tiedostosta ei löytynyt otteluita" })
+      setSnackbar({ type: "info", message: "Lisätystä tiedostosta ei löytynyt tuotavia otteluita" })
       return
     }
     setSnackbar(null)
@@ -1309,41 +1309,21 @@ export default function HallintaPage() {
                                   variant="body2"
                                   sx={{
                                     color: "text.secondary",
+                                    mt: 1,
                                   }}
                                 >
-                                  Tarkista tuotavien otteluiden oikeellisuus, merkitse kotipelit
-                                  rastilla ja paina &quot;Tuo ottelut&quot; painiketta
-                                  tallentaaksesi ottelut.
+                                  Kotipelit on merkitty automaattisesti.
                                 </Typography>
-                              </Stack>
-                              <Stack
-                                direction="row"
-                                spacing={1}
-                                sx={{
-                                  alignItems: "center",
-                                  flexWrap: "nowrap",
-                                  ml: 4,
-                                }}
-                              >
-                                <Button
-                                  variant="outlined"
-                                  color="inherit"
-                                  onClick={handleCancelImport}
-                                  disabled={importMutation.isPending}
-                                  data-testid="import-cancel"
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    color: "text.secondary",
+                                    mt: 1,
+                                  }}
                                 >
-                                  Peruuta
-                                </Button>
-                                <Button
-                                  variant="contained"
-                                  color="success"
-                                  onClick={() => importMutation.mutate()}
-                                  disabled={importMutation.isPending}
-                                  data-testid="import-submit"
-                                  sx={{ textWrap: "nowrap" }}
-                                >
-                                  Tuo ottelut
-                                </Button>
+                                  Tarkista otteluiden oikeellisuus ja tallenna ne joukkueelle
+                                  &quot;Tallenna&quot; -painikkeella sivun lopussa.
+                                </Typography>
                               </Stack>
                             </Stack>
 
@@ -1361,6 +1341,35 @@ export default function HallintaPage() {
                               onToggleHomeGame={(key) => handleToggleHomeGame(Number(key))}
                               testIdPrefix="import-preview"
                             />
+
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              sx={{
+                                alignItems: "center",
+                                justifyContent: "flex-end",
+                              }}
+                            >
+                              <Button
+                                variant="outlined"
+                                color="inherit"
+                                onClick={handleCancelImport}
+                                disabled={importMutation.isPending}
+                                data-testid="import-cancel-bottom"
+                              >
+                                Peruuta
+                              </Button>
+                              <Button
+                                variant="contained"
+                                color="success"
+                                onClick={() => importMutation.mutate()}
+                                disabled={importMutation.isPending}
+                                data-testid="import-submit"
+                                sx={{ textWrap: "nowrap" }}
+                              >
+                                Tallenna
+                              </Button>
+                            </Stack>
                           </>
                         )}
                       </Stack>
@@ -1377,9 +1386,8 @@ export default function HallintaPage() {
                           mb: 2,
                         }}
                       >
-                        Merkitse joukkueen kotipelit jotta niihin voi lisätä toimitsijoita. Voit
-                        myös poistaa ja muokata jo lisättyjä otteluita. Järjestelmä tallentaa
-                        valinnan automaattisesti.
+                        Kotipelit mihin voi lisätä toimitsijoita tulee merkitä rivin vasemmasta
+                        laidasta. Voit myös muokata tai poistaa otteluita.
                       </Typography>
 
                       <GamesTable

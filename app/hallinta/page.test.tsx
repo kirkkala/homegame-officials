@@ -134,7 +134,7 @@ describe("HallintaPage", () => {
 
     const message = await screen.findByTestId("status-snackbar")
     expect(message).toBeInTheDocument()
-    expect(message).toHaveTextContent("Excel-tiedostosta ei löytynyt otteluita")
+    expect(message).toHaveTextContent("Lisätystä tiedostosta ei löytynyt tuotavia otteluita")
   })
 
   it("renders preview after successful excel upload", async () => {
@@ -148,7 +148,7 @@ describe("HallintaPage", () => {
         time: "18:30",
         location: "Halli 1",
         rawName: "I div. HNMKY - KlaNMKY",
-        isHomeGame: false,
+        isHomeGame: true,
       },
       {
         division: "II div.",
@@ -174,6 +174,11 @@ describe("HallintaPage", () => {
     expect(await screen.findByTestId("import-preview-title")).toBeInTheDocument()
     expect(screen.getByTestId("import-preview-row-0")).toBeInTheDocument()
     expect(screen.getByTestId("import-preview-row-1")).toBeInTheDocument()
+    expect(screen.getByTestId("import-preview-home-toggle-0")).toBeChecked()
+    expect(screen.getByTestId("import-preview-home-toggle-1")).not.toBeChecked()
+    expect(screen.getByTestId("import-cancel")).toBeInTheDocument()
+    expect(screen.getByTestId("import-cancel-bottom")).toBeInTheDocument()
+    expect(screen.getByTestId("import-submit")).toBeInTheDocument()
   })
 
   it("adds players from textarea", async () => {
