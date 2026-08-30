@@ -1076,18 +1076,29 @@ export default function HallintaPage() {
                       color: "text.secondary",
                     }}
                   >
-                    Lisää uudet pelaajat tekstikenttään yksi per rivi. Käytä vain etu- tai
-                    lempinimiä.
+                    Lisää uudet pelaajat tekstikenttään yksi per rivi.{" "}
+                    <strong>Tietosuojan vuoksi käytä vain etu- tai lempinimiä</strong>!
+                    {!playersLoading && players.length === 0 && (
+                      <>
+                        {" "}
+                        <br />
+                        <br />
+                        Saat pelaajalistan helpoiten MyClubin jäsenlistauksesta suodattamalla
+                        pelkästään pelaajat, vie nimet tiedostoon ja kopioi rivit tekstikenttään.
+                      </>
+                    )}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "text.secondary",
-                    }}
-                  >
-                    Voit poistaa pelaajan roskakori-painikkeella. Pelaajan poistaminen säilyttää
-                    otteluihin mahdollisesti merkityn vuorovastuun.
-                  </Typography>
+                  {players.length > 0 && (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "text.secondary",
+                      }}
+                    >
+                      Voit poistaa pelaajan roskakori-painikkeella. Pelaajan poistaminen säilyttää
+                      otteluihin mahdollisesti merkityn vuorovastuun.
+                    </Typography>
+                  )}
 
                   {playersLoading ? (
                     <Stack

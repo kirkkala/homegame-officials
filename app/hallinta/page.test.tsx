@@ -185,6 +185,12 @@ describe("HallintaPage", () => {
     renderHallintaPage()
 
     await user.click(screen.getByTestId("players-tab"))
+    expect(
+      await screen.findByText(/Saat pelaajalisstan helpoiten MyClubin jäsenlistauksesta/i)
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Voit poistaa pelaajan roskakori-painikkeella/i)
+    ).not.toBeInTheDocument()
     const textarea = screen.getByTestId("players-textarea")
     await user.type(textarea, "Matti Meikäläinen\nTeppo Testaaja")
 
@@ -205,6 +211,12 @@ describe("HallintaPage", () => {
     renderHallintaPage()
 
     await user.click(screen.getByTestId("players-tab"))
+
+    expect(await screen.findByTestId("player-chip-p1")).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Saat pelaajalisstan helpoiten MyClubin jäsenlistauksesta/i)
+    ).not.toBeInTheDocument()
+    expect(screen.getByText(/Voit poistaa pelaajan roskakori-painikkeella/i)).toBeInTheDocument()
 
     const chipRoot = screen.getByTestId("player-chip-p1")
     const deleteIcon = within(chipRoot).getByTestId("player-delete-p1")
