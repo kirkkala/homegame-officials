@@ -9,8 +9,8 @@ import { TeamProvider } from "@/components/team-context"
 import { ThemeRegistry } from "@/theme/ThemeRegistry"
 
 export const metadata: Metadata = {
-  title: "Kotipelien toimitsijat",
-  description: "Toimitsijat ja ensiapulaukut 🩹",
+  title: "HNMKY kotipelien toimitsijat",
+  description: "Toimitsijavuorojen hallinta ja ensiapulaukkujen seuranta",
   robots: {
     index: false,
     follow: false,

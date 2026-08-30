@@ -134,7 +134,7 @@ describe("HallintaPage", () => {
 
     const message = await screen.findByTestId("status-snackbar")
     expect(message).toBeInTheDocument()
-    expect(message).toHaveTextContent("Excel-tiedostosta ei löytynyt otteluita")
+    expect(message).toHaveTextContent("Lisätystä tiedostosta ei löytynyt tuotavia otteluita")
   })
 
   it("renders preview after successful excel upload", async () => {
@@ -148,7 +148,7 @@ describe("HallintaPage", () => {
         time: "18:30",
         location: "Halli 1",
         rawName: "I div. HNMKY - KlaNMKY",
-        isHomeGame: false,
+        isHomeGame: true,
       },
       {
         division: "II div.",
@@ -174,6 +174,10 @@ describe("HallintaPage", () => {
     expect(await screen.findByTestId("import-preview-title")).toBeInTheDocument()
     expect(screen.getByTestId("import-preview-row-0")).toBeInTheDocument()
     expect(screen.getByTestId("import-preview-row-1")).toBeInTheDocument()
+    expect(screen.getByTestId("import-preview-home-toggle-0")).toBeChecked()
+    expect(screen.getByTestId("import-preview-home-toggle-1")).not.toBeChecked()
+    expect(screen.getByTestId("import-cancel-bottom")).toBeInTheDocument()
+    expect(screen.getByTestId("import-submit")).toBeInTheDocument()
   })
 
   it("adds players from textarea", async () => {
@@ -181,6 +185,12 @@ describe("HallintaPage", () => {
     renderHallintaPage()
 
     await user.click(screen.getByTestId("players-tab"))
+    expect(
+      await screen.findByText(/Saat pelaajalistan helpoiten MyClubin jäsenlistauksesta/i)
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Voit poistaa pelaajan roskakori-painikkeella/i)
+    ).not.toBeInTheDocument()
     const textarea = screen.getByTestId("players-textarea")
     await user.type(textarea, "Matti Meikäläinen\nTeppo Testaaja")
 
@@ -201,6 +211,12 @@ describe("HallintaPage", () => {
     renderHallintaPage()
 
     await user.click(screen.getByTestId("players-tab"))
+
+    expect(await screen.findByTestId("player-chip-p1")).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Saat pelaajalistan helpoiten MyClubin jäsenlistauksesta/i)
+    ).not.toBeInTheDocument()
+    expect(screen.getByText(/Voit poistaa pelaajan roskakori-painikkeella/i)).toBeInTheDocument()
 
     const chipRoot = screen.getByTestId("player-chip-p1")
     const deleteIcon = within(chipRoot).getByTestId("player-delete-p1")

@@ -6,7 +6,14 @@ export type ParsedGame = {
   time: string // HH:mm
   location: string
   rawName: string
-  isHomeGame: boolean // User will mark this in the UI
+  isHomeGame: boolean
+}
+
+const HOME_CLUB_PREFIX = "HNMKY"
+
+/** True when the listed home team belongs to this club (name starts with HNMKY). */
+export function isClubHomeGame(homeTeam: string): boolean {
+  return homeTeam.trim().toUpperCase().startsWith(HOME_CLUB_PREFIX)
 }
 
 function pad2(value: number): string {
@@ -116,7 +123,7 @@ export async function parseExcelFile(file: ArrayBuffer): Promise<ParsedGame[]> {
       time,
       location,
       rawName: name,
-      isHomeGame: false, // User will mark this in preview
+      isHomeGame: isClubHomeGame(homeTeam),
     })
   }
 
