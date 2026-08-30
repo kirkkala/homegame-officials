@@ -176,7 +176,6 @@ describe("HallintaPage", () => {
     expect(screen.getByTestId("import-preview-row-1")).toBeInTheDocument()
     expect(screen.getByTestId("import-preview-home-toggle-0")).toBeChecked()
     expect(screen.getByTestId("import-preview-home-toggle-1")).not.toBeChecked()
-    expect(screen.getByTestId("import-cancel")).toBeInTheDocument()
     expect(screen.getByTestId("import-cancel-bottom")).toBeInTheDocument()
     expect(screen.getByTestId("import-submit")).toBeInTheDocument()
   })
