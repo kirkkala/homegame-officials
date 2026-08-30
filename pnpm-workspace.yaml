@@ -1,5 +1,20 @@
 packages:
   - .
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+
+overrides:
+  esbuild: ">=0.25.0"
+  yaml: ">=2.8.3"
+  postcss: ">=8.5.10"
+  sharp: ">=0.35.0"
+  uuid: ">=11.1.1"
+
+peerDependencyRules:
+  allowedVersions:
+    next: "16"
+    "@mui/material": "9"
+    "@mui/icons-material": "9"
+
+allowBuilds:
+  esbuild: true
+  sharp: false
+  unrs-resolver: false

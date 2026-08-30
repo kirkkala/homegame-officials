@@ -105,6 +105,7 @@ docker start homegame-postgres
 ### Install & Run
 
 ```bash
+nvm use
 pnpm i
 pnpm dev
 ```
