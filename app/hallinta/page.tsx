@@ -166,7 +166,7 @@ function GamesTable({
                   {game.homeTeam} — {game.awayTeam}
                 </Typography>
               </TableCell>
-              <TableCell>
+              <TableCell sx={{ textWrap: "nowrap" }}>
                 {game.date} {game.time}
               </TableCell>
               <TableCell>{game.location}</TableCell>
@@ -300,7 +300,11 @@ export default function HallintaPage() {
           options?.type === "time" || options?.type === "date" ? { shrink: true } : undefined,
         htmlInput: { "data-testid": testId },
       }}
-      sx={{ flex: options?.flex ?? 1 }}
+      sx={{
+        flex: options?.flex ?? 1,
+        ...(options?.type === "time" && { flex: "0 0 auto", width: "9.5rem" }),
+        ...(options?.type === "date" && { minWidth: "10.5rem" }),
+      }}
     />
   )
 
@@ -1483,9 +1487,10 @@ export default function HallintaPage() {
               )}
             </Stack>
             <Stack
-              direction={{ xs: "column", sm: "row" }}
+              direction="row"
               sx={{
                 gap: 2,
+                flexWrap: "nowrap",
               }}
             >
               {renderEditField(
