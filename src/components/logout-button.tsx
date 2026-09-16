@@ -50,10 +50,10 @@ export function LogoutButton({
       onClick={handleLogout}
       aria-label="Kirjaudu ulos"
       icon={<LogoutIcon />}
-      iconPosition={showLabel ? "start" : undefined}
+      iconPosition={showLabel ? "top" : undefined}
       label={
         showLabel ? (
-          <Stack sx={{ alignItems: "flex-start", lineHeight: 1.2 }}>
+          <Stack sx={{ alignItems: "center", lineHeight: 1.2 }}>
             <span>Kirjaudu ulos</span>
             {email && (
               <Typography

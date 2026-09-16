@@ -97,18 +97,24 @@ const navListItemSx = (theme: Theme) => {
 const navTabsSx = {
   "& .MuiTab-root": {
     ...navTabSx,
-    minWidth: { sm: 48, md: 90 },
-    px: { sm: 1, md: 2 },
+    minWidth: { sm: 48, md: 72 },
+    px: { sm: 1, md: 1.25 },
+    fontSize: { md: "0.75rem" },
+    lineHeight: { md: 1.2 },
+    minHeight: { md: 64 },
+    "& .MuiTab-icon": {
+      mb: { md: 0.25 },
+    },
   },
 }
 
 const PAGES: PageItem[] = [
-  { path: "/", label: "", icon: HomeIcon },
-  { path: "/ensiapulaukut", label: "EA", icon: MedicalServicesIcon },
+  { path: "/", label: "Etusivu", icon: HomeIcon },
+  { path: "/ensiapulaukut", label: "Ensiapulaukut", icon: MedicalServicesIcon },
   { path: "/kayttoohjeet", label: "Käyttöohjeet", icon: HelpIcon },
   {
     path: "/ohjeita",
-    label: "Toimitsijan ohjeet",
+    label: "Ohjeita toimitsijoille",
     icon: FolderOpenIcon,
     openInNewTab: true,
   },
@@ -238,7 +244,7 @@ export function MainHeader() {
                     href={page.path}
                     component={Link}
                     icon={<page.icon />}
-                    iconPosition={showTabLabels ? "start" : undefined}
+                    iconPosition={showTabLabels ? "top" : undefined}
                     aria-label={page.label}
                     target={page.openInNewTab ? "_blank" : undefined}
                     rel={page.openInNewTab ? "noopener noreferrer" : undefined}
