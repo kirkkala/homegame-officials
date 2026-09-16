@@ -2,6 +2,7 @@
 
 import {
   Close as CloseIcon,
+  FolderOpen as FolderOpenIcon,
   HelpOutlineOutlined as HelpIcon,
   Home as HomeIcon,
   Login as LoginIcon,
@@ -46,6 +47,7 @@ type PageItem = {
   label: string
   icon: typeof HomeIcon
   requiresAuth?: boolean
+  openInNewTab?: boolean
 }
 
 const navTabSx = {
@@ -101,9 +103,15 @@ const navTabsSx = {
 }
 
 const PAGES: PageItem[] = [
-  { path: "/", label: "Etusivu", icon: HomeIcon },
+  { path: "/", label: "", icon: HomeIcon },
   { path: "/ensiapulaukut", label: "EA", icon: MedicalServicesIcon },
-  { path: "/kayttoohjeet", label: "Ohjeet", icon: HelpIcon },
+  { path: "/kayttoohjeet", label: "Käyttöohjeet", icon: HelpIcon },
+  {
+    path: "/ohjeita",
+    label: "Toimitsijan ohjeet",
+    icon: FolderOpenIcon,
+    openInNewTab: true,
+  },
   { path: "/hallinta", label: "Hallinta", icon: SettingsIcon, requiresAuth: true },
 ]
 
@@ -232,6 +240,8 @@ export function MainHeader() {
                     icon={<page.icon />}
                     iconPosition={showTabLabels ? "start" : undefined}
                     aria-label={page.label}
+                    target={page.openInNewTab ? "_blank" : undefined}
+                    rel={page.openInNewTab ? "noopener noreferrer" : undefined}
                     sx={{ fontWeight: pathname === page.path ? 700 : 400 }}
                   />
                 ))}
@@ -319,6 +329,8 @@ export function MainHeader() {
                     href={page.path}
                     onClick={toggleDrawer(false)}
                     selected={isActive}
+                    target={page.openInNewTab ? "_blank" : undefined}
+                    rel={page.openInNewTab ? "noopener noreferrer" : undefined}
                   >
                     <ListItemIcon>
                       <Icon color={isActive ? "primary" : "inherit"} />
