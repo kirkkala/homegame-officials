@@ -60,6 +60,30 @@ export const teamManagers = pgTable(
   (table) => [primaryKey({ columns: [table.teamId, table.userId] })]
 )
 
+// Rebound tracking (team-level, not per player)
+export type ReboundSide = "home" | "away"
+
+export type ReboundEvent = {
+  id: string
+  /** Whose basket: the team that just missed. */
+  basket: ReboundSide
+  /** Who secured the rebound. */
+  winner: ReboundSide
+  createdAt: string
+}
+
+export type ReboundTracking = {
+  counterName: string | null
+  counterToken: string | null
+  events: ReboundEvent[]
+}
+
+export const EMPTY_REBOUND_TRACKING: ReboundTracking = {
+  counterName: null,
+  counterToken: null,
+  events: [],
+}
+
 // Games
 export const games = pgTable("games", {
   id: text("id").primaryKey(), // UUID
@@ -77,6 +101,7 @@ export const games = pgTable("games", {
     .$type<Officials>()
     .notNull()
     .default({ poytakirja: null, kello: null, hyokkaysaika: null }),
+  rebounds: jsonb("rebounds").$type<ReboundTracking>().notNull().default(EMPTY_REBOUND_TRACKING),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 

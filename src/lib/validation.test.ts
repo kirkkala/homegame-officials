@@ -3,6 +3,7 @@ import {
   createGamesSchema,
   createPlayerSchema,
   createTeamSchema,
+  reboundActionSchema,
   teamManagerSchema,
   updateBagHolderSchema,
   updateGameSchema,
@@ -191,6 +192,29 @@ describe("validation", () => {
 
     it("rejects an invalid email", () => {
       expect(validate(teamManagerSchema, { email: "not-an-email" }).success).toBe(false)
+    })
+  })
+
+  describe("reboundActionSchema", () => {
+    it("accepts a claim with a name", () => {
+      const result = validate(reboundActionSchema, { action: "claim", name: "Timo" })
+      expect(result.success).toBe(true)
+    })
+
+    it("accepts add with basket and winner", () => {
+      const result = validate(reboundActionSchema, {
+        action: "add",
+        token: "abc",
+        basket: "home",
+        winner: "away",
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("rejects add without a token", () => {
+      expect(
+        validate(reboundActionSchema, { action: "add", basket: "home", winner: "home" }).success
+      ).toBe(false)
     })
   })
 

@@ -25,6 +25,9 @@ export type {
   OfficialAssignment,
   Officials,
   Player,
+  ReboundEvent,
+  ReboundSide,
+  ReboundTracking,
   Team,
   TeamManager,
   User,
@@ -284,6 +287,15 @@ export async function updateGame(
     .returning()
 
   return result[0]
+}
+
+export async function updateGameRebounds(id: string, rebounds: schema.ReboundTracking) {
+  const result = await db
+    .update(schema.games)
+    .set({ rebounds })
+    .where(eq(schema.games.id, id))
+    .returning()
+  return result[0] || null
 }
 
 export async function deleteGame(id: string) {

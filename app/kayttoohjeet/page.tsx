@@ -6,6 +6,7 @@ import {
   HomeOutlined as HomeOutlinedIcon,
   MedicalServicesOutlined as MedicalServicesIcon,
   PersonAdd as PersonAddIcon,
+  SportsBasketball as SportsBasketballIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import {
@@ -147,6 +148,22 @@ export default function KayttoohjeetPage() {
               laukku tulee mukaasi pelistä, lisää nimesi seurantaan painamalla "Ota laukku haltuun"
               tai "Vaihda haltija" mikäli laukku on merkitty edelliselle haltijalle. Näin koko
               joukkue näkee tilanteen helposti ilman ylimääräisiä WhatsApp-kyselyitä.
+            </Typography>
+            <Divider />
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+              <SportsBasketballIcon color="primary" />
+              <Typography component="h3" variant="h5">
+                Levypallot
+              </Typography>
+            </Stack>
+            <Typography>
+              Ottelulistasta avautuu pelisivu, jossa yksi henkilö voi laskea joukkueiden levypallot
+              kummankin korin osalta – ei pelaajakohtaisesti, vaan joukkueittain.
+            </Typography>
+            <Typography>
+              Paina &quot;Lasken levypalloja&quot; ja syötä nimesi. Laskenta lukittuu sinulle, jotta
+              kaksi ihmistä ei merkitse samoja palloja. Väärä merkkaus perutaan &quot;Peru
+              viimeisin&quot; -napista.
             </Typography>
             <Divider />
             <Typography component="h2" variant="h5">

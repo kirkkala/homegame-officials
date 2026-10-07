@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { requireAuthUser, requireTeamManager } from "@/lib/auth-api"
 import { createGames, deleteAllGames, deleteGamesByTeam, getGames } from "@/lib/db"
+import { toPublicGame } from "@/lib/rebounds"
 import { createGamesSchema, validate } from "@/lib/validation"
 
 export async function GET(request: NextRequest) {
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "teamId is required" }, { status: 400 })
     }
     const games = await getGames(teamId)
-    return NextResponse.json(games)
+    return NextResponse.json(games.map((game) => toPublicGame(game)))
   } catch (error) {
     console.error("Failed to get games:", error)
     return NextResponse.json({ error: "Otteluiden haku epäonnistui" }, { status: 500 })
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     }))
 
     const savedGames = await createGames(gamesWithIds, teamId)
-    return NextResponse.json(savedGames)
+    return NextResponse.json(savedGames.map((game) => toPublicGame(game)))
   } catch (error) {
     console.error("Failed to create games:", error)
     return NextResponse.json({ error: "Otteluiden tallennus epäonnistui" }, { status: 500 })

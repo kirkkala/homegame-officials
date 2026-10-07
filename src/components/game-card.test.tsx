@@ -70,6 +70,16 @@ describe("GameCard", () => {
     expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
   })
 
+  it("links the game header to the rebound page", () => {
+    renderGameCard()
+
+    expect(screen.getByTestId("game-link-game-1")).toHaveAttribute(
+      "href",
+      "/ottelu/game-1?team=team-1"
+    )
+    expect(screen.getByTestId("official-button-poytakirja")).toBeInTheDocument()
+  })
+
   it("renders all three official role buttons when the shot clock is enabled", () => {
     renderGameCard({}, { showShotClock: true })
 
