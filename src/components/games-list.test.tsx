@@ -44,6 +44,14 @@ const futureGame = {
   createdAt: "2025-01-01",
 }
 
+const futureAwayGame = {
+  ...futureGame,
+  id: "g-away",
+  homeTeam: "Away Team",
+  awayTeam: "Home",
+  isHomeGame: false,
+}
+
 const baseTeamContext = {
   selectedTeam: { id: "team-1", name: "Test Team", createdAt: "2025-01-01" },
   isLoading: false,
@@ -103,6 +111,29 @@ describe("GamesList", () => {
       expect(screen.getByTestId("game-card-g1")).toBeInTheDocument()
     })
     expect(screen.queryByTestId("first-aid-summary-mock")).not.toBeInTheDocument()
+  })
+
+  it("uses a switch to show past games", async () => {
+    ;(storage.getGames as ReturnType<typeof vi.fn>).mockResolvedValue([
+      futureGame,
+      { ...futureGame, id: "g-past", date: "2020-01-01" },
+    ])
+
+    renderGamesList()
+
+    expect(await screen.findByRole("switch", { name: "Näytä pelatut pelit" })).toBeInTheDocument()
+    expect(screen.getByTestId("game-card-g1")).toBeInTheDocument()
+    expect(screen.queryByTestId("game-card-g-past")).not.toBeInTheDocument()
+  })
+
+  it("lists home and away games without a home-only filter", async () => {
+    ;(storage.getGames as ReturnType<typeof vi.fn>).mockResolvedValue([futureGame, futureAwayGame])
+
+    renderGamesList()
+
+    expect(await screen.findByTestId("game-card-g1")).toBeInTheDocument()
+    expect(screen.getByTestId("game-card-g-away")).toBeInTheDocument()
+    expect(screen.queryByText("Näytä vain kotipelit")).not.toBeInTheDocument()
   })
 
   it("renders first aid summary mock when firstAidBagsEnabled", async () => {

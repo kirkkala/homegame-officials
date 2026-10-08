@@ -115,7 +115,7 @@ export function GameCard({
             <Typography
               variant="body1"
               sx={{
-                fontWeight: game.isHomeGame ? "bold" : "normal",
+                fontWeight: game.isHomeGame ? 700 : 400,
                 lineHeight: 1.3,
                 minWidth: 0,
               }}

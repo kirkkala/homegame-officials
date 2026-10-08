@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material"
 import Link from "next/link"
+import { useEffect } from "react"
 import { Footer } from "@/components/footer"
 import { MainHeader } from "@/components/header"
 import { ReboundTracker } from "@/components/rebound-tracker"
@@ -20,6 +21,11 @@ import { formatDate } from "@/lib/utils"
 
 export function GamePage({ gameId }: { gameId: string }) {
   const { data: game, isLoading, error, sessionReady, runAction, saveResult } = useGame(gameId)
+  const ready = sessionReady && !isLoading
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [gameId, ready])
 
   const homeHref = game ? `/?team=${encodeURIComponent(game.teamId)}` : "/"
 

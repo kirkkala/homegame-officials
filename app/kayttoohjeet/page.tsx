@@ -59,8 +59,7 @@ const steps = [
     description: `
       Vihreä = vahvistettu, oranssi = odottaa vahvistusta. Jos vaihdat
       nimeämistä, sovi siitä etukäteen. Menneet pelit löytyvät valitsemalla
-      "Näytä menneet pelit" listauksessa. Mikäli joukkueenjohtaja on lisännyt
-      myös vieraspelit ne saa piilotettua listauksesta.
+      "Näytä pelatut pelit" listauksessa.
     `,
   },
 ]
