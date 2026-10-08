@@ -4,7 +4,7 @@ import { Place as PlaceIcon, SportsBasketball as SportsBasketballIcon } from "@m
 import { Box, Card, CardContent, Chip, Link, Stack, Typography } from "@mui/material"
 import NextLink from "next/link"
 import type { Game } from "@/lib/storage"
-import { formatDate } from "@/lib/utils"
+import { formatDate, formatGameResult } from "@/lib/utils"
 import { OfficialAssigner } from "./official-assigner"
 
 export function GameCard({
@@ -117,6 +117,7 @@ export function GameCard({
               sx={{
                 fontWeight: game.isHomeGame ? "bold" : "normal",
                 lineHeight: 1.3,
+                minWidth: 0,
               }}
             >
               {game.homeTeam}
@@ -131,6 +132,14 @@ export function GameCard({
               </Typography>
               {game.awayTeam}
             </Typography>
+            {game.result && (
+              <Typography
+                data-testid={`game-score-${game.id}`}
+                sx={{ fontWeight: 800, whiteSpace: "nowrap", ml: "auto", pl: 1 }}
+              >
+                {formatGameResult(game.result)}
+              </Typography>
+            )}
           </Stack>
         </Box>
 

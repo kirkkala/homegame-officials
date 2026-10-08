@@ -1,4 +1,10 @@
-import { computePlayerStats, computePlayerStatsArray, formatDate, slugify } from "@/lib/utils"
+import {
+  computePlayerStats,
+  computePlayerStatsArray,
+  formatDate,
+  formatGameResult,
+  slugify,
+} from "@/lib/utils"
 import { makeGame } from "@/test-utils"
 
 describe("utils", () => {
@@ -26,6 +32,10 @@ describe("utils", () => {
       expect(formatDate("2026-01-30T23:59:00", { format: "weekdayShort" })).toBe("Pe 30.1.2026")
       expect(formatDate("1980-04-12T08:36:25", { format: "weekdayShort" })).toBe("La 12.4.1980")
     })
+  })
+
+  it("formats a game result with an en dash", () => {
+    expect(formatGameResult({ home: 64, away: 58 })).toBe("64–58")
   })
 })
 

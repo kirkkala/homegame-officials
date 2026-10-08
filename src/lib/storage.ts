@@ -35,7 +35,13 @@ export type Game = {
     hyokkaysaika?: OfficialAssignment | null
   }
   rebounds?: PublicReboundTracking
+  result?: GameResult | null
   createdAt: string
+}
+
+export type GameResult = {
+  home: number
+  away: number
 }
 
 export type Player = {
@@ -233,6 +239,15 @@ type ReboundActionBody =
   | { action: "undo"; token: string }
 
 export type ReboundActionResult = PublicReboundTracking & { token?: string }
+
+export async function saveGameResult(gameId: string, result: GameResult): Promise<Game> {
+  const res = await fetch(`/api/games/${gameId}/result`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(result),
+  })
+  return parseJsonResponse<Game>(res)
+}
 
 export async function postReboundAction(
   gameId: string,

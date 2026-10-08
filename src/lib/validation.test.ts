@@ -4,6 +4,7 @@ import {
   createPlayerSchema,
   createTeamSchema,
   reboundActionSchema,
+  saveGameResultSchema,
   teamManagerSchema,
   updateBagHolderSchema,
   updateGameSchema,
@@ -113,6 +114,20 @@ describe("validation", () => {
     it("rejects more than 500 games", () => {
       const games = Array.from({ length: 501 }, () => validGame)
       expect(validate(createGamesSchema, { games, teamId: "team-1" }).success).toBe(false)
+    })
+  })
+
+  describe("saveGameResultSchema", () => {
+    it("accepts integer scores", () => {
+      expect(validate(saveGameResultSchema, { home: 64, away: 58 })).toEqual({
+        success: true,
+        data: { home: 64, away: 58 },
+      })
+    })
+
+    it("rejects a negative or too large score", () => {
+      expect(validate(saveGameResultSchema, { home: -1, away: 58 }).success).toBe(false)
+      expect(validate(saveGameResultSchema, { home: 64, away: 200 }).success).toBe(false)
     })
   })
 

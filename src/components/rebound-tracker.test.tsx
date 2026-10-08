@@ -17,6 +17,7 @@ describe("ReboundTracker", () => {
     const onAction = vi.fn().mockResolvedValue({})
     render(<ReboundTracker game={baseGame} isCounter={false} onAction={onAction} />)
 
+    expect(screen.getByTestId("rebound-claim")).toHaveTextContent("Käynnistä tilastointi")
     await user.click(screen.getByTestId("rebound-claim"))
     await user.type(screen.getByTestId("rebound-claim-name"), "Timo")
     await user.click(screen.getByTestId("rebound-claim-submit"))
@@ -92,7 +93,7 @@ describe("ReboundTracker", () => {
       />
     )
 
-    expect(screen.getByText("Aino kirjaa levypalloja")).toBeInTheDocument()
+    expect(screen.getByText("Aino kirjaa tilastoa")).toBeInTheDocument()
     expect(screen.getByTestId("rebound-takeover")).toBeInTheDocument()
     expect(screen.getByTestId("rebound-btn-home-home")).toBeDisabled()
   })
@@ -126,8 +127,10 @@ describe("ReboundTracker", () => {
       />
     )
 
-    expect(screen.getByText("Stadi hyökkäyspääty / KlaNMKY puolustuspääty")).toBeInTheDocument()
-    expect(screen.getByText("Stadi puolustuspääty / KlaNMKY hyökkäyspääty")).toBeInTheDocument()
+    expect(screen.getByText("Stadi hyökkäyspääty")).toBeInTheDocument()
+    expect(screen.getByText("KlaNMKY puolustuspääty")).toBeInTheDocument()
+    expect(screen.getByText("Stadi puolustuspääty")).toBeInTheDocument()
+    expect(screen.getByText("KlaNMKY hyökkäyspääty")).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Hyökkäys" })).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Puolustus" })).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Yhteensä" })).toBeInTheDocument()
@@ -149,7 +152,8 @@ describe("ReboundTracker", () => {
 
     expect(screen.getByTestId("rebound-btn-home-home")).toHaveTextContent("Helmi Basket")
     expect(screen.getByTestId("rebound-btn-home-away")).toHaveTextContent("HNMKY/Stadi")
-    expect(screen.getByText("Helmi Basket hyökkäyspääty / HNMKY puolustuspääty")).toBeInTheDocument()
+    expect(screen.getByText("Helmi Basket hyökkäyspääty")).toBeInTheDocument()
+    expect(screen.getByText("HNMKY puolustuspääty")).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Hyökkäys" })).toBeInTheDocument()
   })
 

@@ -80,6 +80,11 @@ describe("GameCard", () => {
     expect(screen.getByTestId("official-button-poytakirja")).toBeInTheDocument()
   })
 
+  it("shows the final score on the listing when a result is saved", () => {
+    renderGameCard({ result: { home: 64, away: 58 } })
+    expect(screen.getByTestId("game-score-game-1")).toHaveTextContent("64–58")
+  })
+
   it("marks the link when rebound stats exist, without a count or counter name", () => {
     renderGameCard({
       rebounds: {

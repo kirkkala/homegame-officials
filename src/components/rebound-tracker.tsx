@@ -21,11 +21,12 @@ import {
   Typography,
 } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
+import { GameResultForm } from "@/components/game-result-form"
 import type { ReboundSide } from "@/db/schema"
 import type { ReboundClientAction } from "@/hooks/use-rebounds"
 import { getSavedCounterName, setSavedCounterName } from "@/lib/rebound-session"
 import { computeReboundStats, shortTeamName } from "@/lib/rebounds"
-import type { Game } from "@/lib/storage"
+import type { Game, GameResult } from "@/lib/storage"
 
 function CountButton({
   testId,
@@ -88,6 +89,18 @@ const countSx = {
   fontVariantNumeric: "tabular-nums",
 }
 
+function BasketHeading({ lines }: { lines: [string, string] }) {
+  return (
+    <Stack spacing={0.25} sx={{ mb: 1.25 }}>
+      {lines.map((line) => (
+        <Typography key={line} variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.25 }}>
+          {line}
+        </Typography>
+      ))}
+    </Stack>
+  )
+}
+
 function StatHead({ label, short }: { label: string; short: string }) {
   return (
     <TableCell
@@ -114,17 +127,25 @@ export function ReboundTracker({
   game,
   isCounter,
   onAction,
+  onSaveResult,
 }: {
   game: Game
   isCounter: boolean
   onAction: (action: ReboundClientAction) => Promise<unknown>
+  onSaveResult?: (result: GameResult) => Promise<unknown>
 }) {
   const rebounds = game.rebounds ?? { counterName: null, events: [], isCounter: false }
   const stats = computeReboundStats(rebounds.events)
   const homeShort = shortTeamName(game.homeTeam)
   const awayShort = shortTeamName(game.awayTeam)
-  const homeAttacks = `${homeShort} hyökkäyspääty / ${awayShort} puolustuspääty`
-  const awayAttacks = `${homeShort} puolustuspääty / ${awayShort} hyökkäyspääty`
+  const homeAttacks: [string, string] = [
+    `${homeShort} hyökkäyspääty`,
+    `${awayShort} puolustuspääty`,
+  ]
+  const awayAttacks: [string, string] = [
+    `${homeShort} puolustuspääty`,
+    `${awayShort} hyökkäyspääty`,
+  ]
 
   const [claimOpen, setClaimOpen] = useState(false)
   const [takeOver, setTakeOver] = useState(false)
@@ -169,7 +190,7 @@ export function ReboundTracker({
       setClaimOpen(false)
       setTakeOver(false)
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Laskennan aloitus epäonnistui")
+      setError(e instanceof Error ? e.message : "Tilastoinnin aloitus epäonnistui")
     } finally {
       setBusy(false)
     }
@@ -177,65 +198,55 @@ export function ReboundTracker({
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap", rowGap: 1 }}>
         <SportsBasketballIcon color="primary" />
         <Typography variant="h5" component="h2">
-          Levypallotilasto
+          Tilastot
         </Typography>
         {rebounds.counterName && (
-          <Chip size="small" label={`${rebounds.counterName} kirjaa levypalloja`} />
+          <Chip size="small" label={`${rebounds.counterName} kirjaa tilastoa`} />
         )}
-      </Stack>
-
-      {!isCounter && !rebounds.counterName && (
-        <Button
-          data-testid="rebound-claim"
-          variant="contained"
-          size="large"
-          onClick={() => {
-            setTakeOver(false)
-            setClaimOpen(true)
-          }}
-        >
-          Käynnistä levypallotilaston laskenta
-        </Button>
-      )}
-
-      {!isCounter && rebounds.counterName && (
-        <Button
-          data-testid="rebound-takeover"
-          variant="outlined"
-          onClick={() => {
-            setTakeOver(true)
-            setClaimOpen(true)
-          }}
-        >
-          Ota haltuun
-        </Button>
-      )}
-
-      {isCounter && (
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+        {!isCounter && !rebounds.counterName && (
           <Button
-            data-testid="rebound-undo"
-            variant="outlined"
-            startIcon={<UndoIcon />}
-            disabled={rebounds.events.length === 0}
-            onClick={() => void run({ action: "undo" })}
+            data-testid="rebound-claim"
+            variant="contained"
+            onClick={() => {
+              setTakeOver(false)
+              setClaimOpen(true)
+            }}
+            sx={{ ml: { sm: "auto" } }}
           >
-            Peru viimeisin
+            Käynnistä tilastointi
           </Button>
+        )}
+        {!isCounter && rebounds.counterName && (
+          <Button
+            data-testid="rebound-takeover"
+            variant="outlined"
+            onClick={() => {
+              setTakeOver(true)
+              setClaimOpen(true)
+            }}
+            sx={{ ml: { sm: "auto" } }}
+          >
+            Ota haltuun
+          </Button>
+        )}
+        {isCounter && (
           <Button
             data-testid="rebound-release"
             variant="outlined"
             color="inherit"
             disabled={busy}
             onClick={() => void run({ action: "release" })}
+            sx={{ ml: { sm: "auto" } }}
           >
-            Lopeta laskenta
+            Lopeta tilastojen kirjaus
           </Button>
-        </Stack>
-      )}
+        )}
+      </Stack>
+
+      {onSaveResult && <GameResultForm game={game} onSave={onSaveResult} live={isCounter} />}
 
       {error && !claimOpen && (
         <Alert severity="error" onClose={() => setError(null)}>
@@ -243,14 +254,26 @@ export function ReboundTracker({
         </Alert>
       )}
 
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.25 }}>
-        Kun heitto ei mene koriin, merkitse kumpi joukkue saa pallon.
-      </Typography>
+      {isCounter && (
+        <Stack spacing={1}>
+          <Typography variant="body2" color="text.secondary">
+            Kun heitto ei mene koriin, merkitse kumpi joukkue saa pallon.
+          </Typography>
+          <Button
+            data-testid="rebound-undo"
+            variant="outlined"
+            startIcon={<UndoIcon />}
+            disabled={rebounds.events.length === 0}
+            onClick={() => void run({ action: "undo" })}
+            sx={{ alignSelf: "flex-start" }}
+          >
+            Peru viimeisin
+          </Button>
+        </Stack>
+      )}
 
       <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.25 }}>
-          {homeAttacks}
-        </Typography>
+        <BasketHeading lines={homeAttacks} />
         <Stack direction="row" spacing={1}>
           <CountButton
             testId="rebound-btn-home-home"
@@ -274,9 +297,7 @@ export function ReboundTracker({
       </Paper>
 
       <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.25 }}>
-          {awayAttacks}
-        </Typography>
+        <BasketHeading lines={awayAttacks} />
         <Stack direction="row" spacing={1}>
           <CountButton
             testId="rebound-btn-away-home"
@@ -350,9 +371,7 @@ export function ReboundTracker({
       </Paper>
 
       <Dialog open={claimOpen} onClose={() => setClaimOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>
-          {takeOver ? "Ota tilaston laskenta haltuun" : "Käynnistä levypallotilaston laskenta"}
-        </DialogTitle>
+        <DialogTitle>{takeOver ? "Ota tilastointi haltuun" : "Käynnistä tilastointi"}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             {takeOver
@@ -385,7 +404,7 @@ export function ReboundTracker({
             onClick={() => void handleClaim()}
             disabled={busy}
           >
-            {takeOver ? "Ota haltuun" : "Aloita laskenta"}
+            {takeOver ? "Ota haltuun" : "Aloita"}
           </Button>
         </DialogActions>
       </Dialog>

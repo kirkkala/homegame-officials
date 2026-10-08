@@ -80,10 +80,10 @@ export function requireCounterToken(
   token: string | undefined
 ): string | null {
   if (!tracking.counterToken || !tracking.counterName) {
-    return "Kukaan ei kirjaa levypalloja tällä hetkellä"
+    return "Kukaan ei tilastoi tällä hetkellä"
   }
   if (!token || token !== tracking.counterToken) {
-    return `${tracking.counterName} kirjaa levypalloja`
+    return `${tracking.counterName} kirjaa tilastoa`
   }
   return null
 }

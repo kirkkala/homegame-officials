@@ -84,6 +84,11 @@ export const EMPTY_REBOUND_TRACKING: ReboundTracking = {
   events: [],
 }
 
+export type GameResult = {
+  home: number
+  away: number
+}
+
 // Games
 export const games = pgTable("games", {
   id: text("id").primaryKey(), // UUID
@@ -102,6 +107,7 @@ export const games = pgTable("games", {
     .notNull()
     .default({ poytakirja: null, kello: null, hyokkaysaika: null }),
   rebounds: jsonb("rebounds").$type<ReboundTracking>().notNull().default(EMPTY_REBOUND_TRACKING),
+  result: jsonb("result").$type<GameResult | null>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 

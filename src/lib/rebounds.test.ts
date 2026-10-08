@@ -72,6 +72,6 @@ describe("rebounds", () => {
   it("requires the matching counter token", () => {
     const tracking = { counterName: "Timo", counterToken: "abc", events: [] }
     expect(requireCounterToken(tracking, "abc")).toBeNull()
-    expect(requireCounterToken(tracking, "nope")).toBe("Timo kirjaa levypalloja")
+    expect(requireCounterToken(tracking, "nope")).toBe("Timo kirjaa tilastoa")
   })
 })

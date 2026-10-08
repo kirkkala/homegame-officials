@@ -19,7 +19,7 @@ import { useGame } from "@/hooks/use-rebounds"
 import { formatDate } from "@/lib/utils"
 
 export function GamePage({ gameId }: { gameId: string }) {
-  const { data: game, isLoading, error, sessionReady, runAction } = useGame(gameId)
+  const { data: game, isLoading, error, sessionReady, runAction, saveResult } = useGame(gameId)
 
   const homeHref = game ? `/?team=${encodeURIComponent(game.teamId)}` : "/"
 
@@ -106,6 +106,7 @@ export function GamePage({ gameId }: { gameId: string }) {
                 game={game}
                 isCounter={!!game.rebounds?.isCounter}
                 onAction={runAction}
+                onSaveResult={saveResult}
               />
             </Paper>
           </Stack>

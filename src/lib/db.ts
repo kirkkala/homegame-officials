@@ -22,6 +22,7 @@ export type {
   FirstAidBags,
   FirstAidBagsData,
   Game,
+  GameResult,
   OfficialAssignment,
   Officials,
   Player,
@@ -287,6 +288,15 @@ export async function updateGame(
     .returning()
 
   return result[0]
+}
+
+export async function updateGameResult(id: string, result: schema.GameResult) {
+  const updated = await db
+    .update(schema.games)
+    .set({ result })
+    .where(eq(schema.games.id, id))
+    .returning()
+  return updated[0] || null
 }
 
 export async function updateGameRebounds(id: string, rebounds: schema.ReboundTracking) {

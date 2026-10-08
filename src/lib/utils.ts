@@ -1,4 +1,4 @@
-import type { Game } from "./storage"
+import type { Game, GameResult } from "./storage"
 
 /**
  * Converts a string to a URL-safe slug for use as an ID.
@@ -17,7 +17,15 @@ export function slugify(text: string): string {
 /** Format variants for Finnish date display. */
 export type DateFormat = "full" | "short" | "weekday" | "weekdayShort"
 
-const WEEKDAYS = ["Sunnuntai", "Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai"]
+const WEEKDAYS = [
+  "Sunnuntai",
+  "Maanantai",
+  "Tiistai",
+  "Keskiviikko",
+  "Torstai",
+  "Perjantai",
+  "Lauantai",
+]
 const WEEKDAYS_SHORT = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"]
 
 /**
@@ -40,6 +48,10 @@ export function formatDate(dateStr: string, options: { format?: DateFormat } = {
     return `${weekdays[date.getDay()]} ${day}.${month}.${year}`
   }
   return `${day}.${month}.${year}`
+}
+
+export function formatGameResult(result: GameResult): string {
+  return `${result.home}–${result.away}`
 }
 
 /**

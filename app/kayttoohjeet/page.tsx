@@ -153,17 +153,20 @@ export default function KayttoohjeetPage() {
             <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <SportsBasketballIcon color="primary" />
               <Typography component="h3" variant="h5">
-                Levypallot
+                Tilastointi
               </Typography>
             </Stack>
             <Typography>
-              Ottelulistasta avautuu pelisivu, jossa yksi henkilö voi laskea joukkueiden levypallot
-              kummankin korin osalta – ei pelaajakohtaisesti, vaan joukkueittain.
+              Ottelulistasta avautuu pelisivu &quot;Tilastot&quot;-linkistä. Tulos näkyy heti
+              ylhäällä, joten sitä voi seurata myös toisella laitteella. Paina &quot;Käynnistä
+              tilastointi&quot; ja syötä nimesi – sen jälkeen voit merkitä sekä koreja (+1, +2, +3)
+              että levypalloja samasta näkymästä. Molemmat pisteluvut voi myös syöttää kerralla
+              kynä-ikonista.
             </Typography>
             <Typography>
-              Paina &quot;Lasken levypalloja&quot; ja syötä nimesi. Laskenta lukittuu sinulle, jotta
-              kaksi ihmistä ei merkitse samoja palloja. Väärä merkkaus perutaan &quot;Peru
-              viimeisin&quot; -napista.
+              Tilastointi lukittuu sinulle, jotta kaksi ihmistä ei merkitse samoja palloja.
+              Levypallot merkitään kummankin korin osalta – ei pelaajakohtaisesti, vaan
+              joukkueittain. Väärä merkkaus perutaan &quot;Peru viimeisin&quot; -napista.
             </Typography>
             <Divider />
             <Typography component="h2" variant="h5">

@@ -88,6 +88,13 @@ export const updateBagHolderSchema = z.object({
 const reboundSide = z.enum(["home", "away"])
 const reboundToken = z.string().min(1).max(100)
 
+const score = z.number().int().min(0).max(199)
+
+export const saveGameResultSchema = z.object({
+  home: score,
+  away: score,
+})
+
 export const reboundActionSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("claim"),
