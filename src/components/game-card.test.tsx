@@ -70,14 +70,31 @@ describe("GameCard", () => {
     expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
   })
 
-  it("links the game header to the rebound page", () => {
+  it("links to the rebound page with a Tilastot text link", () => {
     renderGameCard()
 
-    expect(screen.getByTestId("game-link-game-1")).toHaveAttribute(
-      "href",
-      "/ottelu/game-1?team=team-1"
-    )
+    const link = screen.getByTestId("game-link-game-1")
+    expect(link).toHaveAttribute("href", "/ottelu/game-1?team=team-1")
+    expect(link).toHaveTextContent("Tilastot")
+    expect(link).toHaveAccessibleName("Tilastot")
     expect(screen.getByTestId("official-button-poytakirja")).toBeInTheDocument()
+  })
+
+  it("marks the link when rebound stats exist, without a count or counter name", () => {
+    renderGameCard({
+      rebounds: {
+        counterName: "Timo",
+        events: [
+          { id: "e1", basket: "home", winner: "home", createdAt: "2026-10-07T18:00:00.000Z" },
+        ],
+      },
+    })
+
+    const link = screen.getByTestId("game-link-game-1")
+    expect(link).toHaveTextContent("Tilastot")
+    expect(link).toHaveAccessibleName("Tilastot kirjattu")
+    expect(link).not.toHaveTextContent("1")
+    expect(screen.queryByText("Timo")).not.toBeInTheDocument()
   })
 
   it("renders all three official role buttons when the shot clock is enabled", () => {

@@ -21,6 +21,11 @@ describe("utils", () => {
       expect(formatDate("2026-01-30T23:59:00", { format: "weekday" })).toBe("Perjantai 30.1.2026")
       expect(formatDate("1980-04-12T08:36:25", { format: "weekday" })).toBe("Lauantai 12.4.1980")
     })
+
+    it("returns short weekday format when format: 'weekdayShort'", () => {
+      expect(formatDate("2026-01-30T23:59:00", { format: "weekdayShort" })).toBe("Pe 30.1.2026")
+      expect(formatDate("1980-04-12T08:36:25", { format: "weekdayShort" })).toBe("La 12.4.1980")
+    })
   })
 })
 

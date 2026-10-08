@@ -15,13 +15,16 @@ export function slugify(text: string): string {
 }
 
 /** Format variants for Finnish date display. */
-export type DateFormat = "full" | "short" | "weekday"
+export type DateFormat = "full" | "short" | "weekday" | "weekdayShort"
+
+const WEEKDAYS = ["Sunnuntai", "Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai"]
+const WEEKDAYS_SHORT = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"]
 
 /**
  * Formats a date string in Finnish locale.
  *
  * @param dateStr - ISO date string (e.g. "2026-01-30T23:59:00")
- * @param options.format - `"full"` = day.month.year, `"short"` = day.month., `"weekday"` = weekday day.month.year
+ * @param options.format - `"full"` = day.month.year, `"short"` = day.month., `"weekday"` = weekday day.month.year, `"weekdayShort"` = La 12.4.1980
  * @returns Formatted date string
  */
 export function formatDate(dateStr: string, options: { format?: DateFormat } = {}): string {
@@ -32,16 +35,8 @@ export function formatDate(dateStr: string, options: { format?: DateFormat } = {
   const year = date.getFullYear()
 
   if (format === "short") return `${day}.${month}.`
-  if (format === "weekday") {
-    const weekdays = [
-      "Sunnuntai",
-      "Maanantai",
-      "Tiistai",
-      "Keskiviikko",
-      "Torstai",
-      "Perjantai",
-      "Lauantai",
-    ]
+  if (format === "weekday" || format === "weekdayShort") {
+    const weekdays = format === "weekdayShort" ? WEEKDAYS_SHORT : WEEKDAYS
     return `${weekdays[date.getDay()]} ${day}.${month}.${year}`
   }
   return `${day}.${month}.${year}`

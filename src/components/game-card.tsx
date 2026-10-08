@@ -1,12 +1,8 @@
 "use client"
 
-import {
-  ChevronRight as ChevronRightIcon,
-  Place as PlaceIcon,
-  SportsBasketball as SportsBasketballIcon,
-} from "@mui/icons-material"
-import { Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material"
-import Link from "next/link"
+import { Place as PlaceIcon, SportsBasketball as SportsBasketballIcon } from "@mui/icons-material"
+import { Box, Card, CardContent, Chip, Link, Stack, Typography } from "@mui/material"
+import NextLink from "next/link"
 import type { Game } from "@/lib/storage"
 import { formatDate } from "@/lib/utils"
 import { OfficialAssigner } from "./official-assigner"
@@ -24,7 +20,7 @@ export function GameCard({
 }) {
   const gameName = `${game.homeTeam} vs. ${game.awayTeam}`
   const reboundHref = `/ottelu/${game.id}?team=${encodeURIComponent(game.teamId)}`
-  const reboundCount = game.rebounds?.events.length ?? 0
+  const hasReboundStats = (game.rebounds?.events.length ?? 0) > 0
   return (
     <Card variant="outlined">
       <CardContent
@@ -34,24 +30,14 @@ export function GameCard({
         }}
       >
         <Box
-          component={Link}
-          href={reboundHref}
-          data-testid={`game-link-${game.id}`}
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr auto", sm: "1fr auto" },
-            gridTemplateAreas: {
-              xs: `"meta chevron" "teams chevron" "location chevron"`,
-              sm: `"meta location" "teams chevron"`,
-            },
-            columnGap: 2,
+            gridTemplateColumns: "minmax(0, 1fr) auto",
+            gridTemplateAreas: `"meta stats" "teams teams" "location location"`,
+            columnGap: 1.5,
             rowGap: 0.5,
-            alignItems: { xs: "start", sm: "center" },
+            alignItems: "start",
             mb: 1,
-            textDecoration: "none",
-            color: "inherit",
-            borderRadius: 1,
-            "&:hover .game-link-chevron": { color: "primary.main" },
           }}
         >
           <Stack
@@ -69,9 +55,30 @@ export function GameCard({
               <Chip label="Pelattu" size="small" sx={{ fontSize: "0.7rem", lineHeight: 1.4 }} />
             )}
             <Typography>
-              {formatDate(game.date, { format: "weekday" })} klo {game.time}
+              {formatDate(game.date, { format: "weekdayShort" })} klo {game.time}
             </Typography>
           </Stack>
+
+          <Link
+            component={NextLink}
+            href={reboundHref}
+            data-testid={`game-link-${game.id}`}
+            underline="hover"
+            aria-label={hasReboundStats ? "Tilastot kirjattu" : "Tilastot"}
+            sx={{
+              gridArea: "stats",
+              justifySelf: "end",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              lineHeight: 1.4,
+            }}
+          >
+            {hasReboundStats && <SportsBasketballIcon sx={{ fontSize: "1.15rem" }} />}
+            Tilastot
+          </Link>
 
           {game.location && (
             <Stack
@@ -80,7 +87,6 @@ export function GameCard({
                 alignItems: "center",
                 gap: 0.5,
                 gridArea: "location",
-                justifySelf: { xs: "flex-start", sm: "flex-end" },
               }}
             >
               <PlaceIcon sx={{ fontSize: "1rem", color: "text.secondary" }} />
@@ -125,28 +131,6 @@ export function GameCard({
               </Typography>
               {game.awayTeam}
             </Typography>
-          </Stack>
-          <Stack
-            className="game-link-chevron"
-            direction="row"
-            spacing={0.75}
-            sx={{
-              gridArea: "chevron",
-              alignItems: "center",
-              color: "text.secondary",
-              justifySelf: "end",
-            }}
-          >
-            {game.rebounds?.counterName && <Chip size="small" label={game.rebounds.counterName} />}
-            {reboundCount > 0 && (
-              <Chip
-                size="small"
-                icon={<SportsBasketballIcon />}
-                label={reboundCount}
-                sx={{ "& .MuiChip-icon": { fontSize: "0.95rem" } }}
-              />
-            )}
-            <ChevronRightIcon />
           </Stack>
         </Box>
 
