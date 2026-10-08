@@ -166,7 +166,7 @@ export default function KayttoohjeetPage() {
             <Typography>
               Tilastointi lukittuu sinulle, jotta kaksi ihmistä ei merkitse samoja palloja.
               Levypallot merkitään kummankin korin osalta – ei pelaajakohtaisesti, vaan
-              joukkueittain. Väärä merkkaus perutaan &quot;Peru viimeisin&quot; -napista.
+              joukkueittain. Väärä merkkaus perutaan laskurin alla olevasta peruutusikonista.
             </Typography>
             <Divider />
             <Typography component="h2" variant="h5">

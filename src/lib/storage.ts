@@ -236,7 +236,7 @@ type ReboundActionBody =
   | { action: "claim"; name: string; token?: string; takeOver?: boolean }
   | { action: "release"; token: string }
   | { action: "add"; token: string; basket: "home" | "away"; winner: "home" | "away" }
-  | { action: "undo"; token: string }
+  | { action: "remove"; token: string; basket: "home" | "away"; winner: "home" | "away" }
 
 export type ReboundActionResult = PublicReboundTracking & { token?: string }
 

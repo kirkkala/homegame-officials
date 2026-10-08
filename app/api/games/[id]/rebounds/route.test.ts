@@ -106,7 +106,7 @@ describe("POST /api/games/[id]/rebounds", () => {
     expect(res.status).toBe(409)
   })
 
-  it("undoes the last rebound", async () => {
+  it("removes the last matching rebound, not the latest event", async () => {
     vi.mocked(getGameById).mockResolvedValue({
       ...game,
       rebounds: {
@@ -119,10 +119,13 @@ describe("POST /api/games/[id]/rebounds", () => {
       },
     } as never)
 
-    const res = await POST(jsonRequest({ action: "undo", token: "token-1" }), { params })
+    const res = await POST(
+      jsonRequest({ action: "remove", token: "token-1", basket: "home", winner: "home" }),
+      { params }
+    )
     const body = await res.json()
     expect(body.events).toEqual([
-      { id: "e1", basket: "home", winner: "home", createdAt: "2026-10-07T18:00:00.000Z" },
+      { id: "e2", basket: "away", winner: "away", createdAt: "2026-10-07T18:01:00.000Z" },
     ])
   })
 })

@@ -113,8 +113,10 @@ export const reboundActionSchema = z.discriminatedUnion("action", [
     winner: reboundSide,
   }),
   z.object({
-    action: z.literal("undo"),
+    action: z.literal("remove"),
     token: reboundToken,
+    basket: reboundSide,
+    winner: reboundSide,
   }),
 ])
 

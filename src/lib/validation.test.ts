@@ -231,6 +231,16 @@ describe("validation", () => {
         validate(reboundActionSchema, { action: "add", basket: "home", winner: "home" }).success
       ).toBe(false)
     })
+
+    it("accepts remove with basket and winner", () => {
+      const result = validate(reboundActionSchema, {
+        action: "remove",
+        token: "abc",
+        basket: "home",
+        winner: "away",
+      })
+      expect(result.success).toBe(true)
+    })
   })
 
   describe("updateBagHolderSchema", () => {

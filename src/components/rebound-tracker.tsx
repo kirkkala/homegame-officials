@@ -28,58 +28,82 @@ import { getSavedCounterName, setSavedCounterName } from "@/lib/rebound-session"
 import { computeReboundStats, shortTeamName } from "@/lib/rebounds"
 import type { Game, GameResult } from "@/lib/storage"
 
-function CountButton({
+function ReboundPad({
   testId,
   name,
   count,
   ours,
   role,
-  disabled,
-  onClick,
+  canEdit,
+  onAdd,
+  onRemove,
 }: {
   testId: string
   name: string
   count: number
   ours: boolean
-  role: "hyökkäyspääty" | "puolustuspääty"
-  disabled: boolean
-  onClick: () => void
+  role: "hyökkäys" | "puolustus"
+  canEdit: boolean
+  onAdd: () => void
+  onRemove: () => void
 }) {
   return (
-    <Button
-      data-testid={testId}
-      variant="contained"
-      disabled={disabled}
-      onClick={onClick}
-      sx={{
-        flex: 1,
-        minHeight: { xs: 88, sm: 104 },
-        px: 1.5,
-        py: 1.25,
-        borderRadius: 2,
-        display: "flex",
-        flexDirection: "column",
-        gap: 0.25,
-        color: "common.white",
-        bgcolor: ours ? "primary.main" : "grey.800",
-        "&:hover": { bgcolor: ours ? "primary.dark" : "grey.900" },
-        "&.Mui-disabled": {
+    <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
+      <Button
+        data-testid={testId}
+        variant="contained"
+        disabled={!canEdit}
+        onClick={onAdd}
+        sx={{
+          minHeight: { xs: 88, sm: 104 },
+          width: "100%",
+          px: 1.5,
+          py: 1.25,
+          borderRadius: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 0.25,
           color: "common.white",
           bgcolor: ours ? "primary.main" : "grey.800",
-          opacity: 0.72,
-        },
-      }}
-    >
-      <Typography sx={{ fontWeight: 700, fontSize: "0.95rem", opacity: 0.9, lineHeight: 1.2 }}>
-        {name}
-      </Typography>
-      <Typography sx={{ fontSize: { xs: "2rem", sm: "2.35rem" }, fontWeight: 800, lineHeight: 1 }}>
-        {count}
-      </Typography>
-      <Typography variant="caption" sx={{ opacity: 0.9 }}>
-        {role}
-      </Typography>
-    </Button>
+          "&:hover": { bgcolor: ours ? "primary.dark" : "grey.900" },
+          "&.Mui-disabled": {
+            color: "common.white",
+            bgcolor: ours ? "primary.main" : "grey.800",
+            opacity: 0.72,
+          },
+        }}
+      >
+        <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", opacity: 0.9, lineHeight: 1.2 }}>
+          {name}
+        </Typography>
+        <Typography
+          sx={{ fontSize: { xs: "2rem", sm: "2.35rem" }, fontWeight: 800, lineHeight: 1 }}
+        >
+          {count}
+        </Typography>
+        <Typography variant="caption" sx={{ opacity: 0.9 }}>
+          {role}
+        </Typography>
+      </Button>
+      {canEdit && (
+        <Button
+          data-testid={`${testId}-remove`}
+          variant="outlined"
+          color="inherit"
+          disabled={count === 0}
+          onClick={onRemove}
+          aria-label={`Vähennä, ${name} ${role}`}
+          sx={{
+            minHeight: 36,
+            py: 0,
+            color: "text.secondary",
+            borderColor: "divider",
+          }}
+        >
+          <UndoIcon />
+        </Button>
+      )}
+    </Stack>
   )
 }
 
@@ -93,7 +117,7 @@ function BasketHeading({ lines }: { lines: [string, string] }) {
   return (
     <Stack spacing={0.25} sx={{ mb: 1.25 }}>
       {lines.map((line) => (
-        <Typography key={line} variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.25 }}>
+        <Typography key={line} variant="subtitle1" sx={{ fontWeight: 700, fontSize: "0.875rem", lineHeight: 1.25 }}>
           {line}
         </Typography>
       ))}
@@ -138,14 +162,8 @@ export function ReboundTracker({
   const stats = computeReboundStats(rebounds.events)
   const homeShort = shortTeamName(game.homeTeam)
   const awayShort = shortTeamName(game.awayTeam)
-  const homeAttacks: [string, string] = [
-    `${homeShort} hyökkäyspääty`,
-    `${awayShort} puolustuspääty`,
-  ]
-  const awayAttacks: [string, string] = [
-    `${homeShort} puolustuspääty`,
-    `${awayShort} hyökkäyspääty`,
-  ]
+  const homeAttacks: [string, string] = [`${homeShort} hyökkäys`, `${awayShort} puolustus`]
+  const awayAttacks: [string, string] = [`${homeShort} puolustus`, `${awayShort} hyökkäys`]
 
   const [claimOpen, setClaimOpen] = useState(false)
   const [takeOver, setTakeOver] = useState(false)
@@ -174,6 +192,11 @@ export function ReboundTracker({
   async function add(basket: ReboundSide, winner: ReboundSide) {
     if (!isCounter) return
     await run({ action: "add", basket, winner })
+  }
+
+  async function remove(basket: ReboundSide, winner: ReboundSide) {
+    if (!isCounter) return
+    await run({ action: "remove", basket, winner })
   }
 
   async function handleClaim() {
@@ -254,44 +277,28 @@ export function ReboundTracker({
         </Alert>
       )}
 
-      {isCounter && (
-        <Stack spacing={1}>
-          <Typography variant="body2" color="text.secondary">
-            Kun heitto ei mene koriin, merkitse kumpi joukkue saa pallon.
-          </Typography>
-          <Button
-            data-testid="rebound-undo"
-            variant="outlined"
-            startIcon={<UndoIcon />}
-            disabled={rebounds.events.length === 0}
-            onClick={() => void run({ action: "undo" })}
-            sx={{ alignSelf: "flex-start" }}
-          >
-            Peru viimeisin
-          </Button>
-        </Stack>
-      )}
-
       <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
         <BasketHeading lines={homeAttacks} />
         <Stack direction="row" spacing={1}>
-          <CountButton
+          <ReboundPad
             testId="rebound-btn-home-home"
-            name={game.homeTeam}
+            name={homeShort}
             count={stats.home.ownWon}
             ours={game.isHomeGame}
-            role="hyökkäyspääty"
-            disabled={!isCounter}
-            onClick={() => void add("home", "home")}
+            role="hyökkäys"
+            canEdit={isCounter}
+            onAdd={() => void add("home", "home")}
+            onRemove={() => void remove("home", "home")}
           />
-          <CountButton
+          <ReboundPad
             testId="rebound-btn-home-away"
-            name={game.awayTeam}
+            name={awayShort}
             count={stats.home.ownLost}
             ours={!game.isHomeGame}
-            role="puolustuspääty"
-            disabled={!isCounter}
-            onClick={() => void add("home", "away")}
+            role="puolustus"
+            canEdit={isCounter}
+            onAdd={() => void add("home", "away")}
+            onRemove={() => void remove("home", "away")}
           />
         </Stack>
       </Paper>
@@ -299,23 +306,25 @@ export function ReboundTracker({
       <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
         <BasketHeading lines={awayAttacks} />
         <Stack direction="row" spacing={1}>
-          <CountButton
+          <ReboundPad
             testId="rebound-btn-away-home"
-            name={game.homeTeam}
+            name={homeShort}
             count={stats.home.oppWon}
             ours={game.isHomeGame}
-            role="puolustuspääty"
-            disabled={!isCounter}
-            onClick={() => void add("away", "home")}
+            role="puolustus"
+            canEdit={isCounter}
+            onAdd={() => void add("away", "home")}
+            onRemove={() => void remove("away", "home")}
           />
-          <CountButton
+          <ReboundPad
             testId="rebound-btn-away-away"
-            name={game.awayTeam}
+            name={awayShort}
             count={stats.home.oppLost}
             ours={!game.isHomeGame}
-            role="hyökkäyspääty"
-            disabled={!isCounter}
-            onClick={() => void add("away", "away")}
+            role="hyökkäys"
+            canEdit={isCounter}
+            onAdd={() => void add("away", "away")}
+            onRemove={() => void remove("away", "away")}
           />
         </Stack>
       </Paper>

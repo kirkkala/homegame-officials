@@ -1,6 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getGameById, updateGameRebounds } from "@/lib/db"
-import { normalizeRebounds, requireCounterToken, toPublicRebounds } from "@/lib/rebounds"
+import {
+  normalizeRebounds,
+  removeLastMatchingRebound,
+  requireCounterToken,
+  toPublicRebounds,
+} from "@/lib/rebounds"
 import { reboundActionSchema, validate } from "@/lib/validation"
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -60,11 +65,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           },
         ],
       }
-    } else if (action.action === "undo") {
-      if (tracking.events.length === 0) {
-        return NextResponse.json({ error: "Ei peruttavaa merkintää" }, { status: 400 })
+    } else if (action.action === "remove") {
+      next = {
+        ...tracking,
+        events: removeLastMatchingRebound(tracking.events, action.basket, action.winner),
       }
-      next = { ...tracking, events: tracking.events.slice(0, -1) }
     }
 
     const updated = await updateGameRebounds(id, next)

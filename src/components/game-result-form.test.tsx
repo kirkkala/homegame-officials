@@ -6,6 +6,23 @@ import { GameResultForm } from "@/components/game-result-form"
 import { makeGame } from "@/test-utils"
 
 describe("GameResultForm", () => {
+  it("shortens slashed team names on the scoreboard", () => {
+    render(
+      <GameResultForm
+        game={makeGame({
+          homeTeam: "HNMKY/Stadi",
+          awayTeam: "ToPo",
+          result: { home: 10, away: 8 },
+        })}
+        onSave={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText("HNMKY")).toBeInTheDocument()
+    expect(screen.getByText("ToPo")).toBeInTheDocument()
+    expect(screen.queryByText("HNMKY/Stadi")).not.toBeInTheDocument()
+  })
+
   it("shows the score for watchers without live buttons", () => {
     render(<GameResultForm game={makeGame({ result: { home: 10, away: 8 } })} onSave={vi.fn()} />)
 

@@ -16,7 +16,7 @@ export type ReboundClientAction =
   | { action: "claim"; name: string; takeOver?: boolean }
   | { action: "release" }
   | { action: "add"; basket: "home" | "away"; winner: "home" | "away" }
-  | { action: "undo" }
+  | { action: "remove"; basket: "home" | "away"; winner: "home" | "away" }
 
 export function useGame(gameId: string) {
   const [token, setToken] = useState<string | null>(null)

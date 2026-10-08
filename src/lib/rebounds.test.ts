@@ -1,6 +1,7 @@
 import type { ReboundEvent } from "@/db/schema"
 import {
   computeReboundStats,
+  removeLastMatchingRebound,
   requireCounterToken,
   shortTeamName,
   toPublicRebounds,
@@ -73,5 +74,15 @@ describe("rebounds", () => {
     const tracking = { counterName: "Timo", counterToken: "abc", events: [] }
     expect(requireCounterToken(tracking, "abc")).toBeNull()
     expect(requireCounterToken(tracking, "nope")).toBe("Timo kirjaa tilastoa")
+  })
+
+  it("drops the last matching rebound only", () => {
+    const events = [
+      event("home", "home", "1"),
+      event("away", "away", "2"),
+      event("home", "home", "3"),
+    ]
+    expect(removeLastMatchingRebound(events, "home", "home").map((e) => e.id)).toEqual(["1", "2"])
+    expect(removeLastMatchingRebound(events, "away", "home")).toBe(events)
   })
 })

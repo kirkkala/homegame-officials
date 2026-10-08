@@ -60,7 +60,7 @@ function statsForSide(events: ReboundEvent[], side: ReboundSide): TeamReboundSta
   }
 }
 
-/** "HNMKY/Stadi" → "HNMKY". Used only on compact rebound labels. */
+/** "HNMKY/Stadi" → "HNMKY". Compact scoreboard and rebound pad labels. */
 export function shortTeamName(name: string): string {
   const slash = name.lastIndexOf("/")
   if (slash <= 0) return name
@@ -73,6 +73,19 @@ export function computeReboundStats(events: ReboundEvent[]) {
     home: statsForSide(events, "home"),
     away: statsForSide(events, "away"),
   }
+}
+
+export function removeLastMatchingRebound(
+  events: ReboundEvent[],
+  basket: ReboundSide,
+  winner: ReboundSide
+): ReboundEvent[] {
+  for (let i = events.length - 1; i >= 0; i--) {
+    if (events[i].basket === basket && events[i].winner === winner) {
+      return events.filter((_, index) => index !== i)
+    }
+  }
+  return events
 }
 
 export function requireCounterToken(

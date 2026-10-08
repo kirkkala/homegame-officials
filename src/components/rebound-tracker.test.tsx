@@ -54,9 +54,10 @@ describe("ReboundTracker", () => {
     await user.click(screen.getByTestId("rebound-btn-home-home"))
 
     expect(onAction).toHaveBeenCalledWith({ action: "add", basket: "home", winner: "home" })
+    expect(screen.getByTestId("rebound-btn-home-home-remove")).toBeDisabled()
   })
 
-  it("undoes the last rebound", async () => {
+  it("removes one from the matching rebound counter", async () => {
     const user = userEvent.setup()
     const onAction = vi.fn().mockResolvedValue({})
     const event = {
@@ -76,9 +77,8 @@ describe("ReboundTracker", () => {
       />
     )
 
-    expect(screen.getByTestId("rebound-undo")).toHaveTextContent("Peru viimeisin")
-    await user.click(screen.getByTestId("rebound-undo"))
-    expect(onAction).toHaveBeenCalledWith({ action: "undo" })
+    await user.click(screen.getByTestId("rebound-btn-home-away-remove"))
+    expect(onAction).toHaveBeenCalledWith({ action: "remove", basket: "home", winner: "away" })
   })
 
   it("shows a read-only view when someone else is counting", () => {
@@ -96,6 +96,7 @@ describe("ReboundTracker", () => {
     expect(screen.getByText("Aino kirjaa tilastoa")).toBeInTheDocument()
     expect(screen.getByTestId("rebound-takeover")).toBeInTheDocument()
     expect(screen.getByTestId("rebound-btn-home-home")).toBeDisabled()
+    expect(screen.queryByTestId("rebound-btn-home-home-remove")).not.toBeInTheDocument()
   })
 
   it("shows team basket labels and totals", () => {
@@ -127,10 +128,10 @@ describe("ReboundTracker", () => {
       />
     )
 
-    expect(screen.getByText("Stadi hyökkäyspääty")).toBeInTheDocument()
-    expect(screen.getByText("KlaNMKY puolustuspääty")).toBeInTheDocument()
-    expect(screen.getByText("Stadi puolustuspääty")).toBeInTheDocument()
-    expect(screen.getByText("KlaNMKY hyökkäyspääty")).toBeInTheDocument()
+    expect(screen.getByText("Stadi hyökkäys")).toBeInTheDocument()
+    expect(screen.getByText("KlaNMKY puolustus")).toBeInTheDocument()
+    expect(screen.getByText("Stadi puolustus")).toBeInTheDocument()
+    expect(screen.getByText("KlaNMKY hyökkäys")).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Hyökkäys" })).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Puolustus" })).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Yhteensä" })).toBeInTheDocument()
@@ -151,9 +152,9 @@ describe("ReboundTracker", () => {
     )
 
     expect(screen.getByTestId("rebound-btn-home-home")).toHaveTextContent("Helmi Basket")
-    expect(screen.getByTestId("rebound-btn-home-away")).toHaveTextContent("HNMKY/Stadi")
-    expect(screen.getByText("Helmi Basket hyökkäyspääty")).toBeInTheDocument()
-    expect(screen.getByText("HNMKY puolustuspääty")).toBeInTheDocument()
+    expect(screen.getByTestId("rebound-btn-home-away")).toHaveTextContent("HNMKY")
+    expect(screen.getByText("Helmi Basket hyökkäys")).toBeInTheDocument()
+    expect(screen.getByText("HNMKY puolustus")).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Hyökkäys" })).toBeInTheDocument()
   })
 
@@ -170,6 +171,8 @@ describe("ReboundTracker", () => {
       />
     )
 
+    expect(screen.getByTestId("rebound-btn-home-home")).toHaveTextContent("Tapiolan Honka")
+    expect(screen.getByTestId("rebound-btn-home-away")).toHaveTextContent("Helsingin NMKY")
     expect(screen.getByRole("cell", { name: "Tapiolan Honka/Gold" })).toBeInTheDocument()
     expect(screen.getByRole("cell", { name: "Helsingin NMKY/Stadi" })).toBeInTheDocument()
   })
