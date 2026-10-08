@@ -182,9 +182,9 @@ export async function getGames(teamId?: string) {
   return db.select().from(schema.games).orderBy(schema.games.date, schema.games.time)
 }
 
-export async function getGameById(id: string) {
+export async function getGameById(id: string): Promise<schema.Game | null> {
   const result = await db.select().from(schema.games).where(eq(schema.games.id, id))
-  return result[0] || null
+  return result[0] ?? null
 }
 
 export async function createGames(games: Omit<schema.NewGame, "createdAt">[], teamId: string) {
