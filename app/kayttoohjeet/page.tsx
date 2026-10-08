@@ -157,16 +157,11 @@ export default function KayttoohjeetPage() {
               </Typography>
             </Stack>
             <Typography>
-              Ottelulistasta avautuu pelisivu &quot;Tilastot&quot;-linkistä. Tulos näkyy heti
-              ylhäällä, joten sitä voi seurata myös toisella laitteella. Paina &quot;Käynnistä
-              tilastointi&quot; ja syötä nimesi – sen jälkeen voit merkitä sekä koreja (+1, +2, +3)
-              että levypalloja samasta näkymästä. Molemmat pisteluvut voi myös syöttää kerralla
-              kynä-ikonista.
-            </Typography>
-            <Typography>
-              Tilastointi lukittuu sinulle, jotta kaksi ihmistä ei merkitse samoja palloja.
-              Levypallot merkitään kummankin korin osalta – ei pelaajakohtaisesti, vaan
-              joukkueittain. Väärä merkkaus perutaan laskurin alla olevasta peruutusikonista.
+              Ottelulistasta aukeaa pelisivu &quot;Tilastot&quot;-linkistä. Tilastoinnin voi
+              käynnistää painamalla &quot;Käynnistä tilastointi&quot; ja syötä nimesi – sen jälkeen
+              voit merkitä sekä koreja (+1, +2, +3) että levypalloja samasta näkymästä. Tuloksen
+              pisteluvut voi syöttää myös kerralla kynä-ikonista esimerkiksi pelin päättymisen
+              jälkeen. Tiedot jäävät talteen jälkikäteen tarkasteltavaksi.
             </Typography>
             <Divider />
             <Typography component="h2" variant="h5">

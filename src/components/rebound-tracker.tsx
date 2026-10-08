@@ -117,7 +117,11 @@ function BasketHeading({ lines }: { lines: [string, string] }) {
   return (
     <Stack spacing={0.25} sx={{ mb: 1.25 }}>
       {lines.map((line) => (
-        <Typography key={line} variant="subtitle1" sx={{ fontWeight: 700, fontSize: "0.875rem", lineHeight: 1.25 }}>
+        <Typography
+          key={line}
+          variant="subtitle1"
+          sx={{ fontWeight: 700, fontSize: "0.875rem", lineHeight: 1.25 }}
+        >
           {line}
         </Typography>
       ))}
