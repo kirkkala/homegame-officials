@@ -32,7 +32,7 @@ describe("GET /api/games/[id]", () => {
   })
 
   it("returns 404 when the game is missing", async () => {
-    vi.mocked(getGameById).mockResolvedValue(null)
+    vi.mocked(getGameById).mockResolvedValue(null as never)
     const res = await GET({ headers: new Headers() } as NextRequest, { params })
     expect(res.status).toBe(404)
   })

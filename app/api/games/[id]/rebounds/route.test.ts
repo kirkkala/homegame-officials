@@ -19,6 +19,7 @@ const game = {
   location: "Halli 1",
   officials: { poytakirja: null, kello: null },
   rebounds: { counterName: null, counterToken: null, events: [] },
+  result: null,
   createdAt: new Date("2026-01-01"),
 }
 

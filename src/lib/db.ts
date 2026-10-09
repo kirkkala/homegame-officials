@@ -290,22 +290,28 @@ export async function updateGame(
   return result[0]
 }
 
-export async function updateGameResult(id: string, result: schema.GameResult) {
+export async function updateGameResult(
+  id: string,
+  result: schema.GameResult
+): Promise<schema.Game | null> {
   const updated = await db
     .update(schema.games)
     .set({ result })
     .where(eq(schema.games.id, id))
     .returning()
-  return updated[0] || null
+  return updated[0] ?? null
 }
 
-export async function updateGameRebounds(id: string, rebounds: schema.ReboundTracking) {
-  const result = await db
+export async function updateGameRebounds(
+  id: string,
+  rebounds: schema.ReboundTracking
+): Promise<schema.Game | null> {
+  const updated = await db
     .update(schema.games)
     .set({ rebounds })
     .where(eq(schema.games.id, id))
     .returning()
-  return result[0] || null
+  return updated[0] ?? null
 }
 
 export async function deleteGame(id: string) {
