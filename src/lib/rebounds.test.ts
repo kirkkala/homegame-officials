@@ -1,22 +1,19 @@
-import type { ReboundEvent } from "@/db/schema"
+import { EMPTY_REBOUND_TRACKING } from "@/db/schema"
 import {
-  computeReboundStats,
-  removeLastMatchingRebound,
+  adjustReboundCount,
+  formatReboundUpdatedAt,
+  hasReboundCounts,
+  normalizeRebounds,
   requireCounterToken,
   shortTeamName,
   toPublicRebounds,
 } from "@/lib/rebounds"
 
-const event = (
-  basket: ReboundEvent["basket"],
-  winner: ReboundEvent["winner"],
-  id: string
-): ReboundEvent => ({
-  id,
-  basket,
-  winner,
-  createdAt: "2026-10-07T18:00:00.000Z",
-})
+const tracking = {
+  ...EMPTY_REBOUND_TRACKING,
+  counterName: "Timo",
+  counterToken: "secret",
+}
 
 describe("rebounds", () => {
   it("shortens a slashed team name by dropping the last part", () => {
@@ -25,64 +22,66 @@ describe("rebounds", () => {
     expect(shortTeamName("Helmi Basket")).toBe("Helmi Basket")
   })
 
-  it("counts own and opponent basket won/lost for both teams", () => {
-    const events = [
-      event("home", "home", "1"),
-      event("home", "home", "2"),
-      event("home", "away", "3"),
-      event("away", "home", "4"),
-      event("away", "away", "5"),
-      event("away", "away", "6"),
-    ]
-    expect(computeReboundStats(events).home).toEqual({
-      ownWon: 2,
-      ownLost: 1,
-      oppWon: 1,
-      oppLost: 2,
-      total: 3,
+  it("folds a legacy event log into the four counters", () => {
+    expect(
+      normalizeRebounds({
+        counterName: "Timo",
+        counterToken: "abc",
+        events: [
+          { basket: "home", winner: "home" },
+          { basket: "home", winner: "home" },
+          { basket: "home", winner: "away" },
+          { basket: "away", winner: "home" },
+          { basket: "away", winner: "away" },
+          { basket: "away", winner: "away" },
+        ],
+      })
+    ).toMatchObject({
+      homeOff: 2,
+      homeDef: 1,
+      awayOff: 2,
+      awayDef: 1,
+      counterName: "Timo",
     })
-  })
-
-  it("treats the two teams as complements of each other", () => {
-    const events = [
-      event("home", "home", "1"),
-      event("away", "away", "2"),
-      event("home", "away", "3"),
-    ]
-    const stats = computeReboundStats(events)
-    expect(stats.home.ownWon).toBe(stats.away.oppLost)
-    expect(stats.home.ownLost).toBe(stats.away.oppWon)
-    expect(stats.home.oppWon).toBe(stats.away.ownLost)
-    expect(stats.home.oppLost).toBe(stats.away.ownWon)
   })
 
   it("strips the counter token from public rebounds", () => {
-    expect(
-      toPublicRebounds({ counterName: "Timo", counterToken: "secret", events: [] }, "other")
-    ).toEqual({
+    expect(toPublicRebounds(tracking, "other")).toEqual({
+      homeOff: 0,
+      homeDef: 0,
+      awayOff: 0,
+      awayDef: 0,
       counterName: "Timo",
-      events: [],
+      updatedAt: null,
+      counting: true,
       isCounter: false,
     })
-    expect(
-      toPublicRebounds({ counterName: "Timo", counterToken: "secret", events: [] }, "secret")
-        .isCounter
-    ).toBe(true)
+    expect(toPublicRebounds(tracking, "secret").isCounter).toBe(true)
+    expect(JSON.stringify(toPublicRebounds(tracking, "secret"))).not.toContain("secret")
   })
 
   it("requires the matching counter token", () => {
-    const tracking = { counterName: "Timo", counterToken: "abc", events: [] }
-    expect(requireCounterToken(tracking, "abc")).toBeNull()
+    expect(requireCounterToken(tracking, "secret")).toBeNull()
     expect(requireCounterToken(tracking, "nope")).toBe("Timo kirjaa tilastoa")
   })
 
-  it("drops the last matching rebound only", () => {
-    const events = [
-      event("home", "home", "1"),
-      event("away", "away", "2"),
-      event("home", "home", "3"),
-    ]
-    expect(removeLastMatchingRebound(events, "home", "home").map((e) => e.id)).toEqual(["1", "2"])
-    expect(removeLastMatchingRebound(events, "away", "home")).toBe(events)
+  it("increments and decrements only the matching counter", () => {
+    const added = adjustReboundCount(tracking, "home", "home", 1)
+    expect(added.homeOff).toBe(1)
+    expect(added.awayOff).toBe(0)
+    expect(added.updatedAt).toEqual(expect.any(String))
+
+    const removed = adjustReboundCount(added, "home", "home", -1)
+    expect(removed.homeOff).toBe(0)
+    expect(adjustReboundCount(tracking, "away", "home", -1).homeDef).toBe(0)
+  })
+
+  it("detects whether any rebounds were counted", () => {
+    expect(hasReboundCounts(tracking)).toBe(false)
+    expect(hasReboundCounts({ ...tracking, homeDef: 1 })).toBe(true)
+  })
+
+  it("formats the blob timestamp in Finnish", () => {
+    expect(formatReboundUpdatedAt("2026-10-09T05:16:00.000Z")).toMatch(/9\.10\.2026 klo /)
   })
 })

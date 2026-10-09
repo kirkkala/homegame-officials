@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server"
+import { EMPTY_REBOUND_TRACKING } from "@/db/schema"
 import { getGameById, updateGameRebounds } from "@/lib/db"
 import { POST } from "./route"
 
@@ -18,7 +19,7 @@ const game = {
   time: "18:30",
   location: "Halli 1",
   officials: { poytakirja: null, kello: null },
-  rebounds: { counterName: null, counterToken: null, events: [] },
+  rebounds: { ...EMPTY_REBOUND_TRACKING },
   result: null,
   createdAt: new Date("2026-01-01"),
 }
@@ -61,7 +62,7 @@ describe("POST /api/games/[id]/rebounds", () => {
   it("rejects a second counter unless takeOver is set", async () => {
     vi.mocked(getGameById).mockResolvedValue({
       ...game,
-      rebounds: { counterName: "Timo", counterToken: "token-1", events: [] },
+      rebounds: { ...EMPTY_REBOUND_TRACKING, counterName: "Timo", counterToken: "token-1" },
     } as never)
 
     const denied = await POST(jsonRequest({ action: "claim", name: "Aino" }), { params })
@@ -80,7 +81,7 @@ describe("POST /api/games/[id]/rebounds", () => {
   it("adds a rebound when the token matches", async () => {
     vi.mocked(getGameById).mockResolvedValue({
       ...game,
-      rebounds: { counterName: "Timo", counterToken: "token-1", events: [] },
+      rebounds: { ...EMPTY_REBOUND_TRACKING, counterName: "Timo", counterToken: "token-1" },
     } as never)
 
     const res = await POST(
@@ -89,15 +90,16 @@ describe("POST /api/games/[id]/rebounds", () => {
     )
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.events).toHaveLength(1)
-    expect(body.events[0]).toMatchObject({ basket: "home", winner: "away" })
+    expect(body.awayDef).toBe(1)
+    expect(body.homeOff).toBe(0)
+    expect(body).not.toHaveProperty("events")
     expect(body).not.toHaveProperty("token")
   })
 
   it("rejects add without the counter token", async () => {
     vi.mocked(getGameById).mockResolvedValue({
       ...game,
-      rebounds: { counterName: "Timo", counterToken: "token-1", events: [] },
+      rebounds: { ...EMPTY_REBOUND_TRACKING, counterName: "Timo", counterToken: "token-1" },
     } as never)
 
     const res = await POST(
@@ -107,16 +109,15 @@ describe("POST /api/games/[id]/rebounds", () => {
     expect(res.status).toBe(409)
   })
 
-  it("removes the last matching rebound, not the latest event", async () => {
+  it("decrements only the matching rebound counter", async () => {
     vi.mocked(getGameById).mockResolvedValue({
       ...game,
       rebounds: {
+        ...EMPTY_REBOUND_TRACKING,
         counterName: "Timo",
         counterToken: "token-1",
-        events: [
-          { id: "e1", basket: "home", winner: "home", createdAt: "2026-10-07T18:00:00.000Z" },
-          { id: "e2", basket: "away", winner: "away", createdAt: "2026-10-07T18:01:00.000Z" },
-        ],
+        homeOff: 1,
+        awayOff: 1,
       },
     } as never)
 
@@ -125,8 +126,20 @@ describe("POST /api/games/[id]/rebounds", () => {
       { params }
     )
     const body = await res.json()
-    expect(body.events).toEqual([
-      { id: "e2", basket: "away", winner: "away", createdAt: "2026-10-07T18:01:00.000Z" },
-    ])
+    expect(body.homeOff).toBe(0)
+    expect(body.awayOff).toBe(1)
+  })
+
+  it("keeps the counter name after release", async () => {
+    vi.mocked(getGameById).mockResolvedValue({
+      ...game,
+      rebounds: { ...EMPTY_REBOUND_TRACKING, counterName: "Timo", counterToken: "token-1" },
+    } as never)
+
+    const res = await POST(jsonRequest({ action: "release", token: "token-1" }), { params })
+    const body = await res.json()
+    expect(body.counterName).toBe("Timo")
+    expect(body.counting).toBe(false)
+    expect(body.isCounter).toBe(false)
   })
 })

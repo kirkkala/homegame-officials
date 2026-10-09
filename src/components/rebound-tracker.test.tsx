@@ -3,12 +3,25 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { ReboundTracker } from "@/components/rebound-tracker"
+import type { PublicReboundTracking } from "@/lib/rebounds"
 import { makeGame } from "@/test-utils"
+
+const emptyRebounds = (overrides: Partial<PublicReboundTracking> = {}): PublicReboundTracking => ({
+  homeOff: 0,
+  homeDef: 0,
+  awayOff: 0,
+  awayDef: 0,
+  counterName: null,
+  updatedAt: null,
+  counting: false,
+  isCounter: false,
+  ...overrides,
+})
 
 const baseGame = makeGame({
   homeTeam: "Stadi",
   awayTeam: "KlaNMKY",
-  rebounds: { counterName: null, events: [], isCounter: false },
+  rebounds: emptyRebounds(),
 })
 
 describe("ReboundTracker", () => {
@@ -44,7 +57,7 @@ describe("ReboundTracker", () => {
       <ReboundTracker
         game={{
           ...baseGame,
-          rebounds: { counterName: "Timo", events: [], isCounter: true },
+          rebounds: emptyRebounds({ counterName: "Timo", counting: true, isCounter: true }),
         }}
         isCounter
         onAction={onAction}
@@ -60,17 +73,16 @@ describe("ReboundTracker", () => {
   it("removes one from the matching rebound counter", async () => {
     const user = userEvent.setup()
     const onAction = vi.fn().mockResolvedValue({})
-    const event = {
-      id: "e1",
-      basket: "home" as const,
-      winner: "away" as const,
-      createdAt: "2026-10-07T18:00:00.000Z",
-    }
     render(
       <ReboundTracker
         game={{
           ...baseGame,
-          rebounds: { counterName: "Timo", events: [event], isCounter: true },
+          rebounds: emptyRebounds({
+            counterName: "Timo",
+            counting: true,
+            isCounter: true,
+            awayDef: 1,
+          }),
         }}
         isCounter
         onAction={onAction}
@@ -86,7 +98,7 @@ describe("ReboundTracker", () => {
       <ReboundTracker
         game={{
           ...baseGame,
-          rebounds: { counterName: "Aino", events: [], isCounter: false },
+          rebounds: emptyRebounds({ counterName: "Aino", counting: true }),
         }}
         isCounter={false}
         onAction={vi.fn()}
@@ -99,29 +111,40 @@ describe("ReboundTracker", () => {
     expect(screen.queryByTestId("rebound-btn-home-home-remove")).not.toBeInTheDocument()
   })
 
+  it("keeps the recorder name after counting has stopped", () => {
+    render(
+      <ReboundTracker
+        game={{
+          ...baseGame,
+          rebounds: emptyRebounds({
+            counterName: "Timo",
+            updatedAt: "2026-10-09T05:16:00.000Z",
+            homeOff: 2,
+          }),
+        }}
+        isCounter={false}
+        onAction={vi.fn()}
+      />
+    )
+
+    expect(screen.getByTestId("rebound-claim")).toBeInTheDocument()
+    expect(screen.queryByText("Timo kirjaa tilastoa")).not.toBeInTheDocument()
+    expect(screen.getByTestId("rebound-meta")).toHaveTextContent("Tilastoinut Timo")
+    expect(screen.getByTestId("rebound-meta")).toHaveTextContent("9.10.2026")
+  })
+
   it("shows team basket labels and totals", () => {
     render(
       <ReboundTracker
         game={{
           ...baseGame,
-          rebounds: {
+          rebounds: emptyRebounds({
             counterName: "Timo",
-            events: [
-              {
-                id: "e1",
-                basket: "home",
-                winner: "home",
-                createdAt: "2026-10-07T18:00:00.000Z",
-              },
-              {
-                id: "e2",
-                basket: "away",
-                winner: "away",
-                createdAt: "2026-10-07T18:01:00.000Z",
-              },
-            ],
+            counting: true,
             isCounter: true,
-          },
+            homeOff: 1,
+            awayOff: 1,
+          }),
         }}
         isCounter
         onAction={vi.fn()}
@@ -144,7 +167,7 @@ describe("ReboundTracker", () => {
           homeTeam: "Helmi Basket",
           awayTeam: "HNMKY/Stadi",
           isHomeGame: false,
-          rebounds: { counterName: "Timo", events: [], isCounter: true },
+          rebounds: emptyRebounds({ counterName: "Timo", counting: true, isCounter: true }),
         })}
         isCounter
         onAction={vi.fn()}
@@ -164,7 +187,7 @@ describe("ReboundTracker", () => {
         game={makeGame({
           homeTeam: "Tapiolan Honka/Gold",
           awayTeam: "Helsingin NMKY/Stadi",
-          rebounds: { counterName: "Timo", events: [], isCounter: true },
+          rebounds: emptyRebounds({ counterName: "Timo", counting: true, isCounter: true }),
         })}
         isCounter
         onAction={vi.fn()}

@@ -63,25 +63,24 @@ export const teamManagers = pgTable(
 // Rebound tracking (team-level, not per player)
 export type ReboundSide = "home" | "away"
 
-export type ReboundEvent = {
-  id: string
-  /** Whose basket: the team that just missed. */
-  basket: ReboundSide
-  /** Who secured the rebound. */
-  winner: ReboundSide
-  createdAt: string
-}
-
 export type ReboundTracking = {
+  homeOff: number
+  homeDef: number
+  awayOff: number
+  awayDef: number
   counterName: string | null
   counterToken: string | null
-  events: ReboundEvent[]
+  updatedAt: string | null
 }
 
 export const EMPTY_REBOUND_TRACKING: ReboundTracking = {
+  homeOff: 0,
+  homeDef: 0,
+  awayOff: 0,
+  awayDef: 0,
   counterName: null,
   counterToken: null,
-  events: [],
+  updatedAt: null,
 }
 
 export type GameResult = {

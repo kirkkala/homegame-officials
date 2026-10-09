@@ -64,8 +64,13 @@ export function useGame(gameId: string) {
         return {
           ...base,
           rebounds: {
+            homeOff: result.homeOff,
+            homeDef: result.homeDef,
+            awayOff: result.awayOff,
+            awayDef: result.awayDef,
             counterName: result.counterName,
-            events: result.events,
+            updatedAt: result.updatedAt,
+            counting: result.counting,
             isCounter: Boolean(nextToken),
           },
         }

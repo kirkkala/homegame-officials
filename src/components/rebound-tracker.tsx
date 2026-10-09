@@ -25,7 +25,7 @@ import { GameResultForm } from "@/components/game-result-form"
 import type { ReboundSide } from "@/db/schema"
 import type { ReboundClientAction } from "@/hooks/use-rebounds"
 import { getSavedCounterName, setSavedCounterName } from "@/lib/rebound-session"
-import { computeReboundStats, shortTeamName } from "@/lib/rebounds"
+import { formatReboundUpdatedAt, shortTeamName } from "@/lib/rebounds"
 import type { Game, GameResult } from "@/lib/storage"
 
 function ReboundPad({
@@ -162,8 +162,16 @@ export function ReboundTracker({
   onAction: (action: ReboundClientAction) => Promise<unknown>
   onSaveResult?: (result: GameResult) => Promise<unknown>
 }) {
-  const rebounds = game.rebounds ?? { counterName: null, events: [], isCounter: false }
-  const stats = computeReboundStats(rebounds.events)
+  const rebounds = game.rebounds ?? {
+    homeOff: 0,
+    homeDef: 0,
+    awayOff: 0,
+    awayDef: 0,
+    counterName: null,
+    updatedAt: null,
+    counting: false,
+    isCounter: false,
+  }
   const homeShort = shortTeamName(game.homeTeam)
   const awayShort = shortTeamName(game.awayTeam)
   const homeAttacks: [string, string] = [`${homeShort} hyökkäys`, `${awayShort} puolustus`]
@@ -230,10 +238,10 @@ export function ReboundTracker({
         <Typography variant="h5" component="h2">
           Tilastot
         </Typography>
-        {rebounds.counterName && (
+        {rebounds.counting && rebounds.counterName && (
           <Chip size="small" label={`${rebounds.counterName} kirjaa tilastoa`} />
         )}
-        {!isCounter && !rebounds.counterName && (
+        {!isCounter && !rebounds.counting && (
           <Button
             data-testid="rebound-claim"
             variant="contained"
@@ -246,7 +254,7 @@ export function ReboundTracker({
             Käynnistä tilastointi
           </Button>
         )}
-        {!isCounter && rebounds.counterName && (
+        {!isCounter && rebounds.counting && (
           <Button
             data-testid="rebound-takeover"
             variant="outlined"
@@ -287,7 +295,7 @@ export function ReboundTracker({
           <ReboundPad
             testId="rebound-btn-home-home"
             name={homeShort}
-            count={stats.home.ownWon}
+            count={rebounds.homeOff}
             ours={game.isHomeGame}
             role="hyökkäys"
             canEdit={isCounter}
@@ -297,7 +305,7 @@ export function ReboundTracker({
           <ReboundPad
             testId="rebound-btn-home-away"
             name={awayShort}
-            count={stats.home.ownLost}
+            count={rebounds.awayDef}
             ours={!game.isHomeGame}
             role="puolustus"
             canEdit={isCounter}
@@ -313,7 +321,7 @@ export function ReboundTracker({
           <ReboundPad
             testId="rebound-btn-away-home"
             name={homeShort}
-            count={stats.home.oppWon}
+            count={rebounds.homeDef}
             ours={game.isHomeGame}
             role="puolustus"
             canEdit={isCounter}
@@ -323,7 +331,7 @@ export function ReboundTracker({
           <ReboundPad
             testId="rebound-btn-away-away"
             name={awayShort}
-            count={stats.home.oppLost}
+            count={rebounds.awayOff}
             ours={!game.isHomeGame}
             role="hyökkäys"
             canEdit={isCounter}
@@ -356,13 +364,13 @@ export function ReboundTracker({
                 {game.homeTeam}
               </TableCell>
               <TableCell align="right" sx={countSx}>
-                {stats.home.ownWon}
+                {rebounds.homeOff}
               </TableCell>
               <TableCell align="right" sx={countSx}>
-                {stats.home.oppWon}
+                {rebounds.homeDef}
               </TableCell>
               <TableCell align="right" sx={{ ...countSx, fontWeight: 700 }}>
-                {stats.home.total}
+                {rebounds.homeOff + rebounds.homeDef}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -370,17 +378,32 @@ export function ReboundTracker({
                 {game.awayTeam}
               </TableCell>
               <TableCell align="right" sx={countSx}>
-                {stats.away.ownWon}
+                {rebounds.awayOff}
               </TableCell>
               <TableCell align="right" sx={countSx}>
-                {stats.away.oppWon}
+                {rebounds.awayDef}
               </TableCell>
               <TableCell align="right" sx={{ ...countSx, fontWeight: 700 }}>
-                {stats.away.total}
+                {rebounds.awayOff + rebounds.awayDef}
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
+        {(rebounds.counterName || rebounds.updatedAt) && (
+          <Typography
+            data-testid="rebound-meta"
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mt: 1.25 }}
+          >
+            {[
+              rebounds.counterName ? `Tilastoinut ${rebounds.counterName}` : null,
+              rebounds.updatedAt ? formatReboundUpdatedAt(rebounds.updatedAt) : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </Typography>
+        )}
       </Paper>
 
       <Dialog open={claimOpen} onClose={() => setClaimOpen(false)} fullWidth maxWidth="xs">

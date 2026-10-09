@@ -18,9 +18,13 @@ const game = {
   awayTeam: "KlaNMKY",
   isHomeGame: true,
   rebounds: {
+    homeOff: 0,
+    homeDef: 0,
+    awayOff: 0,
+    awayDef: 0,
     counterName: "Timo",
     counterToken: "secret-token",
-    events: [],
+    updatedAt: null,
   },
 }
 
@@ -46,8 +50,13 @@ describe("GET /api/games/[id]", () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.rebounds).toEqual({
+      homeOff: 0,
+      homeDef: 0,
+      awayOff: 0,
+      awayDef: 0,
       counterName: "Timo",
-      events: [],
+      updatedAt: null,
+      counting: true,
       isCounter: true,
     })
     expect(JSON.stringify(body)).not.toContain("secret-token")

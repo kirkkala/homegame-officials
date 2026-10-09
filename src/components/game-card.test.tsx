@@ -89,9 +89,13 @@ describe("GameCard", () => {
     renderGameCard({
       rebounds: {
         counterName: "Timo",
-        events: [
-          { id: "e1", basket: "home", winner: "home", createdAt: "2026-10-07T18:00:00.000Z" },
-        ],
+        homeOff: 1,
+        homeDef: 0,
+        awayOff: 0,
+        awayDef: 0,
+        updatedAt: "2026-10-09T05:16:00.000Z",
+        counting: false,
+        isCounter: false,
       },
     })
 

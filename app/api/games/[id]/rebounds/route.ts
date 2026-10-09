@@ -1,10 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getGameById, updateGameRebounds } from "@/lib/db"
 import {
+  adjustReboundCount,
   normalizeRebounds,
-  removeLastMatchingRebound,
   requireCounterToken,
   toPublicRebounds,
+  touchRebounds,
 } from "@/lib/rebounds"
 import { reboundActionSchema, validate } from "@/lib/validation"
 
@@ -33,11 +34,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         )
       }
       const token = sameCounter && action.token ? action.token : crypto.randomUUID()
-      const updated = await updateGameRebounds(id, {
-        ...tracking,
-        counterName: action.name,
-        counterToken: token,
-      })
+      const updated = await updateGameRebounds(
+        id,
+        touchRebounds(tracking, { counterName: action.name, counterToken: token })
+      )
       return NextResponse.json({
         ...toPublicRebounds(updated?.rebounds ?? tracking, token),
         token,
@@ -51,25 +51,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     let next = tracking
     if (action.action === "release") {
-      next = { ...tracking, counterName: null, counterToken: null }
+      next = touchRebounds(tracking, { counterToken: null })
     } else if (action.action === "add") {
-      next = {
-        ...tracking,
-        events: [
-          ...tracking.events,
-          {
-            id: crypto.randomUUID(),
-            basket: action.basket,
-            winner: action.winner,
-            createdAt: new Date().toISOString(),
-          },
-        ],
-      }
+      next = adjustReboundCount(tracking, action.basket, action.winner, 1)
     } else if (action.action === "remove") {
-      next = {
-        ...tracking,
-        events: removeLastMatchingRebound(tracking.events, action.basket, action.winner),
-      }
+      next = adjustReboundCount(tracking, action.basket, action.winner, -1)
     }
 
     const updated = await updateGameRebounds(id, next)

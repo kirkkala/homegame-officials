@@ -3,6 +3,7 @@
 import { Place as PlaceIcon, SportsBasketball as SportsBasketballIcon } from "@mui/icons-material"
 import { Box, Card, CardContent, Chip, Link, Stack, Typography } from "@mui/material"
 import NextLink from "next/link"
+import { hasReboundCounts } from "@/lib/rebounds"
 import type { Game } from "@/lib/storage"
 import { formatDate, formatGameResult } from "@/lib/utils"
 import { OfficialAssigner } from "./official-assigner"
@@ -20,7 +21,7 @@ export function GameCard({
 }) {
   const gameName = `${game.homeTeam} vs. ${game.awayTeam}`
   const reboundHref = `/ottelu/${game.id}?team=${encodeURIComponent(game.teamId)}`
-  const hasReboundStats = (game.rebounds?.events.length ?? 0) > 0
+  const hasReboundStats = hasReboundCounts(game.rebounds)
   return (
     <Card variant="outlined">
       <CardContent

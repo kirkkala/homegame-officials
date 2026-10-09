@@ -26,7 +26,6 @@ export type {
   OfficialAssignment,
   Officials,
   Player,
-  ReboundEvent,
   ReboundSide,
   ReboundTracking,
   Team,
