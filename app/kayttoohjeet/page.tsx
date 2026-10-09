@@ -6,6 +6,7 @@ import {
   HomeOutlined as HomeOutlinedIcon,
   MedicalServicesOutlined as MedicalServicesIcon,
   PersonAdd as PersonAddIcon,
+  SportsBasketball as SportsBasketballIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material"
 import {
@@ -58,8 +59,7 @@ const steps = [
     description: `
       Vihreä = vahvistettu, oranssi = odottaa vahvistusta. Jos vaihdat
       nimeämistä, sovi siitä etukäteen. Menneet pelit löytyvät valitsemalla
-      "Näytä menneet pelit" listauksessa. Mikäli joukkueenjohtaja on lisännyt
-      myös vieraspelit ne saa piilotettua listauksesta.
+      "Näytä pelatut pelit" listauksessa.
     `,
   },
 ]
@@ -147,6 +147,20 @@ export default function KayttoohjeetPage() {
               laukku tulee mukaasi pelistä, lisää nimesi seurantaan painamalla "Ota laukku haltuun"
               tai "Vaihda haltija" mikäli laukku on merkitty edelliselle haltijalle. Näin koko
               joukkue näkee tilanteen helposti ilman ylimääräisiä WhatsApp-kyselyitä.
+            </Typography>
+            <Divider />
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+              <SportsBasketballIcon color="primary" />
+              <Typography component="h3" variant="h5">
+                Tilastointi
+              </Typography>
+            </Stack>
+            <Typography>
+              Ottelulistasta aukeaa pelisivu &quot;Tilastot&quot;-linkistä. Tilastoinnin voi
+              käynnistää painamalla &quot;Käynnistä tilastointi&quot; ja syötä nimesi – sen jälkeen
+              voit merkitä sekä koreja (+1, +2, +3) että levypalloja samasta näkymästä. Tuloksen
+              pisteluvut voi syöttää myös kerralla kynä-ikonista esimerkiksi pelin päättymisen
+              jälkeen. Tiedot jäävät talteen jälkikäteen tarkasteltavaksi.
             </Typography>
             <Divider />
             <Typography component="h2" variant="h5">

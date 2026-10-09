@@ -70,6 +70,42 @@ describe("GameCard", () => {
     expect(screen.getByTestId("official-player-p2")).toBeInTheDocument()
   })
 
+  it("links to the rebound page with a Tilastot text link", () => {
+    renderGameCard()
+
+    const link = screen.getByTestId("game-link-game-1")
+    expect(link).toHaveAttribute("href", "/ottelu/game-1?team=team-1")
+    expect(link).toHaveTextContent("Tilastot")
+    expect(link).toHaveAccessibleName("Tilastot")
+    expect(screen.getByTestId("official-button-poytakirja")).toBeInTheDocument()
+  })
+
+  it("shows the final score on the listing when a result is saved", () => {
+    renderGameCard({ result: { home: 64, away: 58 } })
+    expect(screen.getByTestId("game-score-game-1")).toHaveTextContent("64–58")
+  })
+
+  it("marks the link when rebound stats exist, without a count or counter name", () => {
+    renderGameCard({
+      rebounds: {
+        counterName: "Timo",
+        homeOff: 1,
+        homeDef: 0,
+        awayOff: 0,
+        awayDef: 0,
+        updatedAt: "2026-10-09T05:16:00.000Z",
+        counting: false,
+        isCounter: false,
+      },
+    })
+
+    const link = screen.getByTestId("game-link-game-1")
+    expect(link).toHaveTextContent("Tilastot")
+    expect(link).toHaveAccessibleName("Tilastot kirjattu")
+    expect(link).not.toHaveTextContent("1")
+    expect(screen.queryByText("Timo")).not.toBeInTheDocument()
+  })
+
   it("renders all three official role buttons when the shot clock is enabled", () => {
     renderGameCard({}, { showShotClock: true })
 

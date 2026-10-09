@@ -1,6 +1,7 @@
 // API-based storage - data is stored in Postgres via API routes
 
 import { parseJsonResponse } from "@/lib/api"
+import type { PublicReboundTracking } from "@/lib/rebounds"
 
 export type OfficialAssignment = {
   playerName: string // Player whose turn it is
@@ -33,7 +34,14 @@ export type Game = {
     // Optional so existing games without this role stay valid until backfilled.
     hyokkaysaika?: OfficialAssignment | null
   }
+  rebounds?: PublicReboundTracking
+  result?: GameResult | null
   createdAt: string
+}
+
+export type GameResult = {
+  home: number
+  away: number
 }
 
 export type Player = {
@@ -215,6 +223,42 @@ export async function deleteGame(gameId: string): Promise<void> {
   if (!res.ok) {
     throw new Error("Ottelun poisto epäonnistui")
   }
+}
+
+export async function getGame(gameId: string, token?: string | null): Promise<Game> {
+  const headers: HeadersInit = {}
+  if (token) headers["X-Rebound-Token"] = token
+  const res = await fetch(`/api/games/${gameId}`, { headers })
+  return parseJsonResponse<Game>(res)
+}
+
+type ReboundActionBody =
+  | { action: "claim"; name: string; token?: string; takeOver?: boolean }
+  | { action: "release"; token: string }
+  | { action: "add"; token: string; basket: "home" | "away"; winner: "home" | "away" }
+  | { action: "remove"; token: string; basket: "home" | "away"; winner: "home" | "away" }
+
+export type ReboundActionResult = PublicReboundTracking & { token?: string }
+
+export async function saveGameResult(gameId: string, result: GameResult): Promise<Game> {
+  const res = await fetch(`/api/games/${gameId}/result`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(result),
+  })
+  return parseJsonResponse<Game>(res)
+}
+
+export async function postReboundAction(
+  gameId: string,
+  body: ReboundActionBody
+): Promise<ReboundActionResult> {
+  const res = await fetch(`/api/games/${gameId}/rebounds`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  return parseJsonResponse<ReboundActionResult>(res)
 }
 
 // Players (teamId required — API does not return all teams' players)

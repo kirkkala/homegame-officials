@@ -85,6 +85,41 @@ export const updateBagHolderSchema = z.object({
   holder: z.object({ name: nameString }).nullable(),
 })
 
+const reboundSide = z.enum(["home", "away"])
+const reboundToken = z.string().min(1).max(100)
+
+const score = z.number().int().min(0).max(199)
+
+export const saveGameResultSchema = z.object({
+  home: score,
+  away: score,
+})
+
+export const reboundActionSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("claim"),
+    name: nameString,
+    token: z.string().max(100).optional(),
+    takeOver: z.boolean().optional(),
+  }),
+  z.object({
+    action: z.literal("release"),
+    token: reboundToken,
+  }),
+  z.object({
+    action: z.literal("add"),
+    token: reboundToken,
+    basket: reboundSide,
+    winner: reboundSide,
+  }),
+  z.object({
+    action: z.literal("remove"),
+    token: reboundToken,
+    basket: reboundSide,
+    winner: reboundSide,
+  }),
+])
+
 // Helper to validate and return parsed data or error response
 export function validate<T>(
   schema: z.ZodSchema<T>,

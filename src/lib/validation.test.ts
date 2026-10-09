@@ -3,6 +3,8 @@ import {
   createGamesSchema,
   createPlayerSchema,
   createTeamSchema,
+  reboundActionSchema,
+  saveGameResultSchema,
   teamManagerSchema,
   updateBagHolderSchema,
   updateGameSchema,
@@ -115,6 +117,20 @@ describe("validation", () => {
     })
   })
 
+  describe("saveGameResultSchema", () => {
+    it("accepts integer scores", () => {
+      expect(validate(saveGameResultSchema, { home: 64, away: 58 })).toEqual({
+        success: true,
+        data: { home: 64, away: 58 },
+      })
+    })
+
+    it("rejects a negative or too large score", () => {
+      expect(validate(saveGameResultSchema, { home: -1, away: 58 }).success).toBe(false)
+      expect(validate(saveGameResultSchema, { home: 64, away: 200 }).success).toBe(false)
+    })
+  })
+
   describe("updateGameSchema", () => {
     it("accepts an empty object (all fields optional)", () => {
       expect(validate(updateGameSchema, {}).success).toBe(true)
@@ -191,6 +207,39 @@ describe("validation", () => {
 
     it("rejects an invalid email", () => {
       expect(validate(teamManagerSchema, { email: "not-an-email" }).success).toBe(false)
+    })
+  })
+
+  describe("reboundActionSchema", () => {
+    it("accepts a claim with a name", () => {
+      const result = validate(reboundActionSchema, { action: "claim", name: "Timo" })
+      expect(result.success).toBe(true)
+    })
+
+    it("accepts add with basket and winner", () => {
+      const result = validate(reboundActionSchema, {
+        action: "add",
+        token: "abc",
+        basket: "home",
+        winner: "away",
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it("rejects add without a token", () => {
+      expect(
+        validate(reboundActionSchema, { action: "add", basket: "home", winner: "home" }).success
+      ).toBe(false)
+    })
+
+    it("accepts remove with basket and winner", () => {
+      const result = validate(reboundActionSchema, {
+        action: "remove",
+        token: "abc",
+        basket: "home",
+        winner: "away",
+      })
+      expect(result.success).toBe(true)
     })
   })
 

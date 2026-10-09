@@ -29,8 +29,11 @@ export default function Home() {
 
               <Typography>
                 Namikan juniorijoukkueen jojo voi tämän sovelluksen avulla jakaa ja hallinnoida
-                kotipelien toimitsijavuorot yhdessä pelaajien vanhempien kanssa. Sovelluksesta
-                löytyy myös ratkaisu ensiapulaukkujen seurannalle.
+                kotipelien toimitsijavuorot yhdessä pelaajien vanhempien kanssa.
+              </Typography>
+              <Typography>
+                Sovelluksesta löytyy myös ratkaisu ensiapulaukkujen seurannalle sekä
+                tilastointitoiminnallisuus levypallovoittojen seurantaan.
               </Typography>
               <Typography>
                 Sovelluksen käyttö ei vaadi kirjautumista muilta kuin joukkueenjohtajalta pelien

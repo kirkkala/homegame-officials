@@ -57,7 +57,12 @@ homegame-officials/
     * The app can be used by team manager or members of the team
 4. **Track First aid kit bags**
     * Manager add the number of First aid kits in the team
-    * Team members can mark who currently has each Fist aid kit    
+    * Team members can mark who currently has each Fist aid kit
+5. **Game stats**
+    * Open a game from the list
+    * One person can claim "Käynnistä tilastointi" (name lock, so stats are not doubled)
+    * Track live score with +1 / +2 / +3 (or the pencil)
+    * Track rebounds
 
 ## Development
 

@@ -1,9 +1,11 @@
 "use client"
 
-import { Place as PlaceIcon } from "@mui/icons-material"
-import { Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material"
+import { Place as PlaceIcon, SportsBasketball as SportsBasketballIcon } from "@mui/icons-material"
+import { Box, Card, CardContent, Chip, Link, Stack, Typography } from "@mui/material"
+import NextLink from "next/link"
+import { hasReboundCounts } from "@/lib/rebounds"
 import type { Game } from "@/lib/storage"
-import { formatDate } from "@/lib/utils"
+import { formatDate, formatGameResult } from "@/lib/utils"
 import { OfficialAssigner } from "./official-assigner"
 
 export function GameCard({
@@ -18,6 +20,8 @@ export function GameCard({
   showShotClock?: boolean
 }) {
   const gameName = `${game.homeTeam} vs. ${game.awayTeam}`
+  const reboundHref = `/ottelu/${game.id}?team=${encodeURIComponent(game.teamId)}`
+  const hasReboundStats = hasReboundCounts(game.rebounds)
   return (
     <Card variant="outlined">
       <CardContent
@@ -29,14 +33,11 @@ export function GameCard({
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr auto" },
-            gridTemplateAreas: {
-              xs: `"meta" "teams" "location"`,
-              sm: `"meta location" "teams ."`,
-            },
-            columnGap: 2,
+            gridTemplateColumns: "minmax(0, 1fr) auto",
+            gridTemplateAreas: `"meta stats" "teams teams" "location location"`,
+            columnGap: 1.5,
             rowGap: 0.5,
-            alignItems: { xs: "start", sm: "center" },
+            alignItems: "start",
             mb: 1,
           }}
         >
@@ -55,9 +56,30 @@ export function GameCard({
               <Chip label="Pelattu" size="small" sx={{ fontSize: "0.7rem", lineHeight: 1.4 }} />
             )}
             <Typography>
-              {formatDate(game.date, { format: "weekday" })} klo {game.time}
+              {formatDate(game.date, { format: "weekdayShort" })} klo {game.time}
             </Typography>
           </Stack>
+
+          <Link
+            component={NextLink}
+            href={reboundHref}
+            data-testid={`game-link-${game.id}`}
+            underline="hover"
+            aria-label={hasReboundStats ? "Tilastot kirjattu" : "Tilastot"}
+            sx={{
+              gridArea: "stats",
+              justifySelf: "end",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              lineHeight: 1.4,
+            }}
+          >
+            {hasReboundStats && <SportsBasketballIcon sx={{ fontSize: "1.15rem" }} />}
+            Tilastot
+          </Link>
 
           {game.location && (
             <Stack
@@ -66,7 +88,6 @@ export function GameCard({
                 alignItems: "center",
                 gap: 0.5,
                 gridArea: "location",
-                justifySelf: { xs: "flex-start", sm: "flex-end" },
               }}
             >
               <PlaceIcon sx={{ fontSize: "1rem", color: "text.secondary" }} />
@@ -82,27 +103,45 @@ export function GameCard({
             </Stack>
           )}
 
-          <Typography
-            variant="body1"
+          <Stack
+            direction="row"
             sx={{
-              fontWeight: game.isHomeGame ? "bold" : "normal",
+              alignItems: "center",
+              gap: 1,
               gridArea: "teams",
-              lineHeight: 1.3,
               mt: 1,
+              minWidth: 0,
             }}
           >
-            {game.homeTeam}
             <Typography
-              component="span"
+              variant="body1"
               sx={{
-                color: "text.secondary",
-                mx: 0.5,
+                fontWeight: game.isHomeGame ? 700 : 400,
+                lineHeight: 1.3,
+                minWidth: 0,
               }}
             >
-              vs.
+              {game.homeTeam}
+              <Typography
+                component="span"
+                sx={{
+                  color: "text.secondary",
+                  mx: 0.5,
+                }}
+              >
+                vs.
+              </Typography>
+              {game.awayTeam}
             </Typography>
-            {game.awayTeam}
-          </Typography>
+            {game.result && (
+              <Typography
+                data-testid={`game-score-${game.id}`}
+                sx={{ fontWeight: 800, whiteSpace: "nowrap", ml: "auto", pl: 1 }}
+              >
+                {formatGameResult(game.result)}
+              </Typography>
+            )}
+          </Stack>
         </Box>
 
         {game.isHomeGame && (
