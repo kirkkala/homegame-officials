@@ -22,10 +22,14 @@ import type { Game, GameResult } from "@/lib/storage"
 const SCORE_MAX = 199
 
 function parseScore(value: string): number | null {
-  if (value.trim() === "") return null
+  if (value.trim() === "") return 0
   const parsed = Number(value)
   if (!Number.isInteger(parsed) || parsed < 0 || parsed > SCORE_MAX) return null
   return parsed
+}
+
+function scoreDraftValue(value: number): string {
+  return value === 0 ? "" : String(value)
 }
 
 export function GameResultForm({
@@ -133,7 +137,7 @@ export function GameResultForm({
           aria-label={editLabel}
           onClick={() => {
             if (scoreLocked) return
-            setDraft({ home: String(scores.home), away: String(scores.away) })
+            setDraft({ home: scoreDraftValue(scores.home), away: scoreDraftValue(scores.away) })
             setError(null)
           }}
           disabled={busy || scoreLocked}
@@ -179,54 +183,26 @@ export function GameResultForm({
         <DialogTitle>Syötä tulos</DialogTitle>
         <DialogContent>
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "flex-start", mt: 0.5 }}>
-            <TextField
+            <ScoreField
               autoFocus
-              type="number"
               label={game.homeTeam}
               value={draft?.home ?? ""}
               disabled={busy}
               error={Boolean(error)}
-              onChange={(event) =>
-                setDraft((prev) => (prev ? { ...prev, home: event.target.value } : prev))
-              }
-              onKeyDown={(event) => {
-                if (event.key === "Enter") void saveDraft()
-              }}
-              slotProps={{
-                htmlInput: {
-                  min: 0,
-                  max: SCORE_MAX,
-                  inputMode: "numeric",
-                  "data-testid": "game-result-dialog-home",
-                  style: { textAlign: "center" },
-                },
-              }}
-              sx={{ flex: 1, minWidth: 0 }}
+              testId="game-result-dialog-home"
+              onChange={(home) => setDraft((prev) => (prev ? { ...prev, home } : prev))}
+              onSave={() => void saveDraft()}
             />
             <Typography sx={{ fontWeight: 700, color: "text.secondary", pt: 2.75 }}>–</Typography>
-            <TextField
-              type="number"
+            <ScoreField
               label={game.awayTeam}
               value={draft?.away ?? ""}
               disabled={busy}
               error={Boolean(error)}
               helperText={error}
-              onChange={(event) =>
-                setDraft((prev) => (prev ? { ...prev, away: event.target.value } : prev))
-              }
-              onKeyDown={(event) => {
-                if (event.key === "Enter") void saveDraft()
-              }}
-              slotProps={{
-                htmlInput: {
-                  min: 0,
-                  max: SCORE_MAX,
-                  inputMode: "numeric",
-                  "data-testid": "game-result-dialog-away",
-                  style: { textAlign: "center" },
-                },
-              }}
-              sx={{ flex: 1, minWidth: 0 }}
+              testId="game-result-dialog-away"
+              onChange={(away) => setDraft((prev) => (prev ? { ...prev, away } : prev))}
+              onSave={() => void saveDraft()}
             />
           </Stack>
         </DialogContent>
@@ -250,6 +226,54 @@ export function GameResultForm({
         </DialogActions>
       </Dialog>
     </Stack>
+  )
+}
+
+function ScoreField({
+  autoFocus,
+  label,
+  value,
+  disabled,
+  error,
+  helperText,
+  testId,
+  onChange,
+  onSave,
+}: {
+  autoFocus?: boolean
+  label: string
+  value: string
+  disabled: boolean
+  error: boolean
+  helperText?: string | null
+  testId: string
+  onChange: (value: string) => void
+  onSave: () => void
+}) {
+  return (
+    <TextField
+      autoFocus={autoFocus}
+      type="number"
+      label={label}
+      value={value}
+      disabled={disabled}
+      error={error}
+      helperText={helperText}
+      onChange={(event) => onChange(event.target.value)}
+      onFocus={(event) => event.target.select()}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") onSave()
+      }}
+      slotProps={{
+        htmlInput: {
+          min: 0,
+          max: SCORE_MAX,
+          "data-testid": testId,
+          style: { textAlign: "center" },
+        },
+      }}
+      sx={{ flex: 1, minWidth: 0 }}
+    />
   )
 }
 

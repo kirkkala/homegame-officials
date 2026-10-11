@@ -112,4 +112,30 @@ describe("GameResultForm", () => {
 
     expect(onSave).toHaveBeenCalledWith({ home: 64, away: 58 })
   })
+
+  it("saves an empty score as zero", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    render(<GameResultForm game={makeGame({ result: { home: 10, away: 8 } })} onSave={onSave} />)
+
+    await user.click(screen.getByRole("button", { name: "Syötä tulos" }))
+    await user.clear(screen.getByTestId("game-result-dialog-home"))
+    await user.click(screen.getByTestId("game-result-dialog-save"))
+
+    expect(onSave).toHaveBeenCalledWith({ home: 0, away: 8 })
+  })
+
+  it("replaces a selected score when typing", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    render(<GameResultForm game={makeGame({ result: { home: 0, away: 0 } })} onSave={onSave} />)
+
+    await user.click(screen.getByRole("button", { name: "Syötä tulos" }))
+    await user.type(screen.getByTestId("game-result-dialog-home"), "64")
+    await user.click(screen.getByTestId("game-result-dialog-away"))
+    await user.type(screen.getByTestId("game-result-dialog-away"), "58")
+    await user.click(screen.getByTestId("game-result-dialog-save"))
+
+    expect(onSave).toHaveBeenCalledWith({ home: 64, away: 58 })
+  })
 })
