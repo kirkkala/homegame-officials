@@ -71,6 +71,7 @@ export type ReboundTracking = {
   counterName: string | null
   counterToken: string | null
   updatedAt: string | null
+  trackBaskets: boolean
 }
 
 export const EMPTY_REBOUND_TRACKING: ReboundTracking = {
@@ -81,6 +82,7 @@ export const EMPTY_REBOUND_TRACKING: ReboundTracking = {
   counterName: null,
   counterToken: null,
   updatedAt: null,
+  trackBaskets: false,
 }
 
 export type GameResult = {

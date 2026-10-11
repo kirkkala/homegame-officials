@@ -96,6 +96,7 @@ describe("GameCard", () => {
         updatedAt: "2026-10-09T05:16:00.000Z",
         counting: false,
         isCounter: false,
+        trackBaskets: false,
       },
     })
 

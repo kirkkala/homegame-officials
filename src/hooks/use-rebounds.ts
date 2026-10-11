@@ -17,6 +17,7 @@ export type ReboundClientAction =
   | { action: "release" }
   | { action: "add"; basket: "home" | "away"; winner: "home" | "away" }
   | { action: "remove"; basket: "home" | "away"; winner: "home" | "away" }
+  | { action: "trackBaskets"; enabled: boolean }
 
 export function useGame(gameId: string) {
   const [token, setToken] = useState<string | null>(null)
@@ -72,6 +73,7 @@ export function useGame(gameId: string) {
             updatedAt: result.updatedAt,
             counting: result.counting,
             isCounter: Boolean(nextToken),
+            trackBaskets: result.trackBaskets,
           },
         }
       })
@@ -81,7 +83,7 @@ export function useGame(gameId: string) {
 
   const saveResult = useCallback(
     async (result: GameResult) => {
-      const updated = await saveGameResult(gameId, result)
+      const updated = await saveGameResult(gameId, result, token)
       queryClient.setQueryData(["game", gameId, token], (prev: Game | undefined) => {
         const base = prev ?? query.data
         if (!base) return updated

@@ -118,6 +118,11 @@ export const reboundActionSchema = z.discriminatedUnion("action", [
     basket: reboundSide,
     winner: reboundSide,
   }),
+  z.object({
+    action: z.literal("trackBaskets"),
+    token: reboundToken,
+    enabled: z.boolean(),
+  }),
 ])
 
 // Helper to validate and return parsed data or error response

@@ -58,6 +58,7 @@ describe("GET /api/games/[id]", () => {
       updatedAt: null,
       counting: true,
       isCounter: true,
+      trackBaskets: false,
     })
     expect(JSON.stringify(body)).not.toContain("secret-token")
   })

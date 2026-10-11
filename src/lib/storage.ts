@@ -237,13 +237,20 @@ type ReboundActionBody =
   | { action: "release"; token: string }
   | { action: "add"; token: string; basket: "home" | "away"; winner: "home" | "away" }
   | { action: "remove"; token: string; basket: "home" | "away"; winner: "home" | "away" }
+  | { action: "trackBaskets"; token: string; enabled: boolean }
 
 export type ReboundActionResult = PublicReboundTracking & { token?: string }
 
-export async function saveGameResult(gameId: string, result: GameResult): Promise<Game> {
+export async function saveGameResult(
+  gameId: string,
+  result: GameResult,
+  token?: string | null
+): Promise<Game> {
+  const headers: HeadersInit = { "Content-Type": "application/json" }
+  if (token) headers["X-Rebound-Token"] = token
   const res = await fetch(`/api/games/${gameId}/result`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(result),
   })
   return parseJsonResponse<Game>(res)

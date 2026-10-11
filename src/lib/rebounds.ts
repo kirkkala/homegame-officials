@@ -9,6 +9,7 @@ export type PublicReboundTracking = {
   updatedAt: string | null
   counting: boolean
   isCounter: boolean
+  trackBaskets: boolean
 }
 
 export type ReboundCountKey = "homeOff" | "homeDef" | "awayOff" | "awayDef"
@@ -47,6 +48,7 @@ export function normalizeRebounds(value: StoredRebounds | null | undefined): Reb
     counterName: value?.counterName ?? null,
     counterToken: value?.counterToken ?? null,
     updatedAt: value?.updatedAt ?? null,
+    trackBaskets: Boolean(value?.trackBaskets),
   }
 }
 
@@ -64,6 +66,7 @@ export function toPublicRebounds(
     updatedAt: normalized.updatedAt,
     counting: Boolean(normalized.counterToken),
     isCounter: Boolean(token && normalized.counterToken && token === normalized.counterToken),
+    trackBaskets: normalized.trackBaskets,
   }
 }
 

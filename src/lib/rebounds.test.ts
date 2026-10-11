@@ -55,6 +55,7 @@ describe("rebounds", () => {
       updatedAt: null,
       counting: true,
       isCounter: false,
+      trackBaskets: false,
     })
     expect(toPublicRebounds(tracking, "secret").isCounter).toBe(true)
     expect(JSON.stringify(toPublicRebounds(tracking, "secret"))).not.toContain("secret")

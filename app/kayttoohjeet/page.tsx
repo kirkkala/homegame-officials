@@ -157,10 +157,11 @@ export default function KayttoohjeetPage() {
             </Stack>
             <Typography>
               Ottelulistasta aukeaa pelisivu &quot;Tilastot&quot;-linkistä. Tilastoinnin voi
-              käynnistää painamalla &quot;Käynnistä tilastointi&quot; ja syötä nimesi – sen jälkeen
-              voit merkitä sekä koreja (+1, +2, +3) että levypalloja samasta näkymästä. Tuloksen
-              pisteluvut voi syöttää myös kerralla kynä-ikonista esimerkiksi pelin päättymisen
-              jälkeen. Tiedot jäävät talteen jälkikäteen tarkasteltavaksi.
+              käynnistää painamalla &quot;Käynnistä&quot; tulostaulun yläpuolelta ja syöttämällä
+              nimesi – sen jälkeen merkitään levypalloja. Jos haluat kirjata myös koreja livenä,
+              avaa &quot;Kirjaa myös korit&quot; – silloin vain tilastoija voi muuttaa tulosta,
+              ettei kukaan toinen näppäile päälle. Muulloin tuloksen voi syöttää kynä-ikonista, myös
+              pelin jälkeen. Tiedot jäävät talteen jälkikäteen tarkasteltavaksi.
             </Typography>
             <Divider />
             <Typography component="h2" variant="h5">

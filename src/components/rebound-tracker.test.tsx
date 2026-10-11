@@ -15,6 +15,7 @@ const emptyRebounds = (overrides: Partial<PublicReboundTracking> = {}): PublicRe
   updatedAt: null,
   counting: false,
   isCounter: false,
+  trackBaskets: false,
   ...overrides,
 })
 
@@ -91,6 +92,26 @@ describe("ReboundTracker", () => {
 
     await user.click(screen.getByTestId("rebound-btn-home-away-remove"))
     expect(onAction).toHaveBeenCalledWith({ action: "remove", basket: "home", winner: "away" })
+  })
+
+  it("persists live basket tracking from the scoreboard toggle", async () => {
+    const user = userEvent.setup()
+    const onAction = vi.fn().mockResolvedValue({})
+    render(
+      <ReboundTracker
+        game={{
+          ...baseGame,
+          rebounds: emptyRebounds({ counterName: "Timo", counting: true, isCounter: true }),
+        }}
+        isCounter
+        onAction={onAction}
+        onSaveResult={vi.fn()}
+      />
+    )
+
+    expect(screen.getByTestId("rebound-release")).toHaveTextContent("Lopeta")
+    await user.click(screen.getByRole("switch", { name: "Kirjaa myös korit" }))
+    expect(onAction).toHaveBeenCalledWith({ action: "trackBaskets", enabled: true })
   })
 
   it("shows a read-only view when someone else is counting", () => {

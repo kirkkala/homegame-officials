@@ -28,16 +28,56 @@ describe("GameResultForm", () => {
 
     expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("10")
     expect(screen.getByTestId("game-result-away-score")).toHaveTextContent("8")
+    expect(screen.getByRole("button", { name: "Syötä tulos" })).toBeEnabled()
     expect(screen.queryByTestId("game-result-home-add-2")).not.toBeInTheDocument()
+    expect(screen.queryByRole("switch", { name: "Kirjaa myös korit" })).not.toBeInTheDocument()
   })
 
-  it("adds 1, 2 or 3 points while tracking", async () => {
-    const user = userEvent.setup()
-    const onSave = vi.fn().mockResolvedValue({})
+  it("locks the pencil for watchers while live basket tracking is on", () => {
     render(
-      <GameResultForm live game={makeGame({ result: { home: 10, away: 8 } })} onSave={onSave} />
+      <GameResultForm
+        trackBaskets
+        game={makeGame({
+          result: { home: 10, away: 8 },
+          rebounds: {
+            homeOff: 0,
+            homeDef: 0,
+            awayOff: 0,
+            awayDef: 0,
+            counterName: "Timo",
+            updatedAt: null,
+            counting: true,
+            isCounter: false,
+            trackBaskets: true,
+          },
+        })}
+        onSave={vi.fn()}
+      />
     )
 
+    expect(screen.getByRole("button", { name: "Timo kirjaa koreja" })).toBeDisabled()
+    expect(screen.queryByRole("heading", { name: "Syötä tulos" })).not.toBeInTheDocument()
+  })
+
+  it("hides +1 +2 +3 until live basket tracking is turned on", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    const onTrackBaskets = vi.fn().mockResolvedValue({})
+    render(
+      <GameResultForm
+        live
+        game={makeGame({ result: { home: 10, away: 8 } })}
+        onSave={onSave}
+        onTrackBaskets={onTrackBaskets}
+      />
+    )
+
+    expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("10")
+    expect(screen.queryByTestId("game-result-home-add-2")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Syötä tulos" })).toBeEnabled()
+
+    await user.click(screen.getByRole("switch", { name: "Kirjaa myös korit" }))
+    expect(onTrackBaskets).toHaveBeenCalledWith(true)
     await user.click(screen.getByTestId("game-result-home-add-2"))
     expect(onSave).toHaveBeenCalledWith({ home: 12, away: 8 })
 
@@ -51,6 +91,7 @@ describe("GameResultForm", () => {
     render(<GameResultForm live game={makeGame()} onSave={onSave} />)
 
     expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("0")
+    await user.click(screen.getByRole("switch", { name: "Kirjaa myös korit" }))
     await user.click(screen.getByTestId("game-result-home-add-1"))
     expect(onSave).toHaveBeenCalledWith({ home: 1, away: 0 })
   })

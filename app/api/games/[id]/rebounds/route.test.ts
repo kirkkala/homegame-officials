@@ -142,4 +142,34 @@ describe("POST /api/games/[id]/rebounds", () => {
     expect(body.counting).toBe(false)
     expect(body.isCounter).toBe(false)
   })
+
+  it("stores live basket tracking and clears it on release", async () => {
+    vi.mocked(getGameById).mockResolvedValue({
+      ...game,
+      rebounds: { ...EMPTY_REBOUND_TRACKING, counterName: "Timo", counterToken: "token-1" },
+    } as never)
+
+    const enabled = await POST(
+      jsonRequest({ action: "trackBaskets", token: "token-1", enabled: true }),
+      { params }
+    )
+    expect(enabled.status).toBe(200)
+    await expect(enabled.json()).resolves.toMatchObject({ trackBaskets: true })
+
+    vi.mocked(getGameById).mockResolvedValue({
+      ...game,
+      rebounds: {
+        ...EMPTY_REBOUND_TRACKING,
+        counterName: "Timo",
+        counterToken: "token-1",
+        trackBaskets: true,
+      },
+    } as never)
+
+    const released = await POST(jsonRequest({ action: "release", token: "token-1" }), { params })
+    await expect(released.json()).resolves.toMatchObject({
+      counting: false,
+      trackBaskets: false,
+    })
+  })
 })

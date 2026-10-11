@@ -51,11 +51,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     let next = tracking
     if (action.action === "release") {
-      next = touchRebounds(tracking, { counterToken: null })
+      next = touchRebounds(tracking, { counterToken: null, trackBaskets: false })
     } else if (action.action === "add") {
       next = adjustReboundCount(tracking, action.basket, action.winner, 1)
     } else if (action.action === "remove") {
       next = adjustReboundCount(tracking, action.basket, action.winner, -1)
+    } else if (action.action === "trackBaskets") {
+      next = touchRebounds(tracking, { trackBaskets: action.enabled })
     }
 
     const updated = await updateGameRebounds(id, next)

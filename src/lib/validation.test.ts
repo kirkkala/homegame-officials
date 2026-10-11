@@ -241,6 +241,15 @@ describe("validation", () => {
       })
       expect(result.success).toBe(true)
     })
+
+    it("accepts toggling live basket tracking", () => {
+      const result = validate(reboundActionSchema, {
+        action: "trackBaskets",
+        token: "abc",
+        enabled: true,
+      })
+      expect(result.success).toBe(true)
+    })
   })
 
   describe("updateBagHolderSchema", () => {

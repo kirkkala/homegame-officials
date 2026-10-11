@@ -61,8 +61,7 @@ homegame-officials/
 5. **Game stats**
     * Open a game from the list
     * One person can claim "Käynnistä tilastointi" (name lock, so stats are not doubled)
-    * Track live score with +1 / +2 / +3 (or the pencil)
-    * Track rebounds
+    * Track rebounds; optionally live score with "Kirjaa myös korit" (+1 / +2 / +3). Pencil is locked on other devices while that is on.
 
 ## Development
 

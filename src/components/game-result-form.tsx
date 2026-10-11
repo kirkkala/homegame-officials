@@ -8,12 +8,14 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   IconButton,
   Stack,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material"
-import { useState } from "react"
+import { type ReactNode, useEffect, useState } from "react"
 import { shortTeamName } from "@/lib/rebounds"
 import type { Game, GameResult } from "@/lib/storage"
 
@@ -30,15 +32,36 @@ export function GameResultForm({
   game,
   onSave,
   live = false,
+  trackBaskets = false,
+  onTrackBaskets,
+  sessionControl,
 }: {
   game: Game
   onSave: (result: GameResult) => Promise<unknown>
   live?: boolean
+  trackBaskets?: boolean
+  onTrackBaskets?: (enabled: boolean) => Promise<unknown>
+  sessionControl?: ReactNode
 }) {
   const scores = game.result ?? { home: 0, away: 0 }
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [basketsOn, setBasketsOn] = useState(trackBaskets)
   const [draft, setDraft] = useState<{ home: string; away: string } | null>(null)
+  const scoreLocked = trackBaskets && !live
+  const editLabel = scoreLocked
+    ? `${game.rebounds?.counterName ?? "Joku"} kirjaa koreja`
+    : "Syötä tulos"
+
+  useEffect(() => {
+    setBasketsOn(trackBaskets)
+  }, [trackBaskets])
+
+  useEffect(() => {
+    if (!scoreLocked) return
+    setDraft(null)
+    setError(null)
+  }, [scoreLocked])
 
   async function save(next: GameResult) {
     setBusy(true)
@@ -64,8 +87,34 @@ export function GameResultForm({
     await save({ home, away })
   }
 
+  async function toggleBaskets(checked: boolean) {
+    setBasketsOn(checked)
+    try {
+      await onTrackBaskets?.(checked)
+    } catch {
+      setBasketsOn(trackBaskets)
+    }
+  }
+
   return (
     <Stack spacing={0.75}>
+      {(live || sessionControl) && (
+        <Stack spacing={0.25} sx={{ alignItems: "flex-start" }}>
+          {sessionControl}
+          {live && (
+            <FormControlLabel
+              sx={{ ml: 0, mr: 0 }}
+              control={
+                <Switch
+                  checked={basketsOn}
+                  onChange={(_, checked) => void toggleBaskets(checked)}
+                />
+              }
+              label="Kirjaa myös korit"
+            />
+          )}
+        </Stack>
+      )}
       <Box
         sx={{
           display: "grid",
@@ -81,18 +130,19 @@ export function GameResultForm({
         <Score testId="home" value={scores.home} />
         <IconButton
           data-testid="game-result-edit"
-          aria-label="Syötä tulos"
+          aria-label={editLabel}
           onClick={() => {
+            if (scoreLocked) return
             setDraft({ home: String(scores.home), away: String(scores.away) })
             setError(null)
           }}
-          disabled={busy}
+          disabled={busy || scoreLocked}
           size="small"
         >
           <EditOutlinedIcon fontSize="small" />
         </IconButton>
         <Score testId="away" value={scores.away} />
-        {live && (
+        {live && basketsOn && (
           <>
             <PointButtons
               testId="home"
