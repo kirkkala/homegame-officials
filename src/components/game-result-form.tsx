@@ -103,22 +103,29 @@ export function GameResultForm({
   return (
     <Stack spacing={0.75}>
       {(live || sessionControl) && (
-        <Stack spacing={0.25} sx={{ alignItems: "flex-start" }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+        >
           {sessionControl}
           {live && (
             <FormControlLabel
-              sx={{ ml: 0, mr: 0 }}
+              sx={{ ml: 0, mr: 0, whiteSpace: "nowrap" }}
               control={
                 <Switch
                   checked={basketsOn}
                   onChange={(_, checked) => void toggleBaskets(checked)}
                 />
               }
-              label="Kirjaa myös korit"
+              label="Kirjaa korit"
             />
           )}
         </Stack>
       )}
+      <Typography variant="h6" component="h3" sx={{ fontWeight: 700 }}>
+        Tulos
+      </Typography>
       <Box
         sx={{
           display: "grid",
@@ -131,7 +138,19 @@ export function GameResultForm({
         <TeamLabel>{shortTeamName(game.homeTeam)}</TeamLabel>
         <span />
         <TeamLabel>{shortTeamName(game.awayTeam)}</TeamLabel>
-        <Score testId="home" value={scores.home} />
+        <Score
+          testId="home"
+          value={scores.home}
+          minus={
+            live && basketsOn ? (
+              <MinusOne
+                testId="home"
+                disabled={busy || scores.home === 0}
+                onClick={() => void save({ ...scores, home: Math.max(0, scores.home - 1) })}
+              />
+            ) : undefined
+          }
+        />
         <IconButton
           data-testid="game-result-edit"
           aria-label={editLabel}
@@ -145,7 +164,19 @@ export function GameResultForm({
         >
           <EditOutlinedIcon fontSize="small" />
         </IconButton>
-        <Score testId="away" value={scores.away} />
+        <Score
+          testId="away"
+          value={scores.away}
+          minus={
+            live && basketsOn ? (
+              <MinusOne
+                testId="away"
+                disabled={busy || scores.away === 0}
+                onClick={() => void save({ ...scores, away: Math.max(0, scores.away - 1) })}
+              />
+            ) : undefined
+          }
+        />
         {live && basketsOn && (
           <>
             <PointButtons
@@ -289,8 +320,23 @@ function TeamLabel({ children }: { children: string }) {
   )
 }
 
-function Score({ testId, value }: { testId: string; value: number }) {
-  return (
+const pointsGridSx = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1.2fr 1fr",
+  gap: 0.75,
+  alignItems: "center",
+}
+
+const pointButtonSx = {
+  minWidth: 0,
+  minHeight: 44,
+  px: 0.5,
+  fontSize: "1.05rem",
+  fontWeight: 700,
+}
+
+function Score({ testId, value, minus }: { testId: string; value: number; minus?: ReactNode }) {
+  const number = (
     <Box
       data-testid={`game-result-${testId}-score`}
       sx={{
@@ -299,10 +345,45 @@ function Score({ testId, value }: { testId: string; value: number }) {
         fontWeight: 800,
         lineHeight: 1.1,
         py: 0.25,
+        gridColumn: minus ? 2 : undefined,
       }}
     >
       {value}
     </Box>
+  )
+  if (!minus) return number
+  return (
+    <Box sx={pointsGridSx}>
+      {minus}
+      {number}
+    </Box>
+  )
+}
+
+function MinusOne({
+  testId,
+  disabled,
+  onClick,
+}: {
+  testId: string
+  disabled: boolean
+  onClick: () => void
+}) {
+  return (
+    <Button
+      data-testid={`game-result-${testId}-remove-1`}
+      variant="outlined"
+      disabled={disabled}
+      onClick={onClick}
+      sx={{
+        ...pointButtonSx,
+        color: "text.secondary",
+        borderColor: "divider",
+        "&:hover": { borderColor: "grey.400", bgcolor: "action.hover" },
+      }}
+    >
+      -1
+    </Button>
   )
 }
 
@@ -316,7 +397,7 @@ function PointButtons({
   onAdd: (points: number) => void
 }) {
   return (
-    <Stack direction="row" spacing={0.75}>
+    <Box sx={pointsGridSx}>
       {[1, 2, 3].map((points) => (
         <Button
           key={points}
@@ -324,18 +405,11 @@ function PointButtons({
           variant="outlined"
           disabled={disabled}
           onClick={() => onAdd(points)}
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            minHeight: 44,
-            px: 0.5,
-            fontSize: "1.05rem",
-            fontWeight: 700,
-          }}
+          sx={pointButtonSx}
         >
           +{points}
         </Button>
       ))}
-    </Stack>
+    </Box>
   )
 }

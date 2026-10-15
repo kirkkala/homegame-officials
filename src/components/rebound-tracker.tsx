@@ -1,11 +1,16 @@
 "use client"
 
-import { SportsBasketball as SportsBasketballIcon, Undo as UndoIcon } from "@mui/icons-material"
+import {
+  ExpandMore as ExpandMoreIcon,
+  SportsBasketball as SportsBasketballIcon,
+  Undo as UndoIcon,
+} from "@mui/icons-material"
 import {
   Alert,
   Box,
   Button,
   Chip,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -24,7 +29,12 @@ import { useEffect, useRef, useState } from "react"
 import { GameResultForm } from "@/components/game-result-form"
 import type { ReboundSide } from "@/db/schema"
 import type { ReboundClientAction } from "@/hooks/use-rebounds"
-import { getSavedCounterName, setSavedCounterName } from "@/lib/rebound-session"
+import {
+  getReboundHelpOpen,
+  getSavedCounterName,
+  setReboundHelpOpen,
+  setSavedCounterName,
+} from "@/lib/rebound-session"
 import { formatReboundUpdatedAt, shortTeamName } from "@/lib/rebounds"
 import type { Game, GameResult } from "@/lib/storage"
 
@@ -113,6 +123,68 @@ function ReboundPad({
   )
 }
 
+function ReboundSection({ isCounter }: { isCounter: boolean }) {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    setOpen(getReboundHelpOpen())
+  }, [])
+
+  return (
+    <Box>
+      <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+        <Typography variant="h6" component="h3" sx={{ fontWeight: 700, flex: 1, minWidth: 0 }}>
+          Levypallot
+        </Typography>
+        {isCounter && (
+          <Button
+            data-testid="rebound-help"
+            size="small"
+            aria-expanded={open}
+            aria-controls="rebound-help-text"
+            onClick={() => {
+              const next = !open
+              setOpen(next)
+              setReboundHelpOpen(next)
+            }}
+            endIcon={
+              <ExpandMoreIcon
+                sx={{
+                  fontSize: 18,
+                  transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: (theme) =>
+                    theme.transitions.create("transform", {
+                      duration: theme.transitions.duration.shortest,
+                    }),
+                }}
+              />
+            }
+            sx={{ flexShrink: 0, minHeight: 32, px: 1, textTransform: "none", fontWeight: 600 }}
+          >
+            {open ? "Sulje ohje" : "Näytä ohje"}
+          </Button>
+        )}
+      </Stack>
+      {isCounter && (
+        <Collapse in={open} unmountOnExit>
+          <Box id="rebound-help-text" sx={{ pt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Merkitse levypallot painamalla sen joukkueen nappia, joka sai pallon. Ylärivi on
+              kotijoukkueen hyökkäyspääty ja alarivi vierasjoukkueen.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Virheellisen merkinnän voit poistaa -1 painikkeesta ison napin alla.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Muista painaa "Lopeta/tallenna" painiketta kun peli on päättynyt.
+            </Typography>
+          </Box>
+        </Collapse>
+      )}
+    </Box>
+  )
+}
+
 function SessionButtons({
   isCounter,
   counting,
@@ -161,19 +233,14 @@ const countSx = {
   fontVariantNumeric: "tabular-nums",
 }
 
-function BasketHeading({ lines }: { lines: [string, string] }) {
+function BasketHeading({ children }: { children: string }) {
   return (
-    <Stack spacing={0.25} sx={{ mb: 1.25 }}>
-      {lines.map((line) => (
-        <Typography
-          key={line}
-          variant="subtitle1"
-          sx={{ fontWeight: 700, fontSize: "0.875rem", lineHeight: 1.25 }}
-        >
-          {line}
-        </Typography>
-      ))}
-    </Stack>
+    <Typography
+      variant="subtitle1"
+      sx={{ fontWeight: 700, fontSize: "0.875rem", lineHeight: 1.25, mb: 1.25 }}
+    >
+      {children}
+    </Typography>
   )
 }
 
@@ -223,8 +290,6 @@ export function ReboundTracker({
   }
   const homeShort = shortTeamName(game.homeTeam)
   const awayShort = shortTeamName(game.awayTeam)
-  const homeAttacks: [string, string] = [`${homeShort} hyökkäys`, `${awayShort} puolustus`]
-  const awayAttacks: [string, string] = [`${homeShort} puolustus`, `${awayShort} hyökkäys`]
 
   const [claimOpen, setClaimOpen] = useState(false)
   const [takeOver, setTakeOver] = useState(false)
@@ -330,8 +395,10 @@ export function ReboundTracker({
         </Alert>
       )}
 
-      <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
-        <BasketHeading lines={homeAttacks} />
+      <ReboundSection isCounter={isCounter} />
+
+      <Stack>
+        <BasketHeading>Kotijoukkueen hyökkäyspääty</BasketHeading>
         <Stack direction="row" spacing={1}>
           <ReboundPad
             testId="rebound-btn-home-home"
@@ -354,10 +421,10 @@ export function ReboundTracker({
             onRemove={() => void remove("home", "away")}
           />
         </Stack>
-      </Paper>
+      </Stack>
 
-      <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
-        <BasketHeading lines={awayAttacks} />
+      <Stack>
+        <BasketHeading>Vierasjoukkueen hyökkäyspääty</BasketHeading>
         <Stack direction="row" spacing={1}>
           <ReboundPad
             testId="rebound-btn-away-home"
@@ -380,7 +447,7 @@ export function ReboundTracker({
             onRemove={() => void remove("away", "away")}
           />
         </Stack>
-      </Paper>
+      </Stack>
 
       <Paper variant="outlined" sx={{ p: { xs: 1, sm: 2 } }}>
         <Table

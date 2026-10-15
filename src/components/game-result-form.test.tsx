@@ -30,7 +30,9 @@ describe("GameResultForm", () => {
     expect(screen.getByTestId("game-result-away-score")).toHaveTextContent("8")
     expect(screen.getByRole("button", { name: "Syötä tulos" })).toBeEnabled()
     expect(screen.queryByTestId("game-result-home-add-2")).not.toBeInTheDocument()
-    expect(screen.queryByRole("switch", { name: "Kirjaa myös korit" })).not.toBeInTheDocument()
+    expect(screen.queryByTestId("game-result-home-remove-1")).not.toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Tulos" })).toBeInTheDocument()
+    expect(screen.queryByRole("switch", { name: "Kirjaa korit" })).not.toBeInTheDocument()
   })
 
   it("locks the pencil for watchers while live basket tracking is on", () => {
@@ -74,12 +76,19 @@ describe("GameResultForm", () => {
 
     expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("10")
     expect(screen.queryByTestId("game-result-home-add-2")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("game-result-home-remove-1")).not.toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Syötä tulos" })).toBeEnabled()
 
-    await user.click(screen.getByRole("switch", { name: "Kirjaa myös korit" }))
+    await user.click(screen.getByRole("switch", { name: "Kirjaa korit" }))
     expect(onTrackBaskets).toHaveBeenCalledWith(true)
     await user.click(screen.getByTestId("game-result-home-add-2"))
     expect(onSave).toHaveBeenCalledWith({ home: 12, away: 8 })
+
+    await user.click(screen.getByTestId("game-result-home-remove-1"))
+    expect(onSave).toHaveBeenCalledWith({ home: 9, away: 8 })
+
+    await user.click(screen.getByTestId("game-result-away-remove-1"))
+    expect(onSave).toHaveBeenCalledWith({ home: 10, away: 7 })
 
     await user.click(screen.getByTestId("game-result-away-add-3"))
     expect(onSave).toHaveBeenCalledWith({ home: 10, away: 11 })
@@ -91,7 +100,9 @@ describe("GameResultForm", () => {
     render(<GameResultForm live game={makeGame()} onSave={onSave} />)
 
     expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("0")
-    await user.click(screen.getByRole("switch", { name: "Kirjaa myös korit" }))
+    await user.click(screen.getByRole("switch", { name: "Kirjaa korit" }))
+    expect(screen.getByTestId("game-result-home-remove-1")).toBeDisabled()
+    expect(screen.getByTestId("game-result-away-remove-1")).toBeDisabled()
     await user.click(screen.getByTestId("game-result-home-add-1"))
     expect(onSave).toHaveBeenCalledWith({ home: 1, away: 0 })
   })

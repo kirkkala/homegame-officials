@@ -1,8 +1,9 @@
 /// <reference types="@testing-library/jest-dom/vitest" />
 
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { ReboundTracker } from "@/components/rebound-tracker"
+import { setReboundHelpOpen } from "@/lib/rebound-session"
 import type { PublicReboundTracking } from "@/lib/rebounds"
 import { makeGame } from "@/test-utils"
 
@@ -26,6 +27,10 @@ const baseGame = makeGame({
 })
 
 describe("ReboundTracker", () => {
+  beforeEach(() => {
+    setReboundHelpOpen(true)
+  })
+
   it("lets a person claim counting", async () => {
     const user = userEvent.setup()
     const onAction = vi.fn().mockResolvedValue({})
@@ -110,7 +115,7 @@ describe("ReboundTracker", () => {
     )
 
     expect(screen.getByTestId("rebound-release")).toHaveTextContent("Lopeta")
-    await user.click(screen.getByRole("switch", { name: "Kirjaa myös korit" }))
+    await user.click(screen.getByRole("switch", { name: "Kirjaa korit" }))
     expect(onAction).toHaveBeenCalledWith({ action: "trackBaskets", enabled: true })
   })
 
@@ -172,10 +177,8 @@ describe("ReboundTracker", () => {
       />
     )
 
-    expect(screen.getByText("Stadi hyökkäys")).toBeInTheDocument()
-    expect(screen.getByText("KlaNMKY puolustus")).toBeInTheDocument()
-    expect(screen.getByText("Stadi puolustus")).toBeInTheDocument()
-    expect(screen.getByText("KlaNMKY hyökkäys")).toBeInTheDocument()
+    expect(screen.getByText("Kotijoukkueen hyökkäyspääty")).toBeInTheDocument()
+    expect(screen.getByText("Vierasjoukkueen hyökkäyspääty")).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Hyökkäys" })).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Puolustus" })).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Yhteensä" })).toBeInTheDocument()
@@ -197,8 +200,8 @@ describe("ReboundTracker", () => {
 
     expect(screen.getByTestId("rebound-btn-home-home")).toHaveTextContent("Helmi Basket")
     expect(screen.getByTestId("rebound-btn-home-away")).toHaveTextContent("HNMKY")
-    expect(screen.getByText("Helmi Basket hyökkäys")).toBeInTheDocument()
-    expect(screen.getByText("HNMKY puolustus")).toBeInTheDocument()
+    expect(screen.getByText("Kotijoukkueen hyökkäyspääty")).toBeInTheDocument()
+    expect(screen.getByText("Vierasjoukkueen hyökkäyspääty")).toBeInTheDocument()
     expect(screen.getByRole("columnheader", { name: "Hyökkäys" })).toBeInTheDocument()
   })
 
@@ -219,5 +222,37 @@ describe("ReboundTracker", () => {
     expect(screen.getByTestId("rebound-btn-home-away")).toHaveTextContent("Helsingin NMKY")
     expect(screen.getByRole("cell", { name: "Tapiolan Honka/Gold" })).toBeInTheDocument()
     expect(screen.getByRole("cell", { name: "Helsingin NMKY/Stadi" })).toBeInTheDocument()
+  })
+
+  it("hides levypallo instructions until this person is counting", () => {
+    render(<ReboundTracker game={baseGame} isCounter={false} onAction={vi.fn()} />)
+
+    expect(screen.getByRole("heading", { name: "Levypallot" })).toBeInTheDocument()
+    expect(screen.queryByTestId("rebound-help")).not.toBeInTheDocument()
+  })
+
+  it("lets the levypallo instructions be collapsed", async () => {
+    const user = userEvent.setup()
+    const countingGame = {
+      ...baseGame,
+      rebounds: emptyRebounds({ counterName: "Timo", counting: true, isCounter: true }),
+    }
+    render(<ReboundTracker game={countingGame} isCounter onAction={vi.fn()} />)
+
+    const heading = screen.getByRole("heading", { name: "Levypallot" })
+    await waitFor(() => {
+      expect(screen.getByText("Sulje ohje")).toBeInTheDocument()
+    })
+    const toggle = screen.getByTestId("rebound-help")
+    expect(heading.parentElement).toContainElement(toggle)
+    expect(screen.getByText(/Ylärivi on kotijoukkueen hyökkäyspääty/)).toBeInTheDocument()
+
+    await user.click(toggle)
+    await waitFor(() => {
+      expect(screen.queryByText(/Ylärivi on kotijoukkueen hyökkäyspääty/)).not.toBeInTheDocument()
+    })
+    expect(screen.getByText("Näytä ohje")).toBeInTheDocument()
+    expect(screen.queryByText("Sulje ohje")).not.toBeInTheDocument()
+    expect(heading.parentElement).toContainElement(screen.getByTestId("rebound-help"))
   })
 })

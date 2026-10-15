@@ -1,4 +1,5 @@
 const NAME_KEY = "rebound-counter-name"
+const HELP_KEY = "rebound-help-open"
 
 function tokenKey(gameId: string) {
   return `rebound-token:${gameId}`
@@ -53,4 +54,12 @@ export function setReboundToken(gameId: string, token: string) {
 
 export function clearReboundToken(gameId: string) {
   removeStorage(tokenKey(gameId))
+}
+
+export function getReboundHelpOpen(): boolean {
+  return readStorage(HELP_KEY) !== "0"
+}
+
+export function setReboundHelpOpen(open: boolean) {
+  writeStorage(HELP_KEY, open ? "1" : "0")
 }
