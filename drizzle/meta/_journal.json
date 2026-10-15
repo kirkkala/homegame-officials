@@ -15,6 +15,13 @@
       "when": 1773586100000,
       "tag": "0001_add_first_aid_team_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778430000000,
+      "tag": "0002_add_game_rebounds",
+      "breakpoints": true
     }
   ]
 }

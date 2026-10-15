@@ -1,7 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { requireTeamManager } from "@/lib/auth-api"
 import { deleteGame, getGameById, updateGame } from "@/lib/db"
+import { toPublicGame } from "@/lib/rebounds"
 import { updateGameSchema, validate } from "@/lib/validation"
+
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const game = await getGameById(id)
+    if (!game) {
+      return NextResponse.json({ error: "Ottelua ei löytynyt" }, { status: 404 })
+    }
+    const token = request.headers.get("X-Rebound-Token")
+    return NextResponse.json(toPublicGame(game, token))
+  } catch (error) {
+    console.error("Failed to get game:", error)
+    return NextResponse.json({ error: "Ottelun haku epäonnistui" }, { status: 500 })
+  }
+}
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -43,7 +59,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const updatedGame = await updateGame(id, updates)
-    return NextResponse.json(updatedGame)
+    if (!updatedGame) {
+      return NextResponse.json({ error: "Ottelua ei löytynyt" }, { status: 404 })
+    }
+    return NextResponse.json(toPublicGame(updatedGame))
   } catch (error) {
     console.error("Failed to update game:", error)
     return NextResponse.json({ error: "Ottelun päivitys epäonnistui" }, { status: 500 })

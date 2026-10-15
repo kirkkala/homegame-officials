@@ -57,7 +57,11 @@ homegame-officials/
     * The app can be used by team manager or members of the team
 4. **Track First aid kit bags**
     * Manager add the number of First aid kits in the team
-    * Team members can mark who currently has each Fist aid kit    
+    * Team members can mark who currently has each Fist aid kit
+5. **Game stats**
+    * Open a game from the list
+    * One person can claim "Käynnistä tilastointi" (name lock, so stats are not doubled)
+    * Track rebounds; optionally live score with "Kirjaa korit" (+1 / +2 / +3). Pencil is locked on other devices while that is on.
 
 ## Development
 
@@ -154,19 +158,12 @@ Preview deployments should not use the production database.
 #### Copy production database
 
 ```bash
-export HOMEGAME_OFFICIALS_PROD_DB="postgresql://user:pass@ep-xxx-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
-export HOMEGAME_OFFICIALS_PREVIEW_DB="postgresql://user:pass@ep-yyy-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+export HOMEGAME_OFFICIALS_PROD_DB="postgresql://..."
 ```
 
 #### Dump (Docker ensures pg_dump is available)
 ```bash
 docker run --rm postgres:17 pg_dump "$HOMEGAME_OFFICIALS_PROD_DB" > prod-backup.sql
-````
-#### Restore to preview
-```bash
-docker run --rm -i postgres:17 psql "$HOMEGAME_OFFICIALS_PREVIEW_DB" \
-  -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-docker run --rm -i postgres:17 psql "$HOMEGAME_OFFICIALS_PREVIEW_DB" < prod-backup.sql
 ```
 
 #### Restore to local

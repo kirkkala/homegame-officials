@@ -1,0 +1,152 @@
+/// <reference types="@testing-library/jest-dom/vitest" />
+
+import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { GameResultForm } from "@/components/game-result-form"
+import { makeGame } from "@/test-utils"
+
+describe("GameResultForm", () => {
+  it("shortens slashed team names on the scoreboard", () => {
+    render(
+      <GameResultForm
+        game={makeGame({
+          homeTeam: "HNMKY/Stadi",
+          awayTeam: "ToPo",
+          result: { home: 10, away: 8 },
+        })}
+        onSave={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText("HNMKY")).toBeInTheDocument()
+    expect(screen.getByText("ToPo")).toBeInTheDocument()
+    expect(screen.queryByText("HNMKY/Stadi")).not.toBeInTheDocument()
+  })
+
+  it("shows the score for watchers without live buttons", () => {
+    render(<GameResultForm game={makeGame({ result: { home: 10, away: 8 } })} onSave={vi.fn()} />)
+
+    expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("10")
+    expect(screen.getByTestId("game-result-away-score")).toHaveTextContent("8")
+    expect(screen.getByRole("button", { name: "Syötä tulos" })).toBeEnabled()
+    expect(screen.queryByTestId("game-result-home-add-2")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("game-result-home-remove-1")).not.toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Tulos" })).toBeInTheDocument()
+    expect(screen.queryByRole("switch", { name: "Kirjaa korit" })).not.toBeInTheDocument()
+  })
+
+  it("locks the pencil for watchers while live basket tracking is on", () => {
+    render(
+      <GameResultForm
+        trackBaskets
+        game={makeGame({
+          result: { home: 10, away: 8 },
+          rebounds: {
+            homeOff: 0,
+            homeDef: 0,
+            awayOff: 0,
+            awayDef: 0,
+            counterName: "Timo",
+            updatedAt: null,
+            counting: true,
+            isCounter: false,
+            trackBaskets: true,
+          },
+        })}
+        onSave={vi.fn()}
+      />
+    )
+
+    expect(screen.getByRole("button", { name: "Timo kirjaa koreja" })).toBeDisabled()
+    expect(screen.queryByRole("heading", { name: "Syötä tulos" })).not.toBeInTheDocument()
+  })
+
+  it("hides +1 +2 +3 until live basket tracking is turned on", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    const onTrackBaskets = vi.fn().mockResolvedValue({})
+    render(
+      <GameResultForm
+        live
+        game={makeGame({ result: { home: 10, away: 8 } })}
+        onSave={onSave}
+        onTrackBaskets={onTrackBaskets}
+      />
+    )
+
+    expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("10")
+    expect(screen.queryByTestId("game-result-home-add-2")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("game-result-home-remove-1")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Syötä tulos" })).toBeEnabled()
+
+    await user.click(screen.getByRole("switch", { name: "Kirjaa korit" }))
+    expect(onTrackBaskets).toHaveBeenCalledWith(true)
+    await user.click(screen.getByTestId("game-result-home-add-2"))
+    expect(onSave).toHaveBeenCalledWith({ home: 12, away: 8 })
+
+    await user.click(screen.getByTestId("game-result-home-remove-1"))
+    expect(onSave).toHaveBeenCalledWith({ home: 9, away: 8 })
+
+    await user.click(screen.getByTestId("game-result-away-remove-1"))
+    expect(onSave).toHaveBeenCalledWith({ home: 10, away: 7 })
+
+    await user.click(screen.getByTestId("game-result-away-add-3"))
+    expect(onSave).toHaveBeenCalledWith({ home: 10, away: 11 })
+  })
+
+  it("starts from zero when no result is saved yet", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    render(<GameResultForm live game={makeGame()} onSave={onSave} />)
+
+    expect(screen.getByTestId("game-result-home-score")).toHaveTextContent("0")
+    await user.click(screen.getByRole("switch", { name: "Kirjaa korit" }))
+    expect(screen.getByTestId("game-result-home-remove-1")).toBeDisabled()
+    expect(screen.getByTestId("game-result-away-remove-1")).toBeDisabled()
+    await user.click(screen.getByTestId("game-result-home-add-1"))
+    expect(onSave).toHaveBeenCalledWith({ home: 1, away: 0 })
+  })
+
+  it("lets both scores be entered in one dialog", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    render(<GameResultForm game={makeGame({ result: { home: 10, away: 8 } })} onSave={onSave} />)
+
+    await user.click(screen.getByRole("button", { name: "Syötä tulos" }))
+    const home = screen.getByTestId("game-result-dialog-home")
+    const away = screen.getByTestId("game-result-dialog-away")
+    await user.clear(home)
+    await user.type(home, "64")
+    await user.clear(away)
+    await user.type(away, "58")
+    await user.click(screen.getByTestId("game-result-dialog-save"))
+
+    expect(onSave).toHaveBeenCalledWith({ home: 64, away: 58 })
+  })
+
+  it("saves an empty score as zero", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    render(<GameResultForm game={makeGame({ result: { home: 10, away: 8 } })} onSave={onSave} />)
+
+    await user.click(screen.getByRole("button", { name: "Syötä tulos" }))
+    await user.clear(screen.getByTestId("game-result-dialog-home"))
+    await user.click(screen.getByTestId("game-result-dialog-save"))
+
+    expect(onSave).toHaveBeenCalledWith({ home: 0, away: 8 })
+  })
+
+  it("replaces a selected score when typing", async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn().mockResolvedValue({})
+    render(<GameResultForm game={makeGame({ result: { home: 0, away: 0 } })} onSave={onSave} />)
+
+    await user.click(screen.getByRole("button", { name: "Syötä tulos" }))
+    await user.type(screen.getByTestId("game-result-dialog-home"), "64")
+    await user.click(screen.getByTestId("game-result-dialog-away"))
+    await user.type(screen.getByTestId("game-result-dialog-away"), "58")
+    await user.click(screen.getByTestId("game-result-dialog-save"))
+
+    expect(onSave).toHaveBeenCalledWith({ home: 64, away: 58 })
+  })
+})

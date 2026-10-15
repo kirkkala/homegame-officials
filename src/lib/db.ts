@@ -22,9 +22,12 @@ export type {
   FirstAidBags,
   FirstAidBagsData,
   Game,
+  GameResult,
   OfficialAssignment,
   Officials,
   Player,
+  ReboundSide,
+  ReboundTracking,
   Team,
   TeamManager,
   User,
@@ -179,9 +182,9 @@ export async function getGames(teamId?: string) {
   return db.select().from(schema.games).orderBy(schema.games.date, schema.games.time)
 }
 
-export async function getGameById(id: string) {
+export async function getGameById(id: string): Promise<schema.Game | null> {
   const result = await db.select().from(schema.games).where(eq(schema.games.id, id))
-  return result[0] || null
+  return result[0] ?? null
 }
 
 export async function createGames(games: Omit<schema.NewGame, "createdAt">[], teamId: string) {
@@ -284,6 +287,30 @@ export async function updateGame(
     .returning()
 
   return result[0]
+}
+
+export async function updateGameResult(
+  id: string,
+  result: schema.GameResult
+): Promise<schema.Game | null> {
+  const updated = await db
+    .update(schema.games)
+    .set({ result })
+    .where(eq(schema.games.id, id))
+    .returning()
+  return updated[0] ?? null
+}
+
+export async function updateGameRebounds(
+  id: string,
+  rebounds: schema.ReboundTracking
+): Promise<schema.Game | null> {
+  const updated = await db
+    .update(schema.games)
+    .set({ rebounds })
+    .where(eq(schema.games.id, id))
+    .returning()
+  return updated[0] ?? null
 }
 
 export async function deleteGame(id: string) {
