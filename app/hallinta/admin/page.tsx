@@ -4,9 +4,9 @@ import { ArrowBack as ArrowBackIcon } from "@mui/icons-material"
 import {
   Box,
   Button,
-  Chip,
   CircularProgress,
   Container,
+  Divider,
   Paper,
   Stack,
   Typography,
@@ -131,37 +131,55 @@ export default function AdminPage() {
                 Ei rekisteröityneitä käyttäjiä.
               </Typography>
             ) : (
-              <Stack
-                sx={{
-                  gap: 1,
-                }}
-              >
+              <Stack divider={<Divider />}>
                 {users.map((u) => (
-                  <Stack
+                  <Box
                     key={u.id}
-                    direction="row"
                     sx={{
-                      flexWrap: "wrap",
-                      alignItems: "center",
-                      gap: 1,
+                      py: 1.5,
                     }}
                   >
-                    <Chip label={u.email} />
+                    <Typography
+                      sx={{
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      {u.email}
+                    </Typography>
                     {u.teams.length > 0 ? (
-                      u.teams.map((t) => (
-                        <Chip key={t.id} label={t.name} size="small" variant="outlined" />
-                      ))
+                      <Box
+                        component="ul"
+                        sx={{
+                          m: 0,
+                          mt: 0.5,
+                          pl: 2.5,
+                        }}
+                      >
+                        {u.teams.map((t) => (
+                          <Typography
+                            key={t.id}
+                            component="li"
+                            variant="body2"
+                            sx={{
+                              color: "text.secondary",
+                            }}
+                          >
+                            {t.name}
+                          </Typography>
+                        ))}
+                      </Box>
                     ) : (
                       <Typography
                         variant="body2"
                         sx={{
+                          mt: 0.5,
                           color: "text.secondary",
                         }}
                       >
                         ei hallittavia joukkueita
                       </Typography>
                     )}
-                  </Stack>
+                  </Box>
                 ))}
               </Stack>
             )}
